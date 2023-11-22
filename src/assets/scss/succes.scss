@@ -1,0 +1,186 @@
+// Success
+
+.order-code > a {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+
+    display: inline-block;
+
+    padding: 18px 63px 17px;
+
+    text-transform: uppercase;
+
+    color: #363f4d;
+    border-radius: 50px;
+    background-color: #f2f2f2;
+    @media #{$md-layout} {
+      font-size: 13px;
+
+      padding: 18px 25px 17px;
+    }
+    @media #{$xs-layout} {
+      margin: 0 0 15px;
+      padding: 18px 40px 17px;
+    }
+    &:hover {
+      color: #fff;
+      background-color: $theme-color;
+    }
+  }
+
+.order-nav {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+
+  padding: 10px 15px;
+
+  text-transform: uppercase;
+
+  color: #fff;
+  border: none;
+  background: none;
+  background-color: $theme-color;
+  &:hover,
+  &.active {
+    background-color: #333;
+    color: #fff;
+  }
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.order-tracking-table-content {
+  table {
+    border: 1px solid #ebebeb;
+    thead > tr, tfoot > tr {
+      border: 1px solid #ebebeb;
+      background-color: #f9f9f9;
+      th {
+        font-size: 14px;
+        font-weight: 500;
+
+        padding: 21px 45px 22px;
+
+        text-align: center;
+        vertical-align: middle;
+        white-space: nowrap;
+        text-transform: uppercase;
+
+        color: #333;
+        border-top: medium none;
+        @media #{$lg-layout} {
+          padding: 21px 35px 22px;
+        }
+        @media #{$xs-layout} {
+          padding: 21px 20px 22px;
+        }
+      }
+    }
+    tbody > tr {
+      border-bottom: 1px solid #ebebeb;
+      td.value {
+
+        padding: 30px 0 30px 30px;
+
+        text-align: left;
+        a {
+          font-size: 15px;
+          font-weight: 500;
+
+          color: #333;
+          &:hover {
+            color: $theme-color;
+          }
+        }
+      }
+      td.field {
+        width: 25%;
+        font-size: 15px;
+
+        padding: 30px 0 30px 30px;
+
+        text-align: left;
+
+        color: #333;
+
+        @media #{$xs-layout} {
+          width: 50%;
+        }
+      }
+    }
+  }
+}
+
+.coupon-container{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .coupon-card{
+    background: linear-gradient(135deg, #7158fe, #9d4de6);
+    color: #fff;
+    text-align: center;
+    padding: 40px 80px;
+    border-radius: 15px;
+    box-shadow: 0 10px 10px 0 rgba(0,0,0,0.15);
+    position: relative;
+  
+  }
+  .logo{
+    width: 80px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  
+  }
+  .coupon-card h3{
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 40px;
+  
+  }
+  .coupon-card p{
+    font-size: 15px;
+  
+  }
+  .coupon-row{
+    display: flex;
+    align-items: center;
+    margin: 25px auto;
+    width: fit-content;
+  
+  }
+  #cpnCode{
+    border: 1px dashed #fff;
+    padding: 10px 20px;
+    border-right: 0;
+  
+  }
+  #cpnBtn{
+    border: 1px solid #fff;
+    background: #fff;
+    padding: 10px 20px;
+    color: #7158fe;
+    cursor: pointer;
+  }
+  .circle1, .circle2{
+    background: #f0fff3;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  
+  }
+  .circle1{
+    left: -25px;
+  }
+  .circle2{
+    right: -25px;
+  }
+  
+}

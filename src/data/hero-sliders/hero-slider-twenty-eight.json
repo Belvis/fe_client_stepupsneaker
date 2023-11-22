@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "title": "Ưu Đãi Đặc Biệt",
+    "subtitle": "Nhận Ngay <br /> Quà Tặng",
+    "image": "images/slider/slider-01.png",
+    "url": "/shop"
+  },
+  {
+    "id": 2,
+    "title": "Bộ Sưu Tập Của Năm",
+    "subtitle": "Ưu Đãi <br /> Cuối Cùng 2024",
+    "image": "images/slider/slider-02.jpg",
+    "url": "/shop"
+  }
+]
