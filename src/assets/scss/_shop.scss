@@ -245,8 +245,8 @@
         background: none;
         box-shadow: 0 0 12px 0.8px rgba(0, 0, 0, 0.1);
         &:hover {
-          color: #fff;
-          background-color: $theme-color;
+          color: #fff !important;
+          background-color: $theme-color !important;
         }
       }
       a.active {
@@ -437,6 +437,29 @@
     }
     @media #{$xs-layout} {
       padding: 0 15px;
+    }
+  }
+}
+.ant-pagination {
+
+  .ant-pagination-item-active{
+    color: $theme-color;
+    border: none;
+
+  }
+
+  .ant-pagination-item {
+
+    &:not(.ant-pagination-item-active):hover {
+      background-color: transparent;
+    }
+  }
+
+  & .ant-pagination-jump-next {
+    & .ant-pagination-item-container {
+      & .ant-pagination-item-link-icon {
+        color: #ffffff;
+      }
     }
   }
 }

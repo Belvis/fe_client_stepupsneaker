@@ -20,7 +20,7 @@ const persistConfig = {
   key: "suns",
   version: 1.1,
   storage,
-  blacklist: ["order"],
+  // blacklist: ["order"],
 };
 
 export const rootReducer = combineReducers({

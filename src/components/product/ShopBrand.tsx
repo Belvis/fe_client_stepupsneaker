@@ -1,49 +1,52 @@
 import React from "react";
 import { setActiveSort } from "../../helpers/product";
-import { IStyleResponse } from "../../interfaces";
+import { IBrandResponse } from "../../interfaces";
 import { Collapse, CollapseProps } from "antd";
 
-interface ShopStylesProps {
-  styles: IStyleResponse[];
+interface ShopBrandProps {
+  brands: IBrandResponse[];
   updateFilterParams: (field: string, value: string) => void;
 }
 
-const ShopStyles: React.FC<ShopStylesProps> = ({
-  styles,
+const ShopBrand: React.FC<ShopBrandProps> = ({
+  brands,
   updateFilterParams,
 }) => {
   const items: CollapseProps["items"] = [
     {
-      key: "style",
-      label: <h4 className="pro-sidebar-title">Kiểu dáng</h4>,
+      key: "brand",
+      label: <h4 className="pro-sidebar-title">Nhãn hiệu</h4>,
       children: (
-        <div className="sidebar-widget-list mt-30">
-          {styles ? (
+        <div className="sidebar-widget-list mt-20">
+          {brands ? (
             <ul>
               <li>
                 <div className="sidebar-widget-list-left">
                   <button
                     onClick={(e) => {
-                      updateFilterParams("style", "");
+                      updateFilterParams("brand", "");
                       setActiveSort(e);
                     }}
                   >
-                    <span className="checkmark" /> Tất cả
+                    <span className="checkmark" />
+                    Tất cả{" "}
                   </button>
                 </div>
               </li>
-              {styles.map((style, key) => {
+              {brands.map((brand, key) => {
                 return (
                   <li key={key}>
                     <div className="sidebar-widget-list-left">
                       <button
+                        className="text-uppercase"
                         onClick={(e) => {
-                          updateFilterParams("style", style.id);
+                          updateFilterParams("brand", brand.id);
                           setActiveSort(e);
                         }}
                       >
                         {" "}
-                        <span className="checkmark" /> {style.name}{" "}
+                        <span className="checkmark" />
+                        {brand.name}{" "}
                       </button>
                     </div>
                   </li>
@@ -51,18 +54,17 @@ const ShopStyles: React.FC<ShopStylesProps> = ({
               })}
             </ul>
           ) : (
-            "Không tìm thấy màu sắc"
+            "Không tìm thấy nhãn hiệu"
           )}
         </div>
       ),
     },
   ];
-
   return (
-    <div className="sidebar-widget">
+    <div className="sidebar-widget mt-40">
       <Collapse ghost items={items} />
     </div>
   );
 };
 
-export default ShopStyles;
+export default ShopBrand;

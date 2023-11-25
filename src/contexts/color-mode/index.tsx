@@ -62,6 +62,20 @@ export const ColorModeContextProvider: React.FC<PropsWithChildren> = ({
           //   // colorBgContainer: '#f6ffed',
           // },
           components: {
+            Steps: {
+              iconSize: 48,
+              customIconSize: 48,
+              customIconFontSize: 30,
+              titleLineHeight: 32,
+              iconFontSize: 30,
+              descriptionMaxWidth: 180,
+              fontSize: 16,
+              fontSizeLG: 20,
+            },
+            Pagination: {
+              // itemActiveBg: mode === "light" ? "#fb5231" : undefined,
+              itemSize: 48,
+            },
             Table: {
               headerBg: mode === "light" ? "#fb5231" : "#141414",
               headerColor: mode === "light" ? "#ffffff" : undefined,

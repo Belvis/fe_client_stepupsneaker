@@ -58,13 +58,13 @@ const cartSlice = createSlice({
         });
       }
 
-      cogoToast.success("Added To Cart", { position: "bottom-left" });
+      cogoToast.success("Added To Cart", { position: "top-center" });
     },
     deleteFromCart(state, action: PayloadAction<string | undefined>) {
       state.cartItems = state.cartItems.filter(
         (item) => item.id !== action.payload
       );
-      cogoToast.error("Removed From Cart", { position: "bottom-left" });
+      cogoToast.error("Removed From Cart", { position: "top-center" });
     },
     decreaseQuantity(state, action: PayloadAction<ICartItem>) {
       const product = action.payload;
@@ -72,7 +72,7 @@ const cartSlice = createSlice({
         state.cartItems = state.cartItems.filter(
           (item) => item.cartItemId !== product.cartItemId
         );
-        cogoToast.error("Removed From Cart", { position: "bottom-left" });
+        cogoToast.error("Removed From Cart", { position: "top-center" });
       } else {
         state.cartItems = state.cartItems.map((item) =>
           item.cartItemId === product.cartItemId
@@ -80,7 +80,7 @@ const cartSlice = createSlice({
             : item
         );
         cogoToast.warn("Item Decremented From Cart", {
-          position: "bottom-left",
+          position: "top-center",
         });
       }
     },

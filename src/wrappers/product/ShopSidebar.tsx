@@ -5,11 +5,17 @@ import ShopStyles from "../../components/product/ShopStyles";
 import ShopColor from "../../components/product/ShopColor";
 import ShopSize from "../../components/product/ShopSize";
 import {
+  IBrandResponse,
   IColorResponse,
+  IMaterialResponse,
   ISizeResponse,
+  ISoleResponse,
   IStyleResponse,
 } from "../../interfaces";
 import { HttpError, useList } from "@refinedev/core";
+import ShopBrand from "../../components/product/ShopBrand";
+import ShopMaterial from "../../components/product/ShopMaterial";
+import ShopSole from "../../components/product/ShopSole";
 
 interface ShopSidebarProps {
   updateFilterParams: (field: string, value: string) => void;
@@ -29,6 +35,12 @@ const ShopSidebar: React.FC<ShopSidebarProps> = ({
     pagination: {
       pageSize: 1000,
     },
+    sorters: [
+      {
+        field: "name",
+        order: "asc",
+      },
+    ],
   });
 
   const {
@@ -40,6 +52,12 @@ const ShopSidebar: React.FC<ShopSidebarProps> = ({
     pagination: {
       pageSize: 1000,
     },
+    sorters: [
+      {
+        field: "name",
+        order: "asc",
+      },
+    ],
   });
 
   const {
@@ -51,11 +69,71 @@ const ShopSidebar: React.FC<ShopSidebarProps> = ({
     pagination: {
       pageSize: 1000,
     },
+    sorters: [
+      {
+        field: "name",
+        order: "asc",
+      },
+    ],
+  });
+
+  const {
+    data: brandData,
+    isLoading: isBrandLoading,
+    isError: isBrandError,
+  } = useList<IBrandResponse, HttpError>({
+    resource: "brands",
+    pagination: {
+      pageSize: 1000,
+    },
+    sorters: [
+      {
+        field: "name",
+        order: "asc",
+      },
+    ],
+  });
+
+  const {
+    data: materialData,
+    isLoading: isMaterialLoading,
+    isError: isMaterialError,
+  } = useList<IMaterialResponse, HttpError>({
+    resource: "materials",
+    pagination: {
+      pageSize: 1000,
+    },
+    sorters: [
+      {
+        field: "name",
+        order: "asc",
+      },
+    ],
+  });
+
+  const {
+    data: soleData,
+    isLoading: isSoleLoading,
+    isError: isSoleError,
+  } = useList<ISoleResponse, HttpError>({
+    resource: "soles",
+    pagination: {
+      pageSize: 1000,
+    },
+    sorters: [
+      {
+        field: "name",
+        order: "asc",
+      },
+    ],
   });
 
   const uniqueStyles = styleData?.data ? styleData.data : [];
   const uniqueColors = colorData?.data ? colorData.data : [];
   const uniqueSizes = sizeData?.data ? sizeData.data : [];
+  const uniqueBrands = brandData?.data ? brandData.data : [];
+  const uniqueMaterials = materialData?.data ? materialData.data : [];
+  const uniqueSoles = soleData?.data ? soleData.data : [];
 
   return (
     <div className={clsx("sidebar-style", sideSpaceClass)}>
@@ -76,6 +154,21 @@ const ShopSidebar: React.FC<ShopSidebarProps> = ({
 
       {/* filter by size */}
       <ShopSize sizes={uniqueSizes} updateFilterParams={updateFilterParams} />
+
+      {/* filter by brand */}
+      <ShopBrand
+        brands={uniqueBrands}
+        updateFilterParams={updateFilterParams}
+      />
+
+      {/* filter by material */}
+      <ShopMaterial
+        materials={uniqueMaterials}
+        updateFilterParams={updateFilterParams}
+      />
+
+      {/* filter by sole */}
+      <ShopSole soles={uniqueSoles} updateFilterParams={updateFilterParams} />
 
       {/* filter by tag */}
     </div>

@@ -43,7 +43,7 @@ const ProductGridSingleTwo: React.FC<ProductGridSingleTwoProps> = ({
     <Fragment>
       <div className={clsx("product-wrap-8", spaceBottomClass, colorClass)}>
         <div className="product-img">
-          <Link to={product.id}>
+          <Link to={"/product/" + product.id}>
             <img
               className="default-img img-fluid"
               src={product.image[0]}

@@ -1,28 +1,53 @@
 import { Fragment, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getDiscountPrice } from "../../helpers/product";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { RootState } from "../../redux/store";
-import { NumberField } from "@refinedev/antd";
+import { NumberField, useModal } from "@refinedev/antd";
 import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { IDistrict, IProvince, IWard } from "../../interfaces";
-import { Form } from "antd";
-import { useCreate, useCustom } from "@refinedev/core";
+import {
+  IDistrict,
+  IProvince,
+  IVoucherResponse,
+  IWard,
+} from "../../interfaces";
+import { Form, Radio, RadioChangeEvent, Space, Spin, Tooltip } from "antd";
+import Accordion from "react-bootstrap/Accordion";
+
+import {
+  HttpError,
+  useApiUrl,
+  useCreate,
+  useCustom,
+  useCustomMutation,
+  useList,
+  useNotification,
+} from "@refinedev/core";
 import { useNavigate } from "react-router-dom";
+import { clearOrder, setOrder } from "../../redux/slices/order-slice";
+import { deleteAllFromCart } from "../../redux/slices/cart-slice";
+import { ContainerOutlined } from "@ant-design/icons";
+import VoucherModal from "../../components/voucher/VoucherModal";
+import { dataProvider } from "../../api/dataProvider";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
 const GHN_TOKEN = import.meta.env.VITE_GHN_USER_TOKEN;
 
-const Checkout = () => {
+const CheckOut = () => {
   const { t } = useTranslation();
+  const { open } = useNotification();
 
   useDocumentTitle(t("nav.pages.checkout") + " | SUNS");
-  const { mutate } = useCreate();
+  const { mutate, isLoading } = useCreate();
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const API_URL = useApiUrl();
+  const { getList } = dataProvider(API_URL);
 
   let { pathname } = useLocation();
   const currency = useSelector((state: RootState) => state.currency);
@@ -45,15 +70,37 @@ const Checkout = () => {
     date_of_birth: number;
     order_note: string;
   }>();
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    "Cash" | "Card"
+  >("Cash");
+  const [voucherCode, setVoucherCode] = useState("");
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setVoucherCode(event.target.value);
+  };
+
+  const handlePaymentMethodChange = (e: RadioChangeEvent) => {
+    setSelectedPaymentMethod(e.target.value);
+  };
 
   const [provinces, setProvinces] = useState<IProvince[]>([]);
   const [districts, setDistricts] = useState<IDistrict[]>([]);
   const [wards, setWards] = useState<IWard[]>([]);
   const provinceId = Form.useWatch("provinceId", form);
   const districtId = Form.useWatch("districtId", form);
-  const [provinceName, setProvinceName] = useState("");
-  const [districtName, setDistrictName] = useState("");
-  const [wardName, setWardName] = useState("");
+  const wardCode = Form.useWatch("wardCode", form);
+  const [provinceName, setProvinceName] = useState(
+    order.address ? order.address.provinceName || "" : ""
+  );
+  const [districtName, setDistrictName] = useState(
+    order.address ? order.address.districtName || "" : ""
+  );
+  const [wardName, setWardName] = useState(
+    order.address ? order.address.wardName || "" : ""
+  );
+
+  const { mutate: calculateFeeMutate, isLoading: isLoadingFee } =
+    useCustomMutation<any>();
 
   const { isLoading: isLoadingProvince, refetch: refetchProvince } = useCustom<
     IProvince[]
@@ -134,16 +181,100 @@ const Checkout = () => {
     }
   }, [districtId]);
 
-  const handleProvinceChange = (value: number, option: any) => {
-    setProvinceName(option.label);
+  useEffect(() => {
+    if (provinceId && districtId && wardCode) {
+      calculateFeeMutate(
+        {
+          url: `${GHN_API_BASE_URL}/v2/shipping-order/fee`,
+          method: "post",
+          values: {
+            from_district_id: 1542,
+            service_id: 53321,
+            to_district_id: Number(districtId),
+            to_ward_code: wardCode,
+            height: 15,
+            length: 15,
+            weight: 500,
+            width: 15,
+            insurance_value: 500000,
+          },
+          config: {
+            headers: {
+              "Content-Type": "application/json",
+              Token: GHN_TOKEN,
+              ShopId: GHN_SHOP_ID,
+            },
+          },
+          successNotification: false,
+          errorNotification: (data, values) => {
+            return {
+              message: `Đã xảy ra lỗi`,
+              description: "Lỗi tính tiền ship",
+              type: "error",
+            };
+          },
+        },
+        {
+          onError: (error, variables, context) => {
+            console.log("An error occurred! ", +error);
+          },
+          onSuccess: (data: any, variables, context) => {
+            dispatch(
+              setOrder({
+                ...order,
+                address: {
+                  ...order.address,
+                  provinceName: provinceName,
+                  districtName: districtName,
+                  wardName: wardName,
+                  provinceId: provinceId,
+                  districtId: districtId,
+                  wardCode: form.getFieldValue("wardCode"),
+                },
+                shippingMoney: data?.response.data.total as number,
+              })
+            );
+          },
+        }
+      );
+    }
+  }, [provinceId, districtId, wardCode]);
+
+  const handleProvinceChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedProvinceID = Number(event.target.value);
+    const selectedProvince = provinces.find(
+      (p) => p.ProvinceID === selectedProvinceID
+    );
+
+    if (selectedProvince) {
+      const provinceName = selectedProvince.ProvinceName;
+      setProvinceName(provinceName);
+    }
   };
 
-  const handleDistrictChange = (value: number, option: any) => {
-    setDistrictName(option.label);
+  const handleDistrictChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedDistrictID = Number(event.target.value);
+    const selectedDistrict = districts.find(
+      (d) => d.DistrictID === selectedDistrictID
+    );
+
+    if (selectedDistrict) {
+      const districtName = selectedDistrict.DistrictName;
+      setDistrictName(districtName);
+    }
   };
 
-  const handleWardChange = (value: string, option: any) => {
-    setWardName(option.label);
+  const handleWardChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedWard = wards.find((w) => w.WardCode === event.target.value);
+
+    if (selectedWard) {
+      const wardName = selectedWard.WardName;
+      setWardName(wardName);
+    }
   };
 
   function onFinish(values: {
@@ -161,50 +292,130 @@ const Checkout = () => {
     4;
     const simplifiedCartItems: { id: string; quantity: number }[] =
       cartItems.map((item) => {
-        const { id, quantity } = item;
-        return { id, quantity };
+        const {
+          selectedProductSize: { productDetailId },
+          quantity,
+        } = item;
+        return { id: productDetailId, quantity };
       });
     const submitData = {
       customer: "",
       employee: "",
-      voucher: order.voucher.id,
+      voucher: order.voucher ? order.voucher.id : "",
       phoneNumber: values.phone_number,
       fullName: values.full_name,
       shippingMoney,
       note: values.order_note,
+      paymentMethod: selectedPaymentMethod,
       addressShipping: {
         phoneNumber: values.phone_number,
         districtId: values.districtId,
-        districtName: "",
+        districtName: districtName,
         provinceId: values.provinceId,
-        provinceName: "",
+        provinceName: provinceName,
         wardCode: values.wardCode,
-        wardName: "",
+        wardName: wardName,
         more: values.line,
       },
       cartItems: simplifiedCartItems,
     };
-    console.log(submitData);
 
-    return;
     mutate(
       {
         resource: "orders",
         values: submitData,
+        successNotification: false,
+        errorNotification: false,
       },
       {
         onError: (error, variables, context) => {
           console.log("An error occurred! " + error.message);
         },
         onSuccess: (data, variables, context) => {
-          navigate("/success/" + data.data.id);
+          setTimeout(() => {
+            dispatch(clearOrder());
+            dispatch(deleteAllFromCart());
+          }, 3000);
+
+          if (selectedPaymentMethod === "Cash") {
+            navigate("/success/" + data.data.id);
+          } else {
+            window.location.href = data.data + "";
+          }
         },
       }
     );
   }
 
+  const {
+    data,
+    isLoading: isLoadingVoucher,
+    isError,
+  } = useList<IVoucherResponse, HttpError>({
+    resource: "vouchers",
+    pagination: {
+      pageSize: 1000,
+    },
+  });
+
+  const vouchers = data?.data ? data?.data : [];
+
+  const {
+    show,
+    close,
+    modalProps: { visible, ...restModalProps },
+  } = useModal();
+
+  const applyVoucher = async (event: React.FormEvent) => {
+    try {
+      event.preventDefault();
+
+      const { data } = await getList<IVoucherResponse>({
+        resource: "vouchers",
+        filters: [
+          {
+            field: "code",
+            operator: "eq",
+            value: voucherCode,
+          },
+        ],
+      });
+
+      const voucher = data[0] ?? ({} as IVoucherResponse);
+
+      if (voucher) {
+        dispatch(
+          setOrder({
+            ...order,
+            voucher: voucher,
+          })
+        );
+        open?.({
+          type: "success",
+          message: "Áp dụng voucher thành công",
+          description: "Thành công",
+        });
+      } else {
+        open?.({
+          type: "error",
+          message: "Voucher không hợp lệ",
+          description: "Thất bại",
+        });
+      }
+    } catch (error) {
+      console.error("Error in handleSubmit:", error);
+
+      open?.({
+        type: "error",
+        message: "Đã xảy ra lỗi",
+        description: "Vui lòng thử lại sau",
+      });
+    }
+  };
+
   return (
     <Fragment>
+      <Spin spinning={isLoading} fullscreen />
       <Breadcrumb
         pages={[
           { label: "home", path: "/" },
@@ -331,10 +542,17 @@ const Checkout = () => {
                                 message: "Tỉnh/thành phố không được để trống!",
                               },
                             ]}
+                            initialValue={
+                              order.address
+                                ? Number(order.address.provinceId)
+                                : ""
+                            }
                           >
                             {provinces.length > 0 ? (
-                              <select>
-                                <option>--Chọn tỉnh/thành phố--</option>
+                              <select onChange={handleProvinceChange}>
+                                <option value="">
+                                  --Chọn tỉnh/thành phố--
+                                </option>
                                 {provinces.map((province, index) => (
                                   <option
                                     key={index}
@@ -367,10 +585,15 @@ const Checkout = () => {
                                 message: "Quận/huyện không được để trống!",
                               },
                             ]}
+                            initialValue={
+                              order.address
+                                ? Number(order.address.districtId)
+                                : ""
+                            }
                           >
                             {districts.length > 0 ? (
-                              <select>
-                                <option>--Chọn quận/huyện--</option>
+                              <select onChange={handleDistrictChange}>
+                                <option value="">--Chọn quận/huyện--</option>
                                 {districts.map((district, index) => (
                                   <option
                                     key={index}
@@ -401,10 +624,13 @@ const Checkout = () => {
                                 message: "Phường/xã không được để trống!",
                               },
                             ]}
+                            initialValue={
+                              order.address ? order.address.wardCode : ""
+                            }
                           >
                             {wards.length > 0 ? (
-                              <select>
-                                <option>--Chọn phường/xã--</option>
+                              <select onChange={handleWardChange}>
+                                <option value="">--Chọn phường/xã--</option>
                                 {wards.map((ward, index) => (
                                   <option key={index} value={ward.WardCode}>
                                     {ward.WardName}
@@ -464,7 +690,7 @@ const Checkout = () => {
                 </div>
 
                 <div className="col-lg-5">
-                  <div className="your-order-area">
+                  <div className="your-order-area mb-2">
                     <h3>{t("checkout.your_order.title")}</h3>
                     <div className="your-order-wrap gray-bg-4">
                       <div className="your-order-product-info">
@@ -580,6 +806,114 @@ const Checkout = () => {
                       </div>
                       <div className="payment-method"></div>
                     </div>
+                  </div>
+                  <div className="your-order-area mb-2 payment-methods-wrapper">
+                    <Accordion>
+                      <Accordion.Item
+                        eventKey="0"
+                        className="single-my-account mb-20"
+                      >
+                        <Accordion.Header className="panel-heading">
+                          Bạn có mã giảm giá?, sử dụng tại đây.
+                        </Accordion.Header>
+                        <Accordion.Body style={{ padding: 0 }}>
+                          <div className="checkout-discount-code-wrapper">
+                            <div className="title-wrap">
+                              <h4 className="cart-bottom-title section-bg-gray">
+                                {t(`cart.voucher.title`)}
+                              </h4>
+                            </div>
+
+                            <div className="discount-code">
+                              <p>{t(`cart.voucher.subtitle`)}</p>
+                              <div className="discount-form">
+                                <input
+                                  type="text"
+                                  value={voucherCode}
+                                  onChange={handleChange}
+                                />
+                                <Space>
+                                  <button
+                                    className="cart-btn-2"
+                                    onClick={applyVoucher}
+                                  >
+                                    {t(`cart.buttons.apply_voucher`)}
+                                  </button>
+                                  <Tooltip title="Xem voucher">
+                                    <button
+                                      className="cart-btn-3"
+                                      type="button"
+                                      onClick={show}
+                                    >
+                                      <ContainerOutlined />
+                                    </button>
+                                  </Tooltip>
+                                </Space>
+                              </div>
+                            </div>
+                          </div>
+                        </Accordion.Body>
+                      </Accordion.Item>
+                    </Accordion>
+                  </div>
+                  <div className="your-order-area">
+                    <h3>Phương thức thanh toán</h3>
+                    <div className="payment-methods-wrapper">
+                      <Accordion defaultActiveKey="0">
+                        <Accordion.Item
+                          eventKey="0"
+                          className="single-my-account mb-20"
+                        >
+                          <Accordion.Header className="panel-heading">
+                            <span>Thanh toán khi nhận hàng (Ship COD)</span>
+                            <img
+                              src="images\payment-methods\Icon-GHN.png"
+                              alt="Mo ta anh"
+                              style={{
+                                height: "30px",
+                              }}
+                            />
+                          </Accordion.Header>
+                          <Accordion.Body>
+                            <Radio
+                              name="paymentMethod"
+                              value="Cash"
+                              checked={selectedPaymentMethod === "Cash"}
+                              onChange={handlePaymentMethodChange}
+                            >
+                              Hình thức giao hàng thu hộ tiền hoặc giao hàng thu
+                              tiền. Người mua thanh toán khi nhận hàng
+                            </Radio>
+                          </Accordion.Body>
+                        </Accordion.Item>
+                        <Accordion.Item
+                          eventKey="1"
+                          className="single-my-account mb-20"
+                        >
+                          <Accordion.Header className="panel-heading">
+                            <span>Thanh toán bằng chuyển khoản (VNPAY)</span>
+                            <img
+                              src="images\payment-methods\Icon-VNPAY.png"
+                              alt="Mo ta anh"
+                              style={{
+                                height: "30px",
+                              }}
+                            />
+                          </Accordion.Header>
+                          <Accordion.Body>
+                            <Radio
+                              name="paymentMethod"
+                              value="Card"
+                              checked={selectedPaymentMethod === "Card"}
+                              onChange={handlePaymentMethodChange}
+                            >
+                              Chuyển khoản vào tài khoản của chúng tôi. Đơn hàng
+                              sẽ được xác nhận ngay sau khi chuyển khoản
+                            </Radio>
+                          </Accordion.Body>
+                        </Accordion.Item>
+                      </Accordion>
+                    </div>
                     <div className="place-order mt-25">
                       <button className="btn-hover" type="submit">
                         {t("checkout.buttons.place_order")}
@@ -606,8 +940,13 @@ const Checkout = () => {
           )}
         </div>
       </div>
+      <VoucherModal
+        vouchers={vouchers}
+        isLoading={isLoadingVoucher}
+        restModalProps={restModalProps}
+      />
     </Fragment>
   );
 };
 
-export default Checkout;
+export default CheckOut;

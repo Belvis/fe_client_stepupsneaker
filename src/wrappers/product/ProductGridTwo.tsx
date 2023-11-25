@@ -62,6 +62,12 @@ const ProductGridTwo: FC<ProductGridTwoProps> = ({
     pagination: {
       pageSize: limit,
     },
+    sorters: [
+      {
+        field: "saleCount",
+        order: "desc",
+      },
+    ],
   });
   const prods = data?.data ? mapProductsToClients(data?.data) : [];
 

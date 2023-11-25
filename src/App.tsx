@@ -30,6 +30,7 @@ import LoginRegister from "./pages/other/LoginRegister";
 import MyAccount from "./pages/other/MyAccount";
 import Success from "./pages/other/Success";
 import OrderTracking from "./pages/other/OrderTracking";
+import SubmissionFailed from "./pages/other/SubmissionFailed";
 
 // Icons
 
@@ -117,6 +118,10 @@ function App() {
                       />
                       <Route path={"/my-account"} element={<MyAccount />} />
                       <Route path={"/success/:id"} element={<Success />} />
+                      <Route
+                        path={"/submission-failed"}
+                        element={<SubmissionFailed />}
+                      />
                       <Route
                         path={"/orders/tracking/:id"}
                         element={<OrderTracking />}

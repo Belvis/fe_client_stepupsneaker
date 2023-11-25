@@ -1,19 +1,22 @@
-import { ChangeEvent, Fragment, useEffect, useState } from "react";
+import { ContainerOutlined, LoadingOutlined } from "@ant-design/icons";
+import { NumberField, useModal } from "@refinedev/antd";
+import {
+  HttpError,
+  useApiUrl,
+  useCustom,
+  useCustomMutation,
+  useList,
+  useNotification,
+} from "@refinedev/core";
+import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { Form, Select, Space, Tooltip } from "antd";
+import { Fragment, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-import { getDiscountPrice } from "../../helpers/product";
-import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { cartItemStock } from "../../helpers/product";
-import {
-  addToCart,
-  decreaseQuantity,
-  deleteFromCart,
-  deleteAllFromCart,
-} from "../../redux/slices/cart-slice";
-import { RootState } from "../../redux/store";
-import { NumberField, useModal } from "@refinedev/antd";
-import { useTranslation } from "react-i18next";
-import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { dataProvider } from "../../api/dataProvider";
+import VoucherModal from "../../components/voucher/VoucherModal";
+import { cartItemStock, getDiscountPrice } from "../../helpers/product";
 import {
   IDistrict,
   IProvince,
@@ -21,25 +24,14 @@ import {
   IWard,
 } from "../../interfaces";
 import {
-  Button,
-  Form,
-  Select,
-  Space,
-  Tooltip,
-  List as AntdList,
-  Modal,
-} from "antd";
-import {
-  HttpError,
-  useApiUrl,
-  useCustom,
-  useCustomMutation,
-  useList,
-} from "@refinedev/core";
+  addToCart,
+  decreaseQuantity,
+  deleteAllFromCart,
+  deleteFromCart,
+} from "../../redux/slices/cart-slice";
 import { setOrder } from "../../redux/slices/order-slice";
-import { ContainerOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
-import { dataProvider } from "../../api/dataProvider";
+import { RootState } from "../../redux/store";
+import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -47,12 +39,14 @@ const GHN_TOKEN = import.meta.env.VITE_GHN_USER_TOKEN;
 
 const Cart = () => {
   const { t } = useTranslation();
+  const { open } = useNotification();
 
   const API_URL = useApiUrl();
-  const { getOne } = dataProvider(API_URL);
+  const { getList } = dataProvider(API_URL);
 
   useDocumentTitle(t("nav.pages.cart") + " | SUNS");
-  const { mutate: calculateFeeMutate } = useCustomMutation<any>();
+  const { mutate: calculateFeeMutate, isLoading: isLoadingFee } =
+    useCustomMutation<any>();
 
   let cartTotalPrice = 0;
 
@@ -235,6 +229,15 @@ const Cart = () => {
           dispatch(
             setOrder({
               ...order,
+              address: {
+                ...order.address,
+                provinceName: provinceName,
+                districtName: districtName,
+                wardName: wardName,
+                provinceId: provinceId,
+                districtId: districtId,
+                wardCode: form.getFieldValue("wardCode"),
+              },
               shippingMoney: data?.response.data.total as number,
             })
           );
@@ -243,74 +246,59 @@ const Cart = () => {
     );
   }
 
-  const { show, close, modalProps } = useModal();
-
-  function renderItem(item: IVoucherResponse) {
-    const { id, code, value, constraint, image, endDate, quantity, type } =
-      item;
-
-    const constraintPrice = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency.currencyName,
-      currencyDisplay: "symbol",
-    }).format(constraint);
-    const cashPrice =
-      type === "CASH"
-        ? new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: currency.currencyName,
-            currencyDisplay: "symbol",
-          }).format(value)
-        : 0;
-    return (
-      <AntdList.Item actions={[]}>
-        <AntdList.Item.Meta title={""} description={""} />
-        <div className="coupon-container">
-          <div className="coupon-card">
-            <img src={image} className="logo" />
-            {type === "PERCENTAGE" ? (
-              <h3>
-                Giảm giá {value}% cho đơn hàng trên {constraintPrice}
-                <br />
-                Nhân ngày t1 vô địch
-              </h3>
-            ) : (
-              <h3>
-                Giảm giá {cashPrice} cho đơn hàng trên {constraintPrice}
-                <br />
-                Nhân ngày t1 vô địch
-              </h3>
-            )}
-            <div className="coupon-row">
-              <span id="cpnCode">{code}</span>
-              <span id="cpnBtn">Copy Code</span>
-            </div>
-            <p>Có hạn tới: {dayjs(new Date(endDate)).format("lll")}</p>
-            <div className="circle1"></div>
-            <div className="circle2"></div>
-          </div>
-        </div>
-      </AntdList.Item>
-    );
-  }
+  const {
+    show,
+    close,
+    modalProps: { visible, ...restModalProps },
+  } = useModal();
 
   const [voucherCode, setVoucherCode] = useState("");
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const { data } = await getOne({ resource: "vouchers", id: voucherCode });
+    try {
+      event.preventDefault();
 
-    const voucher = (data as IVoucherResponse) ?? ({} as IVoucherResponse);
+      const { data } = await getList<IVoucherResponse>({
+        resource: "vouchers",
+        filters: [
+          {
+            field: "code",
+            operator: "eq",
+            value: voucherCode,
+          },
+        ],
+      });
 
-    if (voucher)
-      dispatch(
-        setOrder({
-          ...order,
-          voucher: voucher,
-        })
-      );
-    console.log(data);
-    console.log(voucher);
+      const voucher = data[0] ?? ({} as IVoucherResponse);
+
+      if (voucher) {
+        dispatch(
+          setOrder({
+            ...order,
+            voucher: voucher,
+          })
+        );
+        open?.({
+          type: "success",
+          message: "Áp dụng voucher thành công",
+          description: "Thành công",
+        });
+      } else {
+        open?.({
+          type: "error",
+          message: "Voucher không hợp lệ",
+          description: "Thất bại",
+        });
+      }
+    } catch (error) {
+      console.error("Error in handleSubmit:", error);
+
+      open?.({
+        type: "error",
+        message: "Đã xảy ra lỗi",
+        description: "Vui lòng thử lại sau",
+      });
+    }
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -559,6 +547,11 @@ const Cart = () => {
                                   message: "Hãy chọn tỉnh/thành phố trước!",
                                 },
                               ]}
+                              initialValue={
+                                order.address
+                                  ? Number(order.address.provinceId)
+                                  : ""
+                              }
                             >
                               <Select
                                 className="email s-email s-wid"
@@ -584,6 +577,11 @@ const Cart = () => {
                                   message: "Vui lòng chọn quận/huyện!",
                                 },
                               ]}
+                              initialValue={
+                                order.address
+                                  ? Number(order.address.districtId)
+                                  : ""
+                              }
                             >
                               <Select
                                 className="email s-email s-wid"
@@ -609,6 +607,9 @@ const Cart = () => {
                                   message: "Vui lòng chọn phường/xã!",
                                 },
                               ]}
+                              initialValue={
+                                order.address ? order.address.wardCode : ""
+                              }
                             >
                               <Select
                                 className="email s-email s-wid"
@@ -624,8 +625,16 @@ const Cart = () => {
                               />
                             </Form.Item>
                           </div>
-                          <button className="cart-btn-2">
-                            {t(`cart.buttons.get_a_quote`)}
+                          <button
+                            className="cart-btn-2"
+                            disabled={isLoadingFee}
+                          >
+                            {isLoading && (
+                              <span className="loading">
+                                <LoadingOutlined />
+                              </span>
+                            )}
+                            {t("cart.buttons.get_a_quote")}
                           </button>
                         </div>
                       </Form>
@@ -657,7 +666,7 @@ const Cart = () => {
                           <Tooltip title="Xem voucher">
                             <button
                               className="cart-btn-3"
-                              type="submit"
+                              type="button"
                               onClick={show}
                             >
                               <ContainerOutlined />
@@ -749,15 +758,11 @@ const Cart = () => {
           )}
         </div>
       </div>
-      <Modal title="Voucher" {...modalProps} width="1000px">
-        <AntdList
-          bordered
-          itemLayout="horizontal"
-          dataSource={vouchers}
-          renderItem={renderItem}
-          loading={isLoading}
-        />
-      </Modal>
+      <VoucherModal
+        vouchers={vouchers}
+        isLoading={false}
+        restModalProps={restModalProps}
+      />
     </Fragment>
   );
 };
@@ -766,5 +771,5 @@ export default Cart;
 
 const filterOption = (
   input: string,
-  option?: { label: string; value: number }
+  option?: { label: string; value: number | string }
 ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());

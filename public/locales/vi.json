@@ -12,7 +12,12 @@
         "compare": "So sánh",
         "my_account": "Tài khoản của tôi",
         "login_register": "Đăng nhập / Đăng ký",
-        "404_page": "404"
+        "orders": "Đơn hàng của tôi",
+        "orders_tracking": "Theo dõi đơn hàng",
+        "404_page": "404",
+        "success": "Thành công",
+        "submission_failed": "Giao dịch không thành công",
+        "failed": "Thất bại"
       },
       "contact_us": "Liên hệ",
       "about_us": "Về chúng tôi"
@@ -57,6 +62,44 @@
       "buttons": {
         "place_order": "Đặt hàng",
         "shop_now": "Mua ngay"
+      }
+    },
+    "success": {
+
+      "payment": {
+
+        "methods": {
+          "options": {
+            "Cash": "Tiền mặt",
+            "Transfer": "Chuyển khoản",
+            "Card": "Thẻ ngân hàng"
+          }
+        },
+        "transaction_code": "Mã giao dịch"
+      }
+    },
+    "order_tracking": {
+      "steps": {
+        "PLACE_ORDER": {
+          "title": "Đặt hàng",
+          "description": "Khách đặt hàng online."
+        },
+        "WAIT_FOR_CONFIRMATION": {
+          "title": "Chờ xác nhận",
+          "description": "Khách hàng xác nhận đơn hàng."
+        },
+        "WAIT_FOR_DELIVERY": {
+          "title": "Sẵn sàng",
+          "description": "Đơn hàng đã sẵn sàng, đợi được giao."
+        },
+        "DELIVERING": {
+          "title": "Đang giao",
+          "description": "Đơn hàng đang được giao."
+        },
+        "COMPLETED": {
+          "title": "Hoàn tất",
+          "description": "Đơn hàng đã được hoàn thành."
+        }
       }
     },
     "wish_list": {

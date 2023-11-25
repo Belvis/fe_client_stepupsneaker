@@ -362,12 +362,20 @@ h3.cart-page-title {
         transition: all 0.3s ease 0s;
         text-transform: uppercase;
 
+        span.loading {
+          margin-right: 10px;
+        }
+
         color: #fff;
         border: medium none;
         border-radius: 50px;
         background-color: $theme-color;
         &:hover {
           background-color: #333;
+        }
+        &:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
         }
       }
     }

@@ -1,7 +1,13 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { CrudFilters, CrudSorting, HttpError, useList } from "@refinedev/core";
-import { Spin } from "antd";
+import { useLocation, useParams } from "react-router-dom";
+import {
+  CrudFilters,
+  CrudSorting,
+  HttpError,
+  useList,
+  useParsed,
+} from "@refinedev/core";
+import { Pagination, PaginationProps, Spin } from "antd";
 import { mapProductsToClients } from "../../helpers/product";
 import { IProductResponse } from "../../interfaces";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
@@ -13,13 +19,21 @@ import { useDocumentTitle } from "@refinedev/react-router-v6";
 
 const ShopGridStandard: React.FC = () => {
   const { t } = useTranslation();
+  const {
+    params: { ...restParams },
+  } = useParsed();
 
   useDocumentTitle(t("nav.shop") + " | SUNS");
 
   const [layout, setLayout] = useState<string>("grid three-column");
-  const [filters, setFilters] = useState<CrudFilters>([]);
+  const [filters, setFilters] = useState<CrudFilters>([
+    {
+      field: "q",
+      operator: "eq",
+      value: restParams.q,
+    },
+  ]);
   const [sorters, setSorters] = useState<CrudSorting>([]);
-  const [offset, setOffset] = useState<number>(0);
   const [totalElements, setTotalElements] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentData, setCurrentData] = useState<any[]>([]);
@@ -60,6 +74,7 @@ const ShopGridStandard: React.FC = () => {
     resource: "products",
     pagination: {
       pageSize: pageLimit,
+      current: currentPage,
     },
     filters: filters,
     sorters: sorters,
@@ -71,7 +86,11 @@ const ShopGridStandard: React.FC = () => {
       setCurrentData(mapProductsToClients(data.data));
       setTotalElements(data.total);
     }
-  }, [offset, data, filters, sorters]);
+  }, [data, filters, sorters]);
+
+  const onChange: PaginationProps["onChange"] = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <Fragment>
@@ -81,6 +100,8 @@ const ShopGridStandard: React.FC = () => {
           { label: "shop", path: pathname },
         ]}
       />
+
+      <Spin spinning={isLoading} fullscreen />
 
       <div className="shop-area pt-95 pb-100 bg-white">
         <div className="container">
@@ -102,24 +123,17 @@ const ShopGridStandard: React.FC = () => {
               />
 
               {/* shop page content default */}
-              <Spin spinning={isLoading}>
-                <ShopProducts layout={layout} products={currentData} />
-              </Spin>
+              <ShopProducts layout={layout} products={currentData} />
 
               {/* shop product pagination */}
               <div className="pro-pagination-style text-center mt-30">
                 {/* Pagination */}
-                {/* <Paginator
-                  totalRecords={sortedProducts.length}
-                  pageLimit={pageLimit}
-                  pageNeighbours={2}
-                  setOffset={setOffset}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                  pageContainerClass="mb-0 mt-0"
-                  pagePrevText="«"
-                  pageNextText="»"
-                /> */}
+                <Pagination
+                  current={currentPage}
+                  total={totalElements}
+                  showSizeChanger={false}
+                  onChange={onChange}
+                />
               </div>
             </div>
           </div>

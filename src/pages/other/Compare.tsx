@@ -58,7 +58,7 @@ const Compare = () => {
                                   className="image"
                                 >
                                   <img
-                                    style={{ maxHeight: "400px" }}
+                                    style={{ maxHeight: "250px" }}
                                     className="img-fluid"
                                     src={compareItem.image[0]}
                                     alt=""
