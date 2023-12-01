@@ -5,13 +5,31 @@ import Nav from "react-bootstrap/Nav";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
+import {
+  LoginFormTypes,
+  useActiveAuthProvider,
+  useLogin,
+} from "@refinedev/core";
+import { Form, FormProps } from "antd";
 
-const LoginRegister = () => {
+type LoginRegisterProps = {
+  type: "login" | "register";
+  formProps?: FormProps<any> | undefined;
+};
+
+const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
   const { t } = useTranslation();
 
   useDocumentTitle(t("nav.pages.login_register") + " | SUNS");
 
   let { pathname } = useLocation();
+
+  const [form] = Form.useForm<LoginFormTypes>();
+
+  const authProvider = useActiveAuthProvider();
+  const { mutate: login, isLoading } = useLogin<LoginFormTypes>({
+    v3LegacyAuthProviderCompatible: Boolean(authProvider?.isLegacy),
+  });
 
   return (
     <Fragment>
@@ -26,16 +44,16 @@ const LoginRegister = () => {
           <div className="row">
             <div className="col-lg-7 col-md-12 ms-auto me-auto">
               <div className="login-register-wrapper">
-                <Tab.Container defaultActiveKey="login">
+                <Tab.Container defaultActiveKey={type}>
                   <Nav variant="pills" className="login-register-tab-list">
                     <Nav.Item>
                       <Nav.Link eventKey="login">
-                        <h4>Login</h4>
+                        <h4>Đăng nhập</h4>
                       </Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
                       <Nav.Link eventKey="register">
-                        <h4>Register</h4>
+                        <h4>Đăng ký</h4>
                       </Nav.Link>
                     </Nav.Item>
                   </Nav>
@@ -43,28 +61,50 @@ const LoginRegister = () => {
                     <Tab.Pane eventKey="login">
                       <div className="login-form-container">
                         <div className="login-register-form">
-                          <form>
-                            <input
-                              type="text"
-                              name="user-name"
-                              placeholder="Username"
-                            />
-                            <input
-                              type="password"
-                              name="user-password"
-                              placeholder="Password"
-                            />
+                          <Form<LoginFormTypes>
+                            layout="vertical"
+                            form={form}
+                            onFinish={(values) => login(values)}
+                            requiredMark={false}
+                            initialValues={{
+                              remember: false,
+                            }}
+                            {...formProps}
+                          >
+                            <Form.Item
+                              name="email"
+                              rules={[
+                                { required: true },
+                                {
+                                  type: "email",
+                                  message: t(
+                                    "pages.login.errors.validEmail",
+                                    "Invalid email address"
+                                  ),
+                                },
+                              ]}
+                            >
+                              <input type="text" placeholder="Email" />
+                            </Form.Item>
+                            <Form.Item
+                              name="password"
+                              rules={[{ required: true }]}
+                            >
+                              <input type="password" placeholder="Mật khẩu" />
+                            </Form.Item>
                             <div className="button-box">
                               <div className="login-toggle-btn">
                                 <input type="checkbox" />
-                                <label className="ml-10">Remember me</label>
-                                <Link to={"/"}>Forgot Password?</Link>
+                                <label className="ml-10">
+                                  Lưu thông tin đăng nhập
+                                </label>
+                                <Link to={"/"}>Quên mật khẩu?</Link>
                               </div>
                               <button type="submit">
-                                <span>Login</span>
+                                <span>Đăng nhập</span>
                               </button>
                             </div>
-                          </form>
+                          </Form>
                         </div>
                       </div>
                     </Tab.Pane>
@@ -73,23 +113,18 @@ const LoginRegister = () => {
                         <div className="login-register-form">
                           <form>
                             <input
-                              type="text"
-                              name="user-name"
-                              placeholder="Username"
-                            />
-                            <input
-                              type="password"
-                              name="user-password"
-                              placeholder="Password"
-                            />
-                            <input
                               name="user-email"
                               placeholder="Email"
                               type="email"
                             />
+                            <input
+                              type="password"
+                              name="user-password"
+                              placeholder="Mật khẩu"
+                            />
                             <div className="button-box">
                               <button type="submit">
-                                <span>Register</span>
+                                <span>Đăng ký</span>
                               </button>
                             </div>
                           </form>

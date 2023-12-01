@@ -5,6 +5,19 @@ const axiosInstance = axios.create();
 
 axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
 
+axiosInstance.interceptors.request.use(
+  async (config) => {
+    const token = localStorage.getItem("suns-auth-client-token");
+    if (token && config?.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 axiosInstance.interceptors.response.use(
   (response) => {
     return response;

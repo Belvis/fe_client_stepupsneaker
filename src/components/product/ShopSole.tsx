@@ -17,19 +17,6 @@ const ShopSole: React.FC<ShopSoleProps> = ({ soles, updateFilterParams }) => {
         <div className="sidebar-widget-list mt-20">
           {soles ? (
             <ul>
-              <li>
-                <div className="sidebar-widget-list-left">
-                  <button
-                    onClick={(e) => {
-                      updateFilterParams("sole", "");
-                      setActiveSort(e);
-                    }}
-                  >
-                    <span className="checkmark" />
-                    Tất cả{" "}
-                  </button>
-                </div>
-              </li>
               {soles.map((sole, key) => {
                 return (
                   <li key={key}>

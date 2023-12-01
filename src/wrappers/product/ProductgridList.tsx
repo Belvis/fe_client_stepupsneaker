@@ -27,10 +27,6 @@ const ProductGridList: React.FC<ProductGridListProps> = ({
               spaceBottomClass={spaceBottomClass}
               product={product}
               currency={currency}
-              cartItem={
-                cartItems.find((cartItem) => cartItem.id === product.id) ??
-                ({} as ICartItem)
-              }
               wishlistItem={wishlistItems.find(
                 (wishlistItem) => wishlistItem.id === product.id
               )}

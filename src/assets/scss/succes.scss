@@ -255,4 +255,18 @@
       border-bottom: 1px solid #ebebeb;
     }
   }
+  
+}
+
+.tracking-page-area {
+  background-image: url("https://res.cloudinary.com/dwoxggxq7/image/upload/v1701404002/rkwvjhsq0ea9aju8nbev.jpg");
+  background-size: contain;
+  background-position: right;
+  background-repeat: no-repeat;
+  max-width: 100%;
+
+  @media #{$lg-layout,
+    $xs-layout} {
+      background-image: none;
+    }
 }

@@ -298,16 +298,13 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
               onClick={() =>
                 dispatch(
                   addToCart({
+                    id: "",
                     cartItemId: product.id,
                     quantity: quantityCount,
                     image: selectedVariant.image[0],
                     name: product.name,
-                    selectedProductColor: selectedProductColor
-                      ? selectedProductColor
-                      : undefined,
-                    selectedProductSize: selectedProductSize
-                      ? selectedProductSize
-                      : undefined,
+                    selectedProductColor: selectedProductColor,
+                    selectedProductSize: selectedProductSize,
                   })
                 )
               }

@@ -51,15 +51,10 @@ export const dataProvider = (
     const { content } = response.data;
     const data = content.data;
     const totalElements = content.totalElements;
-    const startIndex =
-      pageSize !== undefined && current !== undefined
-        ? (current + 1) * pageSize
-        : 0;
 
     return {
       data: data,
       total: totalElements,
-      startIndex,
     };
   },
 

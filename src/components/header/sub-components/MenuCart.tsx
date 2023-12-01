@@ -5,9 +5,11 @@ import { RootState } from "../../../redux/store";
 import { getDiscountPrice } from "../../../helpers/product";
 import { deleteFromCart } from "../../../redux/slices/cart-slice";
 import { NumberField } from "@refinedev/antd";
-import Item from "antd/es/list/Item";
+import { useTranslation } from "react-i18next";
 
 const MenuCart = () => {
+  const { t } = useTranslation();
+
   const dispatch = useDispatch();
   const currency = useSelector((state: RootState) => state.currency);
   const { cartItems } = useSelector((state: RootState) => state.cart);
@@ -50,7 +52,9 @@ const MenuCart = () => {
                     <h4>
                       <Link to={"/product/" + item.id}> {item.name} </Link>
                     </h4>
-                    <h6>Qty: {item.quantity}</h6>
+                    <h6>
+                      {t("header.menu_cart.qty")}: {item.quantity}
+                    </h6>
                     <span>
                       <NumberField
                         value={
@@ -67,8 +71,14 @@ const MenuCart = () => {
                     </span>
                     {item.selectedProductColor && item.selectedProductSize ? (
                       <div className="cart-item-variation">
-                        <span>Color: {item.selectedProductColor.name}</span>
-                        <span>Size: {item.selectedProductSize.name}</span>
+                        <span>
+                          {t("header.menu_cart.color")}:{" "}
+                          {item.selectedProductColor.name}
+                        </span>
+                        <span>
+                          {t("header.menu_cart.size")}:{" "}
+                          {item.selectedProductSize.name}
+                        </span>
                       </div>
                     ) : (
                       ""
@@ -85,7 +95,7 @@ const MenuCart = () => {
           </ul>
           <div className="shopping-cart-total">
             <h4>
-              Total :{" "}
+              {t("header.menu_cart.total")} :{" "}
               <span className="shop-total">
                 <NumberField
                   value={cartTotalPrice}
@@ -99,16 +109,16 @@ const MenuCart = () => {
             </h4>
           </div>
           <div className="shopping-cart-btn btn-hover text-center">
-            <Link className="default-btn" to={"/cart"}>
-              view cart
+            <Link className="default-btn" to={"/pages/cart"}>
+              {t("header.menu_cart.buttons.view_cart")}
             </Link>
-            <Link className="default-btn" to={"/checkout"}>
-              checkout
+            <Link className="default-btn" to={"/pages/checkout"}>
+              {t("header.menu_cart.buttons.checkout")}
             </Link>
           </div>
         </Fragment>
       ) : (
-        <p className="text-center">No items added to cart</p>
+        <p className="text-center">{t("header.menu_cart.no_items")}</p>
       )}
     </div>
   );

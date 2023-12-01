@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
+  CrudFilter,
   CrudFilters,
   CrudSorting,
   HttpError,
@@ -16,58 +17,160 @@ import ShopSidebar from "../../wrappers/product/ShopSidebar";
 import ShopTopbar from "../../wrappers/product/ShopTopbar";
 import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { useSearchParams } from "react-router-dom";
 
 const ShopGridStandard: React.FC = () => {
   const { t } = useTranslation();
-  const {
-    params: { ...restParams },
-  } = useParsed();
 
-  useDocumentTitle(t("nav.shop") + " | SUNS");
-
-  const [layout, setLayout] = useState<string>("grid three-column");
-  const [filters, setFilters] = useState<CrudFilters>([
-    {
-      field: "q",
-      operator: "eq",
-      value: restParams.q,
-    },
-  ]);
-  const [sorters, setSorters] = useState<CrudSorting>([]);
-  const [totalElements, setTotalElements] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [currentData, setCurrentData] = useState<any[]>([]);
-  const [sortedProducts, setSortedProducts] = useState<any[]>([]);
-
-  const pageLimit: number = 15;
+  const setTitle = useDocumentTitle();
   let { pathname } = useLocation();
 
-  const updateLayout = (layout: string): void => {
-    setLayout(layout);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const setDefaultParam = (param: string, defaultValue: string) => {
+    if (!searchParams.get(param)) {
+      setSearchParams((prev) => {
+        prev.set(param, defaultValue);
+        return prev;
+      });
+    }
   };
 
-  const updateSortParams = (
-    sortType: "asc" | "desc",
-    sortValue: string
+  useEffect(() => {
+    setDefaultParam("page", "1");
+    setDefaultParam("layout", "grid three-column");
+  }, []);
+
+  const [totalElements, setTotalElements] = useState<number>(0);
+  const [currentData, setCurrentData] = useState<any[]>([]);
+  const pageLimit: number = 15;
+
+  const layout = searchParams.get("layout") ?? "grid three-column";
+  const currentPage = Number(searchParams.get("page")) ?? 1;
+
+  const filterFieldsMappings = {
+    style: "style",
+    color: "color",
+    size: "size",
+    brand: "brand",
+    material: "material",
+    sole: "sole",
+  };
+
+  const getFiltersFromSearchParams = (): CrudFilters => {
+    const filters: CrudFilter[] = [];
+
+    Object.entries(filterFieldsMappings).forEach(([field, paramName]) => {
+      const values = searchParams.getAll(paramName);
+
+      if (values.length > 0) {
+        filters.push({
+          field,
+          operator: "eq",
+          value: values,
+        });
+      }
+    });
+
+    const q = searchParams.get("q") ?? "";
+
+    if (q) {
+      filters.push({
+        field: "q",
+        operator: "eq",
+        value: q,
+      });
+    }
+
+    return filters;
+  };
+
+  const getSortersFromSearchParams = (): CrudSorting => {
+    const sorters: CrudSorting = [];
+    const orderBy = searchParams.get("order_by");
+
+    if (orderBy && orderBy != "") {
+      switch (orderBy) {
+        case "price":
+          sorters.push({
+            field: "price",
+            order: "asc",
+          });
+          break;
+        case "price-desc":
+          sorters.push({
+            field: "price",
+            order: "desc",
+          });
+          break;
+        // case "popularity":
+        //   sorters.push({
+        //     field: "popularity", // view - rating - interaction
+        //     order: "desc"
+        //   })
+        //   break;
+        case "latest":
+          sorters.push({
+            field: "createdAt",
+            order: "desc",
+          });
+          break;
+        case "newest":
+          sorters.push({
+            field: "createdAt",
+            order: "asc",
+          });
+          break;
+        case "best-seller":
+          sorters.push({
+            field: "saleCount",
+            order: "desc",
+          });
+          break;
+        default:
+          break;
+      }
+    }
+    return sorters;
+  };
+
+  const updateLayout = (
+    layout: "grid two-column" | "grid three-column" | "list"
   ): void => {
-    setSorters((prev) => [
-      ...prev,
-      {
-        field: sortValue,
-        order: sortType,
-      },
-    ]);
+    setSearchParams((prev: URLSearchParams) => {
+      prev.set("layout", layout);
+      return prev;
+    });
+  };
+
+  const updateSortParams = (orderBy: string): void => {
+    setSearchParams((prev: URLSearchParams) => {
+      prev.set("order_by", orderBy);
+      return prev;
+    });
   };
 
   const updateFilterParams = (field: string, value: string): void => {
-    setFilters((prev) => [
-      ...prev,
-      {
-        field,
-        operator: "eq",
-        value,
-      },
-    ]);
+    setSearchParams((prev: URLSearchParams) => {
+      if (field === "q") {
+        if (value === "") {
+          prev.delete("q");
+        } else {
+          prev.set("q", value);
+        }
+        return prev;
+      }
+
+      const existingValues = prev.getAll(field);
+
+      if (existingValues.includes(value)) {
+        prev.delete(field, value);
+      } else {
+        prev.append(field, value);
+      }
+
+      return prev;
+    });
   };
 
   const { data, isLoading, isError } = useList<IProductResponse, HttpError>({
@@ -76,20 +179,26 @@ const ShopGridStandard: React.FC = () => {
       pageSize: pageLimit,
       current: currentPage,
     },
-    filters: filters,
-    sorters: sorters,
+    filters: getFiltersFromSearchParams(),
+    sorters: getSortersFromSearchParams(),
   });
 
   useEffect(() => {
     if (data?.data) {
-      setSortedProducts(sortedProducts);
       setCurrentData(mapProductsToClients(data.data));
       setTotalElements(data.total);
     }
-  }, [data, filters, sorters]);
+  }, [data]);
+
+  useEffect(() => {
+    setTitle(t("nav.shop") + " | SUNS");
+  }, [searchParams]);
 
   const onChange: PaginationProps["onChange"] = (page) => {
-    setCurrentPage(page);
+    setSearchParams((prev: URLSearchParams) => {
+      prev.set("page", page.toString());
+      return prev;
+    });
   };
 
   return (

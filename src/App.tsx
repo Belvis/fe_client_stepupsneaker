@@ -1,17 +1,24 @@
-import { Action, IResourceItem, Refine } from "@refinedev/core";
+import { Action, Authenticated, IResourceItem, Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
 import { useNotificationProvider } from "@refinedev/antd";
 import "@refinedev/antd/dist/reset.css";
 
 import routerBindings, {
+  CatchAllNavigate,
   DocumentTitleHandler,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router-v6";
 import { App as AntdApp } from "antd";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import { useTranslation } from "react-i18next";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+} from "react-router-dom";
 import { dataProvider } from "./api/dataProvider";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import { Footer, Header } from "./wrappers";
@@ -31,6 +38,8 @@ import MyAccount from "./pages/other/MyAccount";
 import Success from "./pages/other/Success";
 import OrderTracking from "./pages/other/OrderTracking";
 import SubmissionFailed from "./pages/other/SubmissionFailed";
+import TrackingPage from "./pages/other/TrackingPage";
+import { authProvider } from "./api/authProvider";
 
 // Icons
 
@@ -38,6 +47,9 @@ import SubmissionFailed from "./pages/other/SubmissionFailed";
 
 // const API_BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
 const API_BASE_URL = import.meta.env.VITE_BACKEND_API_LOCAL_BASE_URL;
+
+// const AUTH_API_URL = import.meta.env.VITE_BACKEND_API_AUTH_URL;
+const AUTH_API_URL = import.meta.env.VITE_BACKEND_API_LOCAL_AUTH_URL;
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -56,6 +68,7 @@ function App() {
             <ConfirmDialog />
             <Refine
               dataProvider={dataProvider(API_BASE_URL)}
+              authProvider={authProvider(AUTH_API_URL)}
               notificationProvider={useNotificationProvider}
               i18nProvider={i18nProvider}
               routerProvider={routerBindings}
@@ -79,7 +92,7 @@ function App() {
                 >
                   <Routes>
                     <Route
-                      path=""
+                      path="/"
                       element={
                         <ThemedLayoutV2
                           Header={() => (
@@ -108,15 +121,41 @@ function App() {
                         path={"/product/:id"}
                         element={<ProductTabLeft />}
                       />
-                      <Route path={"/cart"} element={<Cart />} />
-                      <Route path={"/checkout"} element={<Checkout />} />
-                      <Route path={"/compare"} element={<Compare />} />
-                      <Route path={"/wishlist"} element={<Wishlist />} />
-                      <Route
-                        path={"/login-register"}
-                        element={<LoginRegister />}
-                      />
-                      <Route path={"/my-account"} element={<MyAccount />} />
+                      <Route path="pages">
+                        <Route path="cart" element={<Cart />} />
+                        <Route path="checkout" element={<Checkout />} />
+                        <Route path="compare" element={<Compare />} />
+                        <Route path="wishlist" element={<Wishlist />} />
+                        <Route
+                          element={
+                            <Authenticated fallback={<Outlet />}>
+                              <Navigate to="/" />
+                            </Authenticated>
+                          }
+                        >
+                          <Route
+                            path="login"
+                            element={<LoginRegister type="login" />}
+                          />
+                          <Route
+                            path="register"
+                            element={<LoginRegister type="register" />}
+                          />
+                          {/* forgot-password */}
+                          {/* update-password */}
+                        </Route>
+                        <Route
+                          element={
+                            <Authenticated
+                              fallback={<CatchAllNavigate to="login" />}
+                            >
+                              <Outlet />
+                            </Authenticated>
+                          }
+                        >
+                          <Route path="my-account" element={<MyAccount />} />
+                        </Route>
+                      </Route>
                       <Route path={"/success/:id"} element={<Success />} />
                       <Route
                         path={"/submission-failed"}
@@ -125,6 +164,10 @@ function App() {
                       <Route
                         path={"/orders/tracking/:id"}
                         element={<OrderTracking />}
+                      />
+                      <Route
+                        path={"/orders/tracking"}
+                        element={<TrackingPage />}
                       />
                       <Route path="*" element={<NotFound />} />
                     </Route>

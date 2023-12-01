@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { debounce } from "lodash";
 
-const ShopSearch = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate();
+interface ShopSearchProps {
+  updateFilterParams: (field: string, value: string) => void;
+}
 
+const ShopSearch: React.FC<ShopSearchProps> = ({ updateFilterParams }) => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-
-    // Chuyển tham số 'q' lên URL
-    navigate("/shop?q=hehe");
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
+  const handleChange = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      updateFilterParams("q", event.target.value);
+    },
+    300
+  );
 
   return (
     <div className="sidebar-widget">
@@ -25,7 +25,6 @@ const ShopSearch = () => {
             type="text"
             name="q"
             placeholder="Nhập từ khoá tại đây..."
-            value={searchTerm}
             onChange={handleChange}
           />
           <button type="submit">

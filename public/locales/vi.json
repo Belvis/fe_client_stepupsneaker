@@ -11,13 +11,15 @@
         "wishlist": "Danh sách mong muốn",
         "compare": "So sánh",
         "my_account": "Tài khoản của tôi",
-        "login_register": "Đăng nhập / Đăng ký",
+        "login_register": "Đăng nhập - Đăng ký",
         "orders": "Đơn hàng của tôi",
         "orders_tracking": "Theo dõi đơn hàng",
         "404_page": "404",
         "success": "Thành công",
         "submission_failed": "Giao dịch không thành công",
-        "failed": "Thất bại"
+        "failed": "Thất bại",
+        "order": "Hoá đơn",
+        "tracking_page": "Tra cứu đơn hàng"
       },
       "contact_us": "Liên hệ",
       "about_us": "Về chúng tôi"
@@ -268,6 +270,19 @@
             "place_holder": "Địa chỉ email của bạn..."
           }
         }
+      }
+    },
+    "header": {
+      "menu_cart": {
+        "qty": "Số lượng",
+        "total": "Tổng",
+        "color": "Màu sắc",
+        "size": "Kích cỡ",
+        "buttons": {
+          "view_cart": "Xem giỏ hàng",
+          "checkout": "Thanh toán"
+        },
+        "no_items": "Không có sản phẩm nào trong giỏ hàng"
       }
     },
     "products": {

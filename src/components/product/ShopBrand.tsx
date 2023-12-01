@@ -20,19 +20,6 @@ const ShopBrand: React.FC<ShopBrandProps> = ({
         <div className="sidebar-widget-list mt-20">
           {brands ? (
             <ul>
-              <li>
-                <div className="sidebar-widget-list-left">
-                  <button
-                    onClick={(e) => {
-                      updateFilterParams("brand", "");
-                      setActiveSort(e);
-                    }}
-                  >
-                    <span className="checkmark" />
-                    Tất cả{" "}
-                  </button>
-                </div>
-              </li>
               {brands.map((brand, key) => {
                 return (
                   <li key={key}>

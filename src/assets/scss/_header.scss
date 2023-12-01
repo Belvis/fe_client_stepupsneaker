@@ -371,6 +371,14 @@
           @media #{$xl-layout}{
             font-size: 13px;
           }
+          &.active {
+            color: $theme-color;
+            text-decoration: underline;
+            &::before {
+              opacity: 1;
+            }
+        }
+
         }
         &:hover a {
           color: $theme-color;

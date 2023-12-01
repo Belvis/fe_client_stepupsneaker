@@ -28,3 +28,27 @@ export const generateFilter = (filters?: CrudFilters) => {
 
   return queryFilters;
 };
+
+export const generateFilterParams = (filters?: CrudFilters) => {
+  const params = new URLSearchParams();
+
+  if (filters) {
+    filters.forEach((filter, index) => {
+      if ("field" in filter) {
+        const { field, operator, value } = filter;
+        params.append(`filters[${index}][field]`, field);
+        params.append(`filters[${index}][operator]`, operator);
+
+        if (Array.isArray(value)) {
+          value.forEach((value, valueIndex) => {
+            params.append(`filters[${index}][value][${valueIndex}]`, value);
+          });
+        } else {
+          params.append(`filters[${index}][value]`, value);
+        }
+      }
+    });
+  }
+
+  return params;
+};

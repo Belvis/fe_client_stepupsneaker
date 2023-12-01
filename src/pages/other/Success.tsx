@@ -9,17 +9,20 @@ import { HttpError, useOne } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Result } from "antd";
 import dayjs from "dayjs";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { getDiscountPrice } from "../../helpers/product";
 import { IOrderResponse } from "../../interfaces";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
+import { clearOrder } from "../../redux/slices/order-slice";
+import { deleteAllFromCart } from "../../redux/slices/cart-slice";
 
 const Success = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
 
   useDocumentTitle(t("nav.pages.success") + " | SUNS");
 

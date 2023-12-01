@@ -2,8 +2,10 @@ import React, { Fragment } from "react";
 import ShopTopAction from "../../components/product/ShopTopAction";
 
 interface ShopTopbarProps {
-  updateLayout: (layout: string) => void;
-  updateSortParams: (sortType: "asc" | "desc", sortValue: string) => void;
+  updateLayout: (
+    layout: "grid two-column" | "grid three-column" | "list"
+  ) => void;
+  updateSortParams: (orderBy: string) => void;
   productCount: number;
   sortedProductCount: number;
 }

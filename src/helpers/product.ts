@@ -200,10 +200,10 @@ export const setActiveSort = (
   const filterButtons = document.querySelectorAll(
     ".sidebar-widget-list-left button, .sidebar-widget-tag button, .product-filter button"
   );
-  filterButtons.forEach((item) => {
-    item.classList.remove("active");
-  });
-  e.currentTarget.classList.add("active");
+  // filterButtons.forEach((item) => {
+  //   item.classList.remove("active");
+  // });
+  e.currentTarget.classList.toggle("active");
 };
 
 export const setActiveLayout = (

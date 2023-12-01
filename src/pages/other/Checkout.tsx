@@ -332,10 +332,8 @@ const CheckOut = () => {
           console.log("An error occurred! " + error.message);
         },
         onSuccess: (data, variables, context) => {
-          setTimeout(() => {
-            dispatch(clearOrder());
-            dispatch(deleteAllFromCart());
-          }, 3000);
+          dispatch(clearOrder());
+          dispatch(deleteAllFromCart());
 
           if (selectedPaymentMethod === "Cash") {
             navigate("/success/" + data.data.id);
@@ -403,8 +401,6 @@ const CheckOut = () => {
         });
       }
     } catch (error) {
-      console.error("Error in handleSubmit:", error);
-
       open?.({
         type: "error",
         message: "Đã xảy ra lỗi",

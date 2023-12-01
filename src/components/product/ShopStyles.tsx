@@ -20,18 +20,6 @@ const ShopStyles: React.FC<ShopStylesProps> = ({
         <div className="sidebar-widget-list mt-30">
           {styles ? (
             <ul>
-              <li>
-                <div className="sidebar-widget-list-left">
-                  <button
-                    onClick={(e) => {
-                      updateFilterParams("style", "");
-                      setActiveSort(e);
-                    }}
-                  >
-                    <span className="checkmark" /> Tất cả
-                  </button>
-                </div>
-              </li>
               {styles.map((style, key) => {
                 return (
                   <li key={key}>

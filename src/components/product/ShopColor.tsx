@@ -20,19 +20,6 @@ const ShopColor: React.FC<ShopColorProps> = ({
         <div className="sidebar-widget-list mt-20">
           {colors ? (
             <ul>
-              <li>
-                <div className="sidebar-widget-list-left">
-                  <button
-                    onClick={(e) => {
-                      updateFilterParams("color", "");
-                      setActiveSort(e);
-                    }}
-                  >
-                    <span className="checkmark" />
-                    Tất cả{" "}
-                  </button>
-                </div>
-              </li>
               {colors.map((color, key) => {
                 return (
                   <li key={key}>

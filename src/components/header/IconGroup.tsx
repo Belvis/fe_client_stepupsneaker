@@ -3,12 +3,15 @@ import clsx from "clsx";
 import MenuCart from "./sub-components/MenuCart";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { Authenticated, useLogout } from "@refinedev/core";
 
 type IconGroupProps = {
   iconWhiteClass?: string;
 };
 
 export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
+  const { mutate: logout } = useLogout();
+
   const handleClick = (e: React.MouseEvent) => {
     const nextSibling = e.currentTarget.nextSibling;
 
@@ -51,20 +54,32 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
         </button>
         <div className="account-dropdown">
           <ul>
-            <li>
-              <Link to={"/login-register"}>Login</Link>
-            </li>
-            <li>
-              <Link to={"/login-register"}>Register</Link>
-            </li>
-            <li>
-              <Link to={"/my-account"}>my account</Link>
-            </li>
+            <Authenticated
+              fallback={
+                <>
+                  <li>
+                    <Link to={"/pages/login"}>Đăng nhập</Link>
+                  </li>
+                  <li>
+                    <Link to={"/pages/register"}>Đăng ký</Link>
+                  </li>
+                </>
+              }
+            >
+              <li>
+                <Link to={"/pages/my-account"}>Tài khoản</Link>
+              </li>
+              <li>
+                <Link to={"/"} onClick={() => logout()}>
+                  Đăng xuất
+                </Link>
+              </li>
+            </Authenticated>
           </ul>
         </div>
       </div>
       <div className="same-style header-compare">
-        <Link to={"/compare"}>
+        <Link to={"/pages/compare"}>
           <i className="pe-7s-shuffle" />
           <span className="count-style">
             {compareItems && compareItems.length ? compareItems.length : 0}
@@ -72,7 +87,7 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
         </Link>
       </div>
       <div className="same-style header-wishlist">
-        <Link to={"/wishlist"}>
+        <Link to={"/pages/wishlist"}>
           <i className="pe-7s-like" />
           <span className="count-style">
             {wishlistItems && wishlistItems.length ? wishlistItems.length : 0}

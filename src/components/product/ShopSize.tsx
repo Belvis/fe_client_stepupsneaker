@@ -17,19 +17,6 @@ const ShopSize: React.FC<ShopSizeProps> = ({ sizes, updateFilterParams }) => {
         <div className="sidebar-widget-list mt-20">
           {sizes ? (
             <ul>
-              <li>
-                <div className="sidebar-widget-list-left">
-                  <button
-                    onClick={(e) => {
-                      updateFilterParams("size", "");
-                      setActiveSort(e);
-                    }}
-                  >
-                    <span className="checkmark" />
-                    Tất cả{" "}
-                  </button>
-                </div>
-              </li>
               {sizes.map((size, key) => {
                 return (
                   <li key={key}>

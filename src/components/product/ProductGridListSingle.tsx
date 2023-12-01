@@ -16,7 +16,6 @@ import Rating from "./sub-components/ProductRating";
 interface ProductGridListSingleProps {
   product: IProductClient;
   currency: CurrencyState;
-  cartItem: ICartItem;
   wishlistItem: any;
   compareItem: any;
   spaceBottomClass: string;
@@ -25,7 +24,6 @@ interface ProductGridListSingleProps {
 const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
   product,
   currency,
-  cartItem,
   wishlistItem,
   compareItem,
   spaceBottomClass,

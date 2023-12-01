@@ -299,7 +299,7 @@ const MobileNavMenu = () => {
               <Link to={"/my-account"}>{t("my_account")}</Link>
             </li>
             <li>
-              <Link to={"/login-register"}>{t("login_register")}</Link>
+              <Link to={"/login"}>{t("login_register")}</Link>
             </li>
             <li>
               <Link to={"/about"}>{t("about_us")}</Link>

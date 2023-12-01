@@ -12,6 +12,7 @@
   }
   .select-shoing-wrap {
     display: flex;
+    align-items: center;
     @media #{$xs-layout} {
       display: block;
     }
@@ -29,6 +30,9 @@
         color: #606060;
         border: 1px solid #e6e6e6;
       }
+    }
+    span {
+      margin-right: 1rem;
     }
     p {
       margin: 0;

@@ -133,7 +133,8 @@ const ProductModal: React.FC<ProductModalProps> = ({
           <div className="col-md-5 col-sm-12 col-xs-12">
             <div className="product-large-image-wrapper">
               <Swiper options={gallerySwiperParams}>
-                {selectedVariant.image &&
+                {selectedVariant &&
+                  selectedVariant.image &&
                   selectedVariant.image.length > 0 &&
                   selectedVariant.image.map((img, i) => {
                     return (
@@ -148,7 +149,8 @@ const ProductModal: React.FC<ProductModalProps> = ({
             </div>
             <div className="product-small-image-wrapper mt-15">
               <Swiper options={thumbnailSwiperParams}>
-                {selectedVariant.image &&
+                {selectedVariant &&
+                  selectedVariant.image &&
                   selectedVariant.image.map((image, i) => {
                     return (
                       <SwiperSlide key={i}>
@@ -366,16 +368,13 @@ const ProductModal: React.FC<ProductModalProps> = ({
                       onClick={() =>
                         dispatch(
                           addToCart({
+                            id: "",
                             cartItemId: product.id,
                             quantity: quantityCount,
                             image: selectedVariant.image[0],
                             name: product.name,
-                            selectedProductColor: selectedProductColor
-                              ? selectedProductColor
-                              : undefined,
-                            selectedProductSize: selectedProductSize
-                              ? selectedProductSize
-                              : undefined,
+                            selectedProductColor: selectedProductColor,
+                            selectedProductSize: selectedProductSize,
                           })
                         )
                       }

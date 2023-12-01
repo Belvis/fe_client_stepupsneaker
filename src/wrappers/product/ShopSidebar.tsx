@@ -31,7 +31,7 @@ const ShopSidebar: React.FC<ShopSidebarProps> = ({
     isLoading: isStyleLoading,
     isError: isStyleError,
   } = useList<IStyleResponse, HttpError>({
-    resource: "styles",
+    resource: "products/styles",
     pagination: {
       pageSize: 1000,
     },
@@ -48,7 +48,7 @@ const ShopSidebar: React.FC<ShopSidebarProps> = ({
     isLoading: isColorLoading,
     isError: isColorError,
   } = useList<IColorResponse, HttpError>({
-    resource: "colors",
+    resource: "products/colors",
     pagination: {
       pageSize: 1000,
     },
@@ -65,7 +65,7 @@ const ShopSidebar: React.FC<ShopSidebarProps> = ({
     isLoading: isSizeLoading,
     isError: isSizeError,
   } = useList<ISizeResponse, HttpError>({
-    resource: "sizes",
+    resource: "products/sizes",
     pagination: {
       pageSize: 1000,
     },
@@ -82,7 +82,7 @@ const ShopSidebar: React.FC<ShopSidebarProps> = ({
     isLoading: isBrandLoading,
     isError: isBrandError,
   } = useList<IBrandResponse, HttpError>({
-    resource: "brands",
+    resource: "products/brands",
     pagination: {
       pageSize: 1000,
     },
@@ -99,7 +99,7 @@ const ShopSidebar: React.FC<ShopSidebarProps> = ({
     isLoading: isMaterialLoading,
     isError: isMaterialError,
   } = useList<IMaterialResponse, HttpError>({
-    resource: "materials",
+    resource: "products/materials",
     pagination: {
       pageSize: 1000,
     },
@@ -116,7 +116,7 @@ const ShopSidebar: React.FC<ShopSidebarProps> = ({
     isLoading: isSoleLoading,
     isError: isSoleError,
   } = useList<ISoleResponse, HttpError>({
-    resource: "soles",
+    resource: "products/soles",
     pagination: {
       pageSize: 1000,
     },
@@ -138,7 +138,7 @@ const ShopSidebar: React.FC<ShopSidebarProps> = ({
   return (
     <div className={clsx("sidebar-style", sideSpaceClass)}>
       {/* shop search */}
-      <ShopSearch />
+      <ShopSearch updateFilterParams={updateFilterParams} />
 
       {/* filter by categories */}
       <ShopStyles

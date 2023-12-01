@@ -1,7 +1,7 @@
-import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import clsx from "clsx";
+import { Fragment } from "react";
 
 type NavMenuProps = {
   menuWhiteClass?: string;
@@ -14,6 +14,10 @@ export const NavMenu: React.FC<NavMenuProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  const handleNavLinkClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+  };
+
   return (
     <div
       className={clsx(
@@ -25,50 +29,59 @@ export const NavMenu: React.FC<NavMenuProps> = ({
       <nav>
         <ul>
           <li>
-            <Link to={"/"}>{t("nav.home")}</Link>
+            <NavLink to={"/"}>{t("nav.home")}</NavLink>
           </li>
           <li>
-            <Link to={"/shop"}> {t("nav.shop")}</Link>
+            <NavLink to={"/shop"}>{t("nav.shop")}</NavLink>
           </li>
           <li>
-            <Link to={"/shop"}>{t("nav.collection")}</Link>
+            <NavLink to={"/orders/tracking"}>
+              {t("nav.pages.tracking_page")}
+            </NavLink>
           </li>
           <li>
-            <Link to={"/"}>
-              {t("nav.pages.title")}
-              {sidebarMenu ? (
-                <span>
-                  <i className="fa fa-angle-right"></i>
-                </span>
-              ) : (
-                <i className="fa fa-angle-down" />
+            <NavLink to={"/pages"} onClick={handleNavLinkClick}>
+              {() => (
+                <Fragment>
+                  {t("nav.pages.title")}
+                  {sidebarMenu ? (
+                    <span>
+                      <i className="fa fa-angle-right"></i>
+                    </span>
+                  ) : (
+                    <i className="fa fa-angle-down" />
+                  )}
+                </Fragment>
               )}
-            </Link>
+            </NavLink>
             <ul className="submenu">
               <li>
-                <Link to={"/cart"}>{t("nav.pages.cart")}</Link>
+                <NavLink to={"/pages/cart"}>{t("nav.pages.cart")}</NavLink>
               </li>
               <li>
-                <Link to={"/checkout"}>{t("nav.pages.checkout")}</Link>
+                <NavLink to={"/pages/checkout"}>
+                  {t("nav.pages.checkout")}
+                </NavLink>
               </li>
               <li>
-                <Link to={"/wishlist"}>{t("nav.pages.wishlist")}</Link>
+                <NavLink to={"/pages/wishlist"}>
+                  {t("nav.pages.wishlist")}
+                </NavLink>
               </li>
               <li>
-                <Link to={"/compare"}>{t("nav.pages.compare")}</Link>
+                <NavLink to={"/pages/compare"}>
+                  {t("nav.pages.compare")}
+                </NavLink>
               </li>
               <li>
-                <Link to={"/my-account"}>{t("nav.pages.my_account")}</Link>
-              </li>
-              <li>
-                <Link to={"/login-register"}>
-                  {t("nav.pages.login_register")}
-                </Link>
+                <NavLink to={"/pages/my-account"}>
+                  {t("nav.pages.my_account")}
+                </NavLink>
               </li>
             </ul>
           </li>
           <li>
-            <Link to={"/contact"}>{t("nav.contact_us")}</Link>
+            <NavLink to={"/contact"}>{t("nav.contact_us")}</NavLink>
           </li>
         </ul>
       </nav>
