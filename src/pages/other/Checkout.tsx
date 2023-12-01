@@ -8,20 +8,31 @@ import { NumberField, useModal } from "@refinedev/antd";
 import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import {
+  ICustomerResponse,
   IDistrict,
   IProvince,
   IVoucherResponse,
   IWard,
 } from "../../interfaces";
-import { Form, Radio, RadioChangeEvent, Space, Spin, Tooltip } from "antd";
+import {
+  Button,
+  Form,
+  Radio,
+  RadioChangeEvent,
+  Space,
+  Spin,
+  Tooltip,
+} from "antd";
 import Accordion from "react-bootstrap/Accordion";
 
 import {
+  Authenticated,
   HttpError,
   useApiUrl,
   useCreate,
   useCustom,
   useCustomMutation,
+  useGetIdentity,
   useList,
   useNotification,
 } from "@refinedev/core";
@@ -41,6 +52,9 @@ const CheckOut = () => {
   const { open } = useNotification();
 
   useDocumentTitle(t("nav.pages.checkout") + " | SUNS");
+
+  const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
+
   const { mutate, isLoading } = useCreate();
 
   const navigate = useNavigate();
@@ -432,7 +446,19 @@ const CheckOut = () => {
               >
                 <div className="col-lg-7">
                   <div className="billing-info-wrap">
-                    <h3>{t("checkout.billing_details.title")}</h3>
+                    <div className="row">
+                      <div className="col">
+                        <h3>{t("checkout.billing_details.title")}</h3>
+                      </div>
+                      <div className="col text-center">
+                        <Authenticated>
+                          <Button style={{ borderRadius: 0 }}>
+                            Chọn địa chỉ của bạn
+                          </Button>
+                        </Authenticated>
+                      </div>
+                    </div>
+
                     <div className="row">
                       <div className="col-lg-12">
                         <div className="billing-info mb-20">
@@ -863,7 +889,7 @@ const CheckOut = () => {
                           <Accordion.Header className="panel-heading">
                             <span>Thanh toán khi nhận hàng (Ship COD)</span>
                             <img
-                              src="images\payment-methods\Icon-GHN.png"
+                              src="/images/payment-methods/Icon-GHN.png"
                               alt="Mo ta anh"
                               style={{
                                 height: "30px",
@@ -889,7 +915,7 @@ const CheckOut = () => {
                           <Accordion.Header className="panel-heading">
                             <span>Thanh toán bằng chuyển khoản (VNPAY)</span>
                             <img
-                              src="images\payment-methods\Icon-VNPAY.png"
+                              src="/images/payment-methods/Icon-VNPAY.png"
                               alt="Mo ta anh"
                               style={{
                                 height: "30px",

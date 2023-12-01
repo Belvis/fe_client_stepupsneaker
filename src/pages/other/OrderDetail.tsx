@@ -44,14 +44,14 @@ const InitialEventData: IEvent[] = [
   },
 ];
 
-const OrderTracking = () => {
+const OrderDetail = () => {
   const { t } = useTranslation();
 
   useDocumentTitle(t("nav.pages.orders_tracking") + " | SUNS");
 
   let { pathname } = useLocation();
 
-  let { code } = useParams();
+  let { id } = useParams();
 
   const screens = useBreakpoint();
   const currentBreakPoints = Object.entries(screens)
@@ -59,8 +59,8 @@ const OrderTracking = () => {
     .map((screen) => screen[0]);
 
   const { data, isLoading, isError } = useOne<IOrderResponse, HttpError>({
-    resource: "orders/tracking",
-    id: code,
+    resource: "orders",
+    id: id,
   });
 
   const order = data?.data ? data?.data : ({} as IOrderResponse);
@@ -201,7 +201,7 @@ const OrderTracking = () => {
         ]}
       />
       <div className="bg-white p-100">
-        <h3>Trạng thái đơn hàng: #{order && order.code}</h3>
+        <h3>Trạng thái đơn hàng: #{order.code.toUpperCase()}</h3>
         <hr />
         <div className="table-content table-responsive order-tracking-table-content">
           <table className="w-100">
@@ -421,4 +421,4 @@ const OrderTracking = () => {
   );
 };
 
-export default OrderTracking;
+export default OrderDetail;

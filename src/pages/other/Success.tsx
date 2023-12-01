@@ -75,7 +75,7 @@ const Success = () => {
               </p>
               <p>Chúng tôi sẽ liên hệ với bạn trong 24h, xin hãy chờ đợi.</p>
               <div className="order-code">
-                <Link to={"/orders/tracking/" + order.id}>
+                <Link to={"/orders/tracking/" + order.code}>
                   Mã đơn hàng: {order.code.toUpperCase()}
                 </Link>
               </div>

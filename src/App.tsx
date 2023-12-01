@@ -40,6 +40,8 @@ import OrderTracking from "./pages/other/OrderTracking";
 import SubmissionFailed from "./pages/other/SubmissionFailed";
 import TrackingPage from "./pages/other/TrackingPage";
 import { authProvider } from "./api/authProvider";
+import OrderDetail from "./pages/other/OrderDetail";
+import MyOrders from "./pages/other/MyOrders";
 
 // Icons
 
@@ -122,10 +124,11 @@ function App() {
                         element={<ProductTabLeft />}
                       />
                       <Route path="pages">
-                        <Route path="cart" element={<Cart />} />
                         <Route path="checkout" element={<Checkout />} />
+                        <Route path="cart" element={<Cart />} />
                         <Route path="compare" element={<Compare />} />
                         <Route path="wishlist" element={<Wishlist />} />
+
                         <Route
                           element={
                             <Authenticated fallback={<Outlet />}>
@@ -144,6 +147,7 @@ function App() {
                           {/* forgot-password */}
                           {/* update-password */}
                         </Route>
+
                         <Route
                           element={
                             <Authenticated
@@ -156,19 +160,23 @@ function App() {
                           <Route path="my-account" element={<MyAccount />} />
                         </Route>
                       </Route>
+
                       <Route path={"/success/:id"} element={<Success />} />
                       <Route
                         path={"/submission-failed"}
                         element={<SubmissionFailed />}
                       />
+                      <Route path={"/orders/:id"} element={<OrderDetail />} />
+                      <Route path={"/orders"} element={<MyOrders />} />
                       <Route
-                        path={"/orders/tracking/:id"}
+                        path={"/orders/tracking/:code"}
                         element={<OrderTracking />}
                       />
                       <Route
                         path={"/orders/tracking"}
                         element={<TrackingPage />}
                       />
+
                       <Route path="*" element={<NotFound />} />
                     </Route>
                   </Routes>

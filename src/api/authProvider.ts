@@ -99,18 +99,22 @@ export const authProvider = (url: string): AuthBindings => ({
   getPermissions: async () => null,
   getIdentity: async () => {
     const token = localStorage.getItem(TOKEN_KEY);
+
     if (!token) {
       return null;
     }
 
-    const response = await httpClient.get(
-      `http://localhost:8080/client/customers/me`
-    );
+    try {
+      const response = await httpClient
+        .get("http://localhost:8080/client/customers/me")
+        .then((res) => {
+          return res.data.content;
+        });
 
-    const identity = response.data ?? null;
-
-    console.log(identity);
-
-    return identity;
+      return response;
+    } catch (error) {
+      console.error("Error fetching identity:", error);
+      return null;
+    }
   },
 });

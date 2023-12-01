@@ -183,6 +183,13 @@ export interface IPaymentMethodResponse {
 }
 // Request
 
+export interface ICustomerRequest {
+  fullName: string;
+  email: string;
+  dateOfBirth: number | string;
+  gender: string;
+  image: string;
+}
 export interface IAddressRequest {
   phoneNumber: string;
   districtId: number;
