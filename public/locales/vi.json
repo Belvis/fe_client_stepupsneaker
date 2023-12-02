@@ -61,6 +61,19 @@
         "total_money": "Tổng cộng"
       },
       "no_items_found": "Không tìm thấy sản phẩm nào trong giỏ hàng.",
+      "payment_methods": {
+        "title": "Phương thức thanh toán",
+        "options": {
+          "cod": {
+            "title": "Thanh toán khi nhận hàng (Ship COD)",
+            "description": "Hình thức giao hàng thu hộ tiền hoặc giao hàng thu tiền. Người mua thanh toán khi nhận hàng"
+          },
+          "bank_transfer" :{
+            "title": "Thanh toán bằng chuyển khoản (VNPAY)",
+            "description": "Chuyển khoản vào tài khoản của chúng tôi. Đơn hàng sẽ được xác nhận ngay sau khi chuyển khoản"
+          }
+        }
+      },
       "buttons": {
         "place_order": "Đặt hàng",
         "shop_now": "Mua ngay"

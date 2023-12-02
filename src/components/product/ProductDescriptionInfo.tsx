@@ -26,6 +26,7 @@ import Rating from "./sub-components/ProductRating";
 import { Badge, Space } from "antd";
 import { SaleIcon } from "../icons/icon-sale";
 import { useTranslation } from "react-i18next";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 interface ProductDescriptionInfoProps {
   product: IProductClient;
@@ -97,29 +98,18 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
       <div className="product-details-price">
         {discountedPrice !== null ? (
           <Fragment>
-            <span>
-              {new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: currency.currencyName,
-                currencyDisplay: "symbol",
-              }).format(finalDiscountedPrice)}
-            </span>{" "}
-            <span className="old">
-              {new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: currency.currencyName,
-                currencyDisplay: "symbol",
-              }).format(finalProductPrice)}
-            </span>
+            <CurrencyFormatter
+              value={finalDiscountedPrice}
+              currency={currency}
+            />{" "}
+            <CurrencyFormatter
+              className="old"
+              value={finalProductPrice}
+              currency={currency}
+            />
           </Fragment>
         ) : (
-          <span>
-            {new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: currency.currencyName,
-              currencyDisplay: "symbol",
-            }).format(finalProductPrice)}
-          </span>
+          <CurrencyFormatter value={finalProductPrice} currency={currency} />
         )}
       </div>
       {/* {product.rating && product.rating > 0 ? ( */}

@@ -27,21 +27,19 @@ import Accordion from "react-bootstrap/Accordion";
 
 import {
   Authenticated,
-  HttpError,
-  useApiUrl,
   useCreate,
   useCustom,
   useCustomMutation,
   useGetIdentity,
-  useList,
-  useNotification,
 } from "@refinedev/core";
 import { useNavigate } from "react-router-dom";
 import { clearOrder, setOrder } from "../../redux/slices/order-slice";
 import { deleteAllFromCart } from "../../redux/slices/cart-slice";
 import { ContainerOutlined } from "@ant-design/icons";
 import VoucherModal from "../../components/voucher/VoucherModal";
-import { dataProvider } from "../../api/dataProvider";
+import DiscountCodeAccordion from "../../components/voucher/DiscountCodeAccordion";
+import PaymentMethodAccordion from "../../components/payment-methods/PaymentMethodAccordion";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -49,19 +47,17 @@ const GHN_TOKEN = import.meta.env.VITE_GHN_USER_TOKEN;
 
 const CheckOut = () => {
   const { t } = useTranslation();
-  const { open } = useNotification();
 
   useDocumentTitle(t("nav.pages.checkout") + " | SUNS");
 
   const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
 
+  console.log(user);
+
   const { mutate, isLoading } = useCreate();
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const API_URL = useApiUrl();
-  const { getList } = dataProvider(API_URL);
 
   let { pathname } = useLocation();
   const currency = useSelector((state: RootState) => state.currency);
@@ -359,70 +355,6 @@ const CheckOut = () => {
     );
   }
 
-  const {
-    data,
-    isLoading: isLoadingVoucher,
-    isError,
-  } = useList<IVoucherResponse, HttpError>({
-    resource: "vouchers",
-    pagination: {
-      pageSize: 1000,
-    },
-  });
-
-  const vouchers = data?.data ? data?.data : [];
-
-  const {
-    show,
-    close,
-    modalProps: { visible, ...restModalProps },
-  } = useModal();
-
-  const applyVoucher = async (event: React.FormEvent) => {
-    try {
-      event.preventDefault();
-
-      const { data } = await getList<IVoucherResponse>({
-        resource: "vouchers",
-        filters: [
-          {
-            field: "code",
-            operator: "eq",
-            value: voucherCode,
-          },
-        ],
-      });
-
-      const voucher = data[0] ?? ({} as IVoucherResponse);
-
-      if (voucher) {
-        dispatch(
-          setOrder({
-            ...order,
-            voucher: voucher,
-          })
-        );
-        open?.({
-          type: "success",
-          message: "Áp dụng voucher thành công",
-          description: "Thành công",
-        });
-      } else {
-        open?.({
-          type: "error",
-          message: "Voucher không hợp lệ",
-          description: "Thất bại",
-        });
-      }
-    } catch (error) {
-      open?.({
-        type: "error",
-        message: "Đã xảy ra lỗi",
-        description: "Vui lòng thử lại sau",
-      });
-    }
-  };
-
   return (
     <Fragment>
       <Spin spinning={isLoading} fullscreen />
@@ -451,7 +383,7 @@ const CheckOut = () => {
                         <h3>{t("checkout.billing_details.title")}</h3>
                       </div>
                       <div className="col text-center">
-                        <Authenticated>
+                        <Authenticated fallback={false}>
                           <Button style={{ borderRadius: 0 }}>
                             Chọn địa chỉ của bạn
                           </Button>
@@ -761,22 +693,17 @@ const CheckOut = () => {
                                   <span className="order-middle-left">
                                     {cartItem.name} X {cartItem.quantity}
                                   </span>{" "}
-                                  <span className="order-price">
-                                    <NumberField
-                                      value={
-                                        discountedPrice !== null
-                                          ? finalDiscountedPrice *
-                                            cartItem.quantity
-                                          : parseFloat(finalProductPrice) *
-                                            cartItem.quantity
-                                      }
-                                      options={{
-                                        currency: currency.currencyName,
-                                        style: "currency",
-                                        currencyDisplay: "symbol",
-                                      }}
-                                    />
-                                  </span>
+                                  <CurrencyFormatter
+                                    className="order-price"
+                                    value={
+                                      discountedPrice !== null
+                                        ? finalDiscountedPrice *
+                                          cartItem.quantity
+                                        : parseFloat(finalProductPrice) *
+                                          cartItem.quantity
+                                    }
+                                    currency={currency}
+                                  />
                                 </li>
                               );
                             })}
@@ -830,112 +757,15 @@ const CheckOut = () => {
                     </div>
                   </div>
                   <div className="your-order-area mb-2 payment-methods-wrapper">
-                    <Accordion>
-                      <Accordion.Item
-                        eventKey="0"
-                        className="single-my-account mb-20"
-                      >
-                        <Accordion.Header className="panel-heading">
-                          Bạn có mã giảm giá?, sử dụng tại đây.
-                        </Accordion.Header>
-                        <Accordion.Body style={{ padding: 0 }}>
-                          <div className="checkout-discount-code-wrapper">
-                            <div className="title-wrap">
-                              <h4 className="cart-bottom-title section-bg-gray">
-                                {t(`cart.voucher.title`)}
-                              </h4>
-                            </div>
-
-                            <div className="discount-code">
-                              <p>{t(`cart.voucher.subtitle`)}</p>
-                              <div className="discount-form">
-                                <input
-                                  type="text"
-                                  value={voucherCode}
-                                  onChange={handleChange}
-                                />
-                                <Space>
-                                  <button
-                                    className="cart-btn-2"
-                                    onClick={applyVoucher}
-                                  >
-                                    {t(`cart.buttons.apply_voucher`)}
-                                  </button>
-                                  <Tooltip title="Xem voucher">
-                                    <button
-                                      className="cart-btn-3"
-                                      type="button"
-                                      onClick={show}
-                                    >
-                                      <ContainerOutlined />
-                                    </button>
-                                  </Tooltip>
-                                </Space>
-                              </div>
-                            </div>
-                          </div>
-                        </Accordion.Body>
-                      </Accordion.Item>
-                    </Accordion>
+                    <Authenticated fallback={false}>
+                      <DiscountCodeAccordion />
+                    </Authenticated>
                   </div>
                   <div className="your-order-area">
-                    <h3>Phương thức thanh toán</h3>
-                    <div className="payment-methods-wrapper">
-                      <Accordion defaultActiveKey="0">
-                        <Accordion.Item
-                          eventKey="0"
-                          className="single-my-account mb-20"
-                        >
-                          <Accordion.Header className="panel-heading">
-                            <span>Thanh toán khi nhận hàng (Ship COD)</span>
-                            <img
-                              src="/images/payment-methods/Icon-GHN.png"
-                              alt="Mo ta anh"
-                              style={{
-                                height: "30px",
-                              }}
-                            />
-                          </Accordion.Header>
-                          <Accordion.Body>
-                            <Radio
-                              name="paymentMethod"
-                              value="Cash"
-                              checked={selectedPaymentMethod === "Cash"}
-                              onChange={handlePaymentMethodChange}
-                            >
-                              Hình thức giao hàng thu hộ tiền hoặc giao hàng thu
-                              tiền. Người mua thanh toán khi nhận hàng
-                            </Radio>
-                          </Accordion.Body>
-                        </Accordion.Item>
-                        <Accordion.Item
-                          eventKey="1"
-                          className="single-my-account mb-20"
-                        >
-                          <Accordion.Header className="panel-heading">
-                            <span>Thanh toán bằng chuyển khoản (VNPAY)</span>
-                            <img
-                              src="/images/payment-methods/Icon-VNPAY.png"
-                              alt="Mo ta anh"
-                              style={{
-                                height: "30px",
-                              }}
-                            />
-                          </Accordion.Header>
-                          <Accordion.Body>
-                            <Radio
-                              name="paymentMethod"
-                              value="Card"
-                              checked={selectedPaymentMethod === "Card"}
-                              onChange={handlePaymentMethodChange}
-                            >
-                              Chuyển khoản vào tài khoản của chúng tôi. Đơn hàng
-                              sẽ được xác nhận ngay sau khi chuyển khoản
-                            </Radio>
-                          </Accordion.Body>
-                        </Accordion.Item>
-                      </Accordion>
-                    </div>
+                    <PaymentMethodAccordion
+                      selectedPaymentMethod={selectedPaymentMethod}
+                      handlePaymentMethodChange={handlePaymentMethodChange}
+                    />
                     <div className="place-order mt-25">
                       <button className="btn-hover" type="submit">
                         {t("checkout.buttons.place_order")}
@@ -962,11 +792,6 @@ const CheckOut = () => {
           )}
         </div>
       </div>
-      <VoucherModal
-        vouchers={vouchers}
-        isLoading={isLoadingVoucher}
-        restModalProps={restModalProps}
-      />
     </Fragment>
   );
 };

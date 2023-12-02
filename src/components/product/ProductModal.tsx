@@ -15,6 +15,7 @@ import { addToWishlist } from "../../redux/slices/wishlist-slice";
 import { RootState } from "../../redux/store";
 import { Badge, Space } from "antd";
 import { SaleIcon } from "../icons/icon-sale";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 type ProductModalProps = {
   currency: any;
@@ -169,29 +170,21 @@ const ProductModal: React.FC<ProductModalProps> = ({
               <div className="product-details-price">
                 {discountedPrice !== null ? (
                   <Fragment>
-                    <span>
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: currency.currencyName,
-                        currencyDisplay: "symbol",
-                      }).format(finalDiscountedPrice)}
-                    </span>
-                    <span className="old">
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: currency.currencyName,
-                        currencyDisplay: "symbol",
-                      }).format(finalProductPrice)}
-                    </span>
+                    <CurrencyFormatter
+                      value={finalDiscountedPrice}
+                      currency={currency}
+                    />
+                    <CurrencyFormatter
+                      className="old"
+                      value={finalProductPrice}
+                      currency={currency}
+                    />
                   </Fragment>
                 ) : (
-                  <span>
-                    {new Intl.NumberFormat("en-US", {
-                      style: "currency",
-                      currency: currency.currencyName,
-                      currencyDisplay: "symbol",
-                    }).format(finalProductPrice)}
-                  </span>
+                  <CurrencyFormatter
+                    value={finalProductPrice}
+                    currency={currency}
+                  />
                 )}
               </div>
               {/* {product.rating && product.rating > 0 ? ( */}

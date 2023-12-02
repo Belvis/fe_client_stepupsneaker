@@ -6,6 +6,7 @@ import { getDiscountPrice } from "../../../helpers/product";
 import { deleteFromCart } from "../../../redux/slices/cart-slice";
 import { NumberField } from "@refinedev/antd";
 import { useTranslation } from "react-i18next";
+import { CurrencyFormatter } from "../../../helpers/currency";
 
 const MenuCart = () => {
   const { t } = useTranslation();
@@ -25,21 +26,17 @@ const MenuCart = () => {
                 item.selectedProductSize?.price ?? 0,
                 0
               );
-              const finalProductPrice = (
-                (item.selectedProductSize?.price ?? 0) * currency.currencyRate
-              ).toFixed(2);
+              const finalProductPrice =
+                (item.selectedProductSize?.price ?? 0) * currency.currencyRate;
 
               const finalDiscountedPrice =
                 discountedPrice !== null
-                  ? parseFloat(
-                      (discountedPrice * currency.currencyRate).toFixed(2)
-                    )
+                  ? discountedPrice * currency.currencyRate
                   : 0.0;
 
               discountedPrice !== null
                 ? (cartTotalPrice += finalDiscountedPrice * item.quantity)
-                : (cartTotalPrice +=
-                    parseFloat(finalProductPrice) * item.quantity);
+                : (cartTotalPrice += finalProductPrice * item.quantity);
 
               return (
                 <li className="single-shopping-cart" key={item.id}>
@@ -55,20 +52,14 @@ const MenuCart = () => {
                     <h6>
                       {t("header.menu_cart.qty")}: {item.quantity}
                     </h6>
-                    <span>
-                      <NumberField
-                        value={
-                          discountedPrice !== null
-                            ? finalDiscountedPrice
-                            : finalProductPrice
-                        }
-                        options={{
-                          currency: currency.currencyName,
-                          style: "currency",
-                          currencyDisplay: "symbol",
-                        }}
-                      />
-                    </span>
+                    <CurrencyFormatter
+                      value={
+                        discountedPrice !== null
+                          ? finalDiscountedPrice
+                          : finalProductPrice
+                      }
+                      currency={currency}
+                    />
                     {item.selectedProductColor && item.selectedProductSize ? (
                       <div className="cart-item-variation">
                         <span>
@@ -96,16 +87,11 @@ const MenuCart = () => {
           <div className="shopping-cart-total">
             <h4>
               {t("header.menu_cart.total")} :{" "}
-              <span className="shop-total">
-                <NumberField
-                  value={cartTotalPrice}
-                  options={{
-                    currency: currency.currencyName,
-                    style: "currency",
-                    currencyDisplay: "symbol",
-                  }}
-                />
-              </span>
+              <CurrencyFormatter
+                className="shop-total"
+                value={cartTotalPrice}
+                currency={currency}
+              />
             </h4>
           </div>
           <div className="shopping-cart-btn btn-hover text-center">

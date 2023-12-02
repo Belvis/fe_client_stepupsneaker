@@ -32,6 +32,7 @@ import {
 import { setOrder } from "../../redux/slices/order-slice";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -201,11 +202,12 @@ const Cart = () => {
           },
         },
         successNotification: (data: any, values) => {
-          const shippingMoney = new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: currency.currencyName,
-            currencyDisplay: "symbol",
-          }).format(data?.response.data.total ?? 0);
+          const shippingMoney = (
+            <CurrencyFormatter
+              value={data?.response.data.total ?? 0}
+              currency={currency}
+            />
+          );
           return {
             message:
               "Chi phí vận chuyển của bạn được ước tính là " + shippingMoney,
@@ -338,25 +340,19 @@ const Cart = () => {
                             cartItem.selectedProductSize?.price ?? 0,
                             0
                           );
-                          const finalProductPrice = (
+                          const finalProductPrice =
                             (cartItem.selectedProductSize?.price ?? 0) *
-                            currency.currencyRate
-                          ).toFixed(2);
+                            currency.currencyRate;
                           const finalDiscountedPrice =
                             discountedPrice !== null
-                              ? parseFloat(
-                                  (
-                                    discountedPrice * currency.currencyRate
-                                  ).toFixed(2)
-                                )
+                              ? discountedPrice * currency.currencyRate
                               : 0.0;
 
                           discountedPrice !== null
                             ? (cartTotalPrice +=
                                 finalDiscountedPrice * cartItem.quantity)
                             : (cartTotalPrice +=
-                                parseFloat(finalProductPrice) *
-                                cartItem.quantity);
+                                finalProductPrice * cartItem.quantity);
 
                           return (
                             <tr key={key}>
@@ -394,38 +390,23 @@ const Cart = () => {
                               <td className="product-price-cart">
                                 {discountedPrice !== null ? (
                                   <Fragment>
-                                    <span className="amount old">
-                                      <NumberField
-                                        value={finalProductPrice}
-                                        options={{
-                                          currency: currency.currencyName,
-                                          style: "currency",
-                                          currencyDisplay: "symbol",
-                                        }}
-                                      />
-                                    </span>
-                                    <span className="amount">
-                                      <NumberField
-                                        value={finalDiscountedPrice}
-                                        options={{
-                                          currency: currency.currencyName,
-                                          style: "currency",
-                                          currencyDisplay: "symbol",
-                                        }}
-                                      />
-                                    </span>
+                                    <CurrencyFormatter
+                                      className="amount old"
+                                      value={finalProductPrice}
+                                      currency={currency}
+                                    />
+                                    <CurrencyFormatter
+                                      className="amount"
+                                      value={finalDiscountedPrice}
+                                      currency={currency}
+                                    />
                                   </Fragment>
                                 ) : (
-                                  <span className="amount">
-                                    <NumberField
-                                      value={finalProductPrice}
-                                      options={{
-                                        currency: currency.currencyName,
-                                        style: "currency",
-                                        currencyDisplay: "symbol",
-                                      }}
-                                    />
-                                  </span>
+                                  <CurrencyFormatter
+                                    className="amount"
+                                    value={finalProductPrice}
+                                    currency={currency}
+                                  />
                                 )}
                               </td>
 
@@ -469,18 +450,14 @@ const Cart = () => {
                                 </div>
                               </td>
                               <td className="product-subtotal">
-                                <NumberField
+                                <CurrencyFormatter
+                                  className="amount"
                                   value={
                                     discountedPrice !== null
                                       ? finalDiscountedPrice * cartItem.quantity
-                                      : parseFloat(finalProductPrice) *
-                                        cartItem.quantity
+                                      : finalProductPrice * cartItem.quantity
                                   }
-                                  options={{
-                                    currency: currency.currencyName,
-                                    style: "currency",
-                                    currencyDisplay: "symbol",
-                                  }}
+                                  currency={currency}
                                 />
                               </td>
 
@@ -687,51 +664,38 @@ const Cart = () => {
                     </div>
                     <h5>
                       {t(`cart.cart_total.total`)}{" "}
-                      <span>
-                        {new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: currency.currencyName,
-                          currencyDisplay: "symbol",
-                        }).format(Number(cartTotalPrice.toFixed(2)))}
-                      </span>
+                      <CurrencyFormatter
+                        value={cartTotalPrice}
+                        currency={currency}
+                      />
                     </h5>
                     <h5>
                       {t(`cart.cart_total.shipping`)}{" "}
-                      <span>
-                        {new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: currency.currencyName,
-                          currencyDisplay: "symbol",
-                        }).format(order.shippingMoney ?? 0)}
-                      </span>
+                      <CurrencyFormatter
+                        value={order.shippingMoney ?? 0}
+                        currency={currency}
+                      />
                     </h5>
                     <h5>
                       {"Giảm giá"}{" "}
-                      <span>
-                        {new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: currency.currencyName,
-                          currencyDisplay: "symbol",
-                        }).format(
+                      <CurrencyFormatter
+                        value={
                           order.voucher
                             ? order.voucher.type == "PERCENTAGE"
-                              ? (order.voucher.value / 100) *
-                                Number(cartTotalPrice.toFixed(2))
+                              ? (order.voucher.value / 100) * cartTotalPrice
                               : order.voucher.value
                             : 0
-                        )}
-                      </span>
+                        }
+                        currency={currency}
+                      />
                     </h5>
 
                     <h4 className="grand-totall-title">
                       {t(`cart.cart_total.grand_total`)}{" "}
-                      <span>
-                        {new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: currency.currencyName,
-                          currencyDisplay: "symbol",
-                        }).format(Number(cartTotalPrice.toFixed(2)))}
-                      </span>
+                      <CurrencyFormatter
+                        value={cartTotalPrice}
+                        currency={currency}
+                      />
                     </h4>
                     <Link to={"/checkout"}>
                       {t(`cart.buttons.proceed_to_checkout`)}

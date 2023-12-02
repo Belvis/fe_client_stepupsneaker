@@ -12,6 +12,7 @@ import { CurrencyState } from "../../redux/slices/currency-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
 import ProductModal from "./ProductModal";
 import Rating from "./sub-components/ProductRating";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 interface ProductGridListSingleProps {
   product: IProductClient;
@@ -118,32 +119,21 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
           <div className="product-price">
             {discountedPrice !== null ? (
               <Fragment>
-                <span>
-                  {new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: currency.currencyName,
-                    currencyDisplay: "symbol",
-                  }).format(finalDiscountedPrice)}
-                </span>
-                <span className="old">
-                  {new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: currency.currencyName,
-                    currencyDisplay: "symbol",
-                  }).format(finalProductPrice)}
-                </span>
+                <CurrencyFormatter
+                  value={finalDiscountedPrice}
+                  currency={currency}
+                />
+                <CurrencyFormatter
+                  className="old"
+                  value={finalProductPrice}
+                  currency={currency}
+                />
               </Fragment>
             ) : (
-              <span>
-                <NumberField
-                  value={finalProductPrice}
-                  options={{
-                    currency: currency.currencyName,
-                    style: "currency",
-                    currencyDisplay: "symbol",
-                  }}
-                />
-              </span>
+              <CurrencyFormatter
+                value={finalProductPrice}
+                currency={currency}
+              />
             )}
           </div>
         </div>
@@ -201,24 +191,21 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
               <div className="product-list-price">
                 {discountedPrice !== null ? (
                   <Fragment>
-                    <span>
-                      {currency.currencySymbol + finalDiscountedPrice}
-                    </span>{" "}
-                    <span className="old">
-                      {currency.currencySymbol + finalProductPrice}
-                    </span>
+                    <CurrencyFormatter
+                      value={finalDiscountedPrice}
+                      currency={currency}
+                    />{" "}
+                    <CurrencyFormatter
+                      className="old"
+                      value={finalProductPrice}
+                      currency={currency}
+                    />
                   </Fragment>
                 ) : (
-                  <span>
-                    <NumberField
-                      value={finalProductPrice}
-                      options={{
-                        currency: currency.currencyName,
-                        style: "currency",
-                        currencyDisplay: "symbol",
-                      }}
-                    />
-                  </span>
+                  <CurrencyFormatter
+                    value={finalProductPrice}
+                    currency={currency}
+                  />
                 )}
               </div>
               {/* {product.rating && product.rating > 0 ? ( */}

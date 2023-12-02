@@ -4,6 +4,7 @@ import { IVoucherResponse } from "../../interfaces";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import dayjs from "dayjs";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 interface VoucherModalProps {
   vouchers: IVoucherResponse[];
@@ -28,19 +29,15 @@ const VoucherModal: React.FC<VoucherModalProps> = ({
     const { id, code, value, constraint, image, endDate, quantity, type } =
       item;
 
-    const constraintPrice = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency.currencyName,
-      currencyDisplay: "symbol",
-    }).format(constraint);
+    const constraintPrice = (
+      <CurrencyFormatter value={constraint} currency={currency} />
+    );
     const cashPrice =
-      type === "CASH"
-        ? new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: currency.currencyName,
-            currencyDisplay: "symbol",
-          }).format(value)
-        : 0;
+      type === "CASH" ? (
+        <CurrencyFormatter value={value} currency={currency} />
+      ) : (
+        0
+      );
 
     const handleCopyCode = () => {
       if (code) {

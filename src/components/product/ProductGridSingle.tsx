@@ -11,6 +11,7 @@ import { addToWishlist } from "../../redux/slices/wishlist-slice";
 import ProductModal from "./ProductModal";
 import { Badge } from "antd";
 import { CurrencyState } from "../../redux/slices/currency-slice";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 type ProductGridSingleNineProps = {
   cartItem?: ICartItem;
@@ -116,30 +117,20 @@ const ProductGridSingleNine: React.FC<ProductGridSingleNineProps> = ({
               <div className="price-2">
                 {discountedPrice !== null ? (
                   <Fragment>
-                    <span className="old">
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: currency.currencyName,
-                        currencyDisplay: "symbol",
-                      }).format(finalProductPrice)}
-                    </span>{" "}
-                    <NumberField
+                    <CurrencyFormatter
+                      value={finalProductPrice}
+                      currency={currency}
+                    />{" "}
+                    <CurrencyFormatter
+                      className="old"
                       value={finalDiscountedPrice}
-                      options={{
-                        currency: currency.currencyName,
-                        style: "currency",
-                        currencyDisplay: "symbol",
-                      }}
+                      currency={currency}
                     />
                   </Fragment>
                 ) : (
-                  <NumberField
+                  <CurrencyFormatter
                     value={finalProductPrice}
-                    options={{
-                      currency: currency.currencyName,
-                      style: "currency",
-                      currencyDisplay: "symbol",
-                    }}
+                    currency={currency}
                   />
                 )}
               </div>

@@ -9,6 +9,7 @@ import { CurrencyState } from "../../redux/slices/currency-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
 import ProductModal from "./ProductModal";
 import Rating from "./sub-components/ProductRating";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 type ProductGridSingleTwoProps = {
   cartItem?: ICartItem;
@@ -72,27 +73,21 @@ const ProductGridSingleTwo: React.FC<ProductGridSingleTwoProps> = ({
           <div className="product-price">
             {discountedPrice !== null ? (
               <Fragment>
-                <span className="old">
-                  {new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: currency.currencyName,
-                    currencyDisplay: "symbol",
-                  }).format(finalProductPrice)}
-                </span>{" "}
-                {new Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: currency.currencyName,
-                  currencyDisplay: "symbol",
-                }).format(finalDiscountedPrice)}
+                <CurrencyFormatter
+                  className="old"
+                  value={finalProductPrice}
+                  currency={currency}
+                />{" "}
+                <CurrencyFormatter
+                  value={finalDiscountedPrice}
+                  currency={currency}
+                />
               </Fragment>
             ) : (
-              <span>
-                {new Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: currency.currencyName,
-                  currencyDisplay: "symbol",
-                }).format(finalProductPrice)}
-              </span>
+              <CurrencyFormatter
+                value={finalProductPrice}
+                currency={currency}
+              />
             )}
           </div>
 
