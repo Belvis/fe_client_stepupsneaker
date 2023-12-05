@@ -1,80 +1,76 @@
-import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
+import { setCurrency } from "../../../redux/slices/currency-slice";
 
 type LanguageCurrencyChangerProps = {
   currency: any;
 };
 
-const LanguageCurrencyChanger: React.FC<
-  LanguageCurrencyChangerProps
-> = ({}) => {
+const LanguageCurrencyChanger: React.FC<LanguageCurrencyChangerProps> = ({
+  currency,
+}) => {
   const { i18n } = useTranslation();
-  // const dispatch = useDispatch();
-  // const changeLanguageTrigger = e => {
-  //   const languageCode = e.target.value;
-  //   i18n.changeLanguage(languageCode);
-  // };
+  const dispatch = useDispatch();
 
-  // const setCurrencyTrigger = e => {
-  //   const currencyName = e.target.value;
-  //   dispatch(setCurrency(currencyName));
-  // };
+  const changeLanguageTrigger = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const languageCode = e.currentTarget.value;
+    i18n.changeLanguage(languageCode);
+  };
+
+  const setCurrencyTrigger = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const currencyName = e.currentTarget.value;
+    dispatch(setCurrency(currencyName));
+  };
 
   return (
     <div className="language-currency-wrap">
       <div className="same-language-currency language-style">
         <span>
-          Tiếng Việt
-          {/* {i18n.resolvedLanguage === "en"
+          {i18n.resolvedLanguage === "vi"
+            ? "Tiếng Việt"
+            : i18n.resolvedLanguage === "en"
             ? "English"
-            : i18n.resolvedLanguage === "fn"
-            ? "French"
-            : i18n.resolvedLanguage === "de"
-            ? "Germany"
-            : ""}{" "} */}
+            : ""}{" "}
           <i className="fa fa-angle-down" />
         </span>
         <div className="lang-car-dropdown">
           <ul>
             <li>
-              {/* <button value="en" onClick={e => changeLanguageTrigger(e)}> */}
-              <button value="en">English</button>
+              <button value="vi" onClick={(e) => changeLanguageTrigger(e)}>
+                Tiếng Việt
+              </button>
             </li>
             <li>
-              {/* <button value="fn" onClick={e => changeLanguageTrigger(e)}> */}
-              <button value="fn">French</button>
-            </li>
-            <li>
-              {/* <button value="de" onClick={e => changeLanguageTrigger(e)}> */}
-              <button value="de">Germany</button>
+              <button value="en" onClick={(e) => changeLanguageTrigger(e)}>
+                English
+              </button>
             </li>
           </ul>
         </div>
       </div>
       <div className="same-language-currency use-style">
         <span>
-          {/* {currency.currencyName} <i className="fa fa-angle-down" /> */}
-          "VNĐ" <i className="fa fa-angle-down" />
+          {currency.currencyName} <i className="fa fa-angle-down" />
         </span>
         <div className="lang-car-dropdown">
           <ul>
             <li>
-              {/* <button value="USD" onClick={e => setCurrencyTrigger(e)}> */}
-              <button value="USD">USD</button>
+              <button value="VND" onClick={(e) => setCurrencyTrigger(e)}>
+                VND
+              </button>
             </li>
             <li>
-              {/* <button value="EUR" onClick={e => setCurrencyTrigger(e)}> */}
-              <button value="EUR">EUR</button>
-            </li>
-            <li>
-              {/* <button value="GBP" onClick={e => setCurrencyTrigger(e)}> */}
-              <button value="GBP">GBP</button>
+              <button value="USD" onClick={(e) => setCurrencyTrigger(e)}>
+                USD
+              </button>
             </li>
           </ul>
         </div>
       </div>
       <div className="same-language-currency">
-        <p>Call Us 3965410</p>
+        <p>
+          Gọi cho chúng tôi: <span className="phone-number">0987654321</span>
+        </p>
       </div>
     </div>
   );

@@ -196,12 +196,12 @@ const OrderDetail = () => {
       <Breadcrumb
         pages={[
           { label: "home", path: "/" },
-          { label: "pages.orders", path: "/orders" },
+          { label: "pages.orders", path: "/pages/my-account/orders" },
           { label: "pages.orders_tracking", path: pathname },
         ]}
       />
       <div className="bg-white p-100">
-        <h3>Trạng thái đơn hàng: #{order.code.toUpperCase()}</h3>
+        <h3>Trạng thái đơn hàng: #{order.code}</h3>
         <hr />
         <div className="table-content table-responsive order-tracking-table-content">
           <table className="w-100">

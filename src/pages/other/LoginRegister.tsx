@@ -74,12 +74,17 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                             <Form.Item
                               name="email"
                               rules={[
-                                { required: true },
+                                {
+                                  required: true,
+                                  message: "Please enter your email address",
+                                },
                                 {
                                   type: "email",
-                                  message: t(
-                                    "pages.login.errors.validEmail",
-                                    "Invalid email address"
+                                  message: (
+                                    <span>
+                                      Invalid email address. Please enter a
+                                      valid email format.
+                                    </span>
                                   ),
                                 },
                               ]}

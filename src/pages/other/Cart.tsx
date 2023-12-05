@@ -1,11 +1,10 @@
 import { ContainerOutlined, LoadingOutlined } from "@ant-design/icons";
-import { NumberField, useModal } from "@refinedev/antd";
+import { useModal } from "@refinedev/antd";
 import {
-  HttpError,
+  Authenticated,
   useApiUrl,
   useCustom,
   useCustomMutation,
-  useList,
   useNotification,
 } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
@@ -16,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { dataProvider } from "../../api/dataProvider";
 import VoucherModal from "../../components/voucher/VoucherModal";
+import { CurrencyFormatter, formatCurrency } from "../../helpers/currency";
 import { cartItemStock, getDiscountPrice } from "../../helpers/product";
 import {
   IDistrict,
@@ -32,7 +32,6 @@ import {
 import { setOrder } from "../../redux/slices/order-slice";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { CurrencyFormatter } from "../../helpers/currency";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -73,15 +72,6 @@ const Cart = () => {
   const [provinceName, setProvinceName] = useState("");
   const [districtName, setDistrictName] = useState("");
   const [wardName, setWardName] = useState("");
-
-  const { data, isLoading, isError } = useList<IVoucherResponse, HttpError>({
-    resource: "vouchers",
-    pagination: {
-      pageSize: 1000,
-    },
-  });
-
-  const vouchers = data?.data ? data?.data : [];
 
   const { isLoading: isLoadingProvince, refetch: refetchProvince } = useCustom<
     IProvince[]
@@ -202,11 +192,9 @@ const Cart = () => {
           },
         },
         successNotification: (data: any, values) => {
-          const shippingMoney = (
-            <CurrencyFormatter
-              value={data?.response.data.total ?? 0}
-              currency={currency}
-            />
+          const shippingMoney = formatCurrency(
+            data?.response.data.total ?? 0,
+            currency
           );
           return {
             message:
@@ -495,7 +483,7 @@ const Cart = () => {
                 </div>
               </div>
 
-              <div className="row">
+              <div className="row justify-content-between">
                 <div className="col-lg-4 col-md-6">
                   <div className="cart-tax">
                     <div className="title-wrap">
@@ -606,7 +594,7 @@ const Cart = () => {
                             className="cart-btn-2"
                             disabled={isLoadingFee}
                           >
-                            {isLoading && (
+                            {isLoadingFee && (
                               <span className="loading">
                                 <LoadingOutlined />
                               </span>
@@ -619,41 +607,43 @@ const Cart = () => {
                   </div>
                 </div>
 
-                <div className="col-lg-4 col-md-6">
-                  <div className="discount-code-wrapper">
-                    <div className="title-wrap">
-                      <h4 className="cart-bottom-title section-bg-gray">
-                        {t(`cart.voucher.title`)}
-                      </h4>
-                    </div>
-                    <div className="discount-code">
-                      <p>{t(`cart.voucher.subtitle`)}</p>
-                      <form onSubmit={handleSubmit}>
-                        <input
-                          type="text"
-                          required
-                          name="voucher_code"
-                          value={voucherCode}
-                          onChange={handleChange}
-                        />
-                        <Space>
-                          <button className="cart-btn-2" type="submit">
-                            {t(`cart.buttons.apply_voucher`)}
-                          </button>
-                          <Tooltip title="Xem voucher">
-                            <button
-                              className="cart-btn-3"
-                              type="button"
-                              onClick={show}
-                            >
-                              <ContainerOutlined />
+                <Authenticated fallback={false}>
+                  <div className="col-lg-4 col-md-6">
+                    <div className="discount-code-wrapper">
+                      <div className="title-wrap">
+                        <h4 className="cart-bottom-title section-bg-gray">
+                          {t(`cart.voucher.title`)}
+                        </h4>
+                      </div>
+                      <div className="discount-code">
+                        <p>{t(`cart.voucher.subtitle`)}</p>
+                        <form onSubmit={handleSubmit}>
+                          <input
+                            type="text"
+                            required
+                            name="voucher_code"
+                            value={voucherCode}
+                            onChange={handleChange}
+                          />
+                          <Space>
+                            <button className="cart-btn-2" type="submit">
+                              {t(`cart.buttons.apply_voucher`)}
                             </button>
-                          </Tooltip>
-                        </Space>
-                      </form>
+                            <Tooltip title="Xem voucher">
+                              <button
+                                className="cart-btn-3"
+                                type="button"
+                                onClick={show}
+                              >
+                                <ContainerOutlined />
+                              </button>
+                            </Tooltip>
+                          </Space>
+                        </form>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Authenticated>
 
                 <div className="col-lg-4 col-md-12">
                   <div className="grand-totall">
@@ -722,11 +712,9 @@ const Cart = () => {
           )}
         </div>
       </div>
-      <VoucherModal
-        vouchers={vouchers}
-        isLoading={false}
-        restModalProps={restModalProps}
-      />
+      <Authenticated fallback={false}>
+        <VoucherModal restModalProps={restModalProps} />
+      </Authenticated>
     </Fragment>
   );
 };

@@ -10,6 +10,7 @@ import {
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 const Wishlist = () => {
   const { t } = useTranslation();
@@ -54,13 +55,12 @@ const Wishlist = () => {
                             wishlistItem.price.max,
                             wishlistItem.discount
                           );
-                          const finalProductPrice = (
-                            wishlistItem.price.max * currency.currencyRate
-                          ).toFixed(2);
+                          const finalProductPrice =
+                            wishlistItem.price.max * currency.currencyRate;
                           const finalDiscountedPrice = +(
                             (discountedPrice ?? wishlistItem.discount) *
                             currency.currencyRate
-                          ).toFixed(2);
+                          );
 
                           return (
                             <tr key={key}>
@@ -83,29 +83,23 @@ const Wishlist = () => {
                               <td className="product-price-cart">
                                 {discountedPrice !== null ? (
                                   <Fragment>
-                                    <span className="amount old">
-                                      {new Intl.NumberFormat("en-US", {
-                                        style: "currency",
-                                        currency: currency.currencyName,
-                                        currencyDisplay: "symbol",
-                                      }).format(Number(finalProductPrice))}
-                                    </span>
-                                    <span className="amount">
-                                      {new Intl.NumberFormat("en-US", {
-                                        style: "currency",
-                                        currency: currency.currencyName,
-                                        currencyDisplay: "symbol",
-                                      }).format(finalDiscountedPrice)}
-                                    </span>
+                                    <CurrencyFormatter
+                                      className="amount old"
+                                      value={finalProductPrice}
+                                      currency={currency}
+                                    />
+                                    <CurrencyFormatter
+                                      className="amount"
+                                      value={finalDiscountedPrice}
+                                      currency={currency}
+                                    />
                                   </Fragment>
                                 ) : (
-                                  <span className="amount">
-                                    {new Intl.NumberFormat("en-US", {
-                                      style: "currency",
-                                      currency: currency.currencyName,
-                                      currencyDisplay: "symbol",
-                                    }).format(Number(finalProductPrice))}
-                                  </span>
+                                  <CurrencyFormatter
+                                    className="amount"
+                                    value={finalProductPrice}
+                                    currency={currency}
+                                  />
                                 )}
                               </td>
 

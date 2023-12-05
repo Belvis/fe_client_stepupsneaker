@@ -35,9 +35,7 @@ export const NavMenu: React.FC<NavMenuProps> = ({
             <NavLink to={"/shop"}>{t("nav.shop")}</NavLink>
           </li>
           <li>
-            <NavLink to={"/orders/tracking"}>
-              {t("nav.pages.tracking_page")}
-            </NavLink>
+            <NavLink to={"/tracking"}>{t("nav.pages.tracking_page")}</NavLink>
           </li>
           <li>
             <NavLink to={"/pages"} onClick={handleNavLinkClick}>
@@ -79,6 +77,9 @@ export const NavMenu: React.FC<NavMenuProps> = ({
                 </NavLink>
               </li>
             </ul>
+          </li>
+          <li>
+            <NavLink to={"/about_us"}>{t("nav.about_us")}</NavLink>
           </li>
           <li>
             <NavLink to={"/contact"}>{t("nav.contact_us")}</NavLink>

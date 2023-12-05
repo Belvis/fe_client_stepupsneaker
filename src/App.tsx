@@ -42,6 +42,9 @@ import Wishlist from "./pages/other/Wishlist";
 import ProductTabLeft from "./pages/product/ProductTabLeft";
 import ShopGridStandard from "./pages/shop/ShopGridStandard";
 import { Footer, Header } from "./wrappers";
+import Contact from "./pages/other/Contact";
+import About from "./pages/other/About";
+import ResetPassword from "./pages/other/ResetPassword";
 
 // Icons
 
@@ -102,6 +105,7 @@ function App() {
                               layout="container-fluid"
                               headerPaddingClass="header-padding-1"
                               headerBgClass="bg-white"
+                              top="visible"
                             />
                           )}
                           Sider={() => <></>}
@@ -123,12 +127,13 @@ function App() {
                         path={"/product/:id"}
                         element={<ProductTabLeft />}
                       />
-                      <Route path="pages">
+                      <Route path="contact" element={<Contact />} />
+                      <Route path="about_us" element={<About />} />
+                      <Route path="/pages">
                         <Route path="checkout" element={<Checkout />} />
                         <Route path="cart" element={<Cart />} />
                         <Route path="compare" element={<Compare />} />
                         <Route path="wishlist" element={<Wishlist />} />
-
                         <Route
                           element={
                             <Authenticated fallback={<Outlet />}>
@@ -157,24 +162,28 @@ function App() {
                             </Authenticated>
                           }
                         >
-                          <Route path="my-account" element={<MyAccount />} />
+                          <Route path="my-account">
+                            <Route index element={<MyAccount />} />
+                            <Route path={"orders"}>
+                              <Route index element={<MyOrders />} />
+                              <Route path=":id" element={<OrderDetail />} />
+                            </Route>
+                          </Route>
                         </Route>
                       </Route>
 
-                      <Route path={"/success/:id"} element={<Success />} />
+                      <Route path="/success/:id" element={<Success />} />
                       <Route
-                        path={"/submission-failed"}
+                        path="/submission-failed"
                         element={<SubmissionFailed />}
                       />
-                      <Route path={"/orders/:id"} element={<OrderDetail />} />
-                      <Route path={"/orders"} element={<MyOrders />} />
+                      <Route path="/tracking">
+                        <Route index element={<TrackingPage />} />
+                        <Route path=":code" element={<OrderTracking />} />
+                      </Route>
                       <Route
-                        path={"/orders/tracking/:code"}
-                        element={<OrderTracking />}
-                      />
-                      <Route
-                        path={"/orders/tracking"}
-                        element={<TrackingPage />}
+                        path="/reset-password"
+                        element={<ResetPassword />}
                       />
 
                       <Route path="*" element={<NotFound />} />

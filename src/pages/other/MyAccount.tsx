@@ -4,9 +4,27 @@ import Accordion from "react-bootstrap/Accordion";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { HttpError, useGetIdentity, useList, useUpdate } from "@refinedev/core";
-import { Badge, Form, Spin, List as AntdList } from "antd";
 import {
+  HttpError,
+  useApiUrl,
+  useCustomMutation,
+  useDelete,
+  useGetIdentity,
+  useList,
+  useUpdate,
+} from "@refinedev/core";
+import clsx from "clsx";
+import {
+  Badge,
+  Form,
+  Spin,
+  List as AntdList,
+  Upload,
+  message,
+  Avatar,
+} from "antd";
+import {
+  IAddressResponse,
   ICustomerRequest,
   ICustomerResponse,
   IVoucherResponse,
@@ -14,16 +32,36 @@ import {
 import dayjs from "dayjs";
 import { RootState } from "../../redux/store";
 import { useSelector } from "react-redux";
+import { CurrencyFormatter } from "../../helpers/currency";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { getValueFromEvent, useModalForm } from "@refinedev/antd";
+import {
+  RcFile,
+  UploadChangeParam,
+  UploadFile,
+  UploadProps,
+} from "antd/es/upload";
+import { getBase64Image } from "../../helpers/image";
+import { CreateAddressModal } from "../../components/address/CreateAddressModal";
+import { EditAddressModal } from "../../components/address/EditAddressModal";
 
 const MyAccount = () => {
   const { t } = useTranslation();
+  const API_URL = useApiUrl();
+  const [loading, setLoading] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const [userInfoForm] = Form.useForm<ICustomerRequest>();
+  const imageUrl = Form.useWatch("image", userInfoForm);
 
   useDocumentTitle(t("nav.pages.my_account") + " | SUNS");
   const currency = useSelector((state: RootState) => state.currency);
 
   let { pathname } = useLocation();
 
-  const { mutate: update } = useUpdate();
+  const { mutate: update, isLoading: isLoadingUpdate } = useUpdate();
+  const { mutate: setDefault } = useCustomMutation<IAddressResponse>();
+  const { mutate: remove } = useDelete();
 
   const { data, refetch } = useGetIdentity<ICustomerResponse>();
 
@@ -42,15 +80,15 @@ const MyAccount = () => {
 
   const [copied, setCopied] = useState(false);
 
-  const [userInfoForm] = Form.useForm<ICustomerRequest>();
-
   useEffect(() => {
     if (data) {
       const dob = dayjs(new Date(data.dateOfBirth)).format("YYYY-MM-DD");
       userInfoForm.setFieldsValue({
         fullName: data ? data.fullName : "",
-        email: data ? data.email : "",
         dateOfBirth: data ? dob : "",
+        email: data ? data.email : "",
+        gender: data ? data.gender : "",
+        image: data ? data.image : "",
       });
     }
   }, [data]);
@@ -63,6 +101,8 @@ const MyAccount = () => {
           ...data,
           fullName: values.fullName ?? data?.fullName,
           email: values.email ?? data?.email,
+          gender: values.gender ?? data?.gender,
+          image: values.image ?? data?.image,
           dateOfBirth:
             toTimeStamp(values.dateOfBirth as string) ?? data?.dateOfBirth,
         },
@@ -77,6 +117,103 @@ const MyAccount = () => {
     );
   };
 
+  const removeAddress = (id: string) => {
+    remove(
+      {
+        resource: "addresses",
+        id,
+      },
+      {
+        onError: (error, variables, context) => {},
+        onSuccess: (data, variables, context) => {
+          refetch();
+        },
+      }
+    );
+  };
+
+  const uploadButton = (
+    <div>
+      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
+
+  const beforeUpload = (file: RcFile) => {
+    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+    if (!isJpgOrPng) {
+      messageApi.open({
+        type: "error",
+        content: "You can only upload JPG/PNG file!",
+      });
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      messageApi.open({
+        type: "error",
+        content: "Image must smaller than 2MB!",
+      });
+    }
+    return isJpgOrPng && isLt2M;
+  };
+
+  const handleChange: UploadProps["onChange"] = (
+    info: UploadChangeParam<UploadFile>
+  ) => {
+    if (info.file.status === "uploading") {
+      setLoading(true);
+      return;
+    }
+    if (info.file.status === "done") {
+      getBase64Image(info.file.originFileObj as RcFile, (url) => {
+        setLoading(false);
+        console.log(url);
+
+        userInfoForm.setFieldValue("image", url);
+      });
+    }
+  };
+
+  const {
+    modalProps: createModalProps,
+    formProps: createFormProps,
+    show: createModalShow,
+    onFinish: createOnFinish,
+    close: createModalClose,
+  } = useModalForm<IAddressResponse>({
+    resource: "addresses",
+    onMutationSuccess: () => {
+      createFormProps.form?.resetFields();
+      refetch().then(() => {
+        createModalClose();
+      });
+    },
+    autoSubmitClose: true,
+    autoResetForm: true,
+    action: "create",
+    redirect: false,
+    warnWhenUnsavedChanges: false,
+  });
+
+  const {
+    modalProps: editModalProps,
+    formProps: editFormProps,
+    show: editModalShow,
+    onFinish: editOnFinish,
+    close: editModalClose,
+  } = useModalForm<IAddressResponse>({
+    resource: "addresses",
+    onMutationSuccess: () => {
+      refetch().then(() => {
+        editModalClose();
+      });
+    },
+    action: "edit",
+    redirect: false,
+    autoSubmitClose: true,
+    warnWhenUnsavedChanges: false,
+  });
+
   function toTimeStamp(date: string) {
     return dayjs(date).valueOf();
   }
@@ -85,19 +222,15 @@ const MyAccount = () => {
     const { id, code, value, constraint, image, endDate, quantity, type } =
       item;
 
-    const constraintPrice = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency.currencyName,
-      currencyDisplay: "symbol",
-    }).format(constraint);
+    const constraintPrice = (
+      <CurrencyFormatter value={constraint} currency={currency} />
+    );
     const cashPrice =
-      type === "CASH"
-        ? new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: currency.currencyName,
-            currencyDisplay: "symbol",
-          }).format(value)
-        : 0;
+      type === "CASH" ? (
+        <CurrencyFormatter value={value} currency={currency} />
+      ) : (
+        0
+      );
 
     const handleCopyCode = () => {
       if (code) {
@@ -141,8 +274,36 @@ const MyAccount = () => {
     );
   }
 
+  function handleAddressSetDefault(id: string) {
+    const apiUrl = `${API_URL}/addresses/set-default-address?address=${id}`;
+
+    setDefault(
+      {
+        url: apiUrl,
+        method: "put",
+        values: { address: id },
+        successNotification: () => ({
+          message: "Successfully set default.",
+          description: "Success with no errors",
+          type: "success",
+        }),
+        errorNotification: () => ({
+          message: "Something went wrong when setting default address",
+          description: "Error",
+          type: "error",
+        }),
+      },
+      {
+        onSuccess: () => {
+          // Assuming refetch is a function that fetches data again
+          refetch();
+        },
+      }
+    );
+  }
   return (
     <Fragment>
+      {contextHolder}
       <Breadcrumb
         pages={[
           { label: "home", path: "/" },
@@ -166,15 +327,65 @@ const MyAccount = () => {
                       <Accordion.Body>
                         <Form
                           layout="vertical"
-                          form={userInfoForm}
                           onFinish={(values) => updateUserInfo(values)}
-                          requiredMark={false}
+                          form={userInfoForm}
+                          initialValues={{
+                            fullName: "",
+                            dateOfBirth: "",
+                            email: "",
+                            gender: "",
+                            image: "",
+                          }}
                         >
                           <div className="myaccount-info-wrapper">
                             <div className="account-info-wrapper">
                               <h5>Thông tin cá nhân của bạn</h5>
                             </div>
                             <div className="row">
+                              <div className="col-12 text-center mb-3">
+                                <Form.Item
+                                  name="image"
+                                  valuePropName="file"
+                                  getValueFromEvent={getValueFromEvent}
+                                  noStyle
+                                >
+                                  <Upload
+                                    name="file"
+                                    listType="picture-circle"
+                                    className="avatar-uploader"
+                                    showUploadList={false}
+                                    action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                                    beforeUpload={beforeUpload}
+                                    onChange={handleChange}
+                                    maxCount={1}
+                                    customRequest={({
+                                      onSuccess,
+                                      onError,
+                                      file,
+                                    }) => {
+                                      if (onSuccess) {
+                                        try {
+                                          onSuccess("ok");
+                                        } catch (error) {}
+                                      }
+                                    }}
+                                  >
+                                    {imageUrl ? (
+                                      <Avatar
+                                        style={{
+                                          width: "100%",
+                                          height: "100%",
+                                          // maxWidth: "200px",
+                                        }}
+                                        src={imageUrl}
+                                        alt="User avatar"
+                                      />
+                                    ) : (
+                                      uploadButton
+                                    )}
+                                  </Upload>
+                                </Form.Item>
+                              </div>
                               <div className="col-lg-6 col-md-6">
                                 <div className="billing-info">
                                   <label>Tên</label>
@@ -219,6 +430,7 @@ const MyAccount = () => {
                                       {
                                         required: true,
                                         message: "Email không được để trống!",
+                                        type: "email",
                                       },
                                     ]}
                                   >
@@ -226,10 +438,42 @@ const MyAccount = () => {
                                   </Form.Item>
                                 </div>
                               </div>
+                              <div className="col-lg-6 col-md-6">
+                                <div className="billing-select">
+                                  <label>Giới tính</label>
+                                  <Form.Item
+                                    name="gender"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message:
+                                          "Giới tính không được để trống!",
+                                      },
+                                    ]}
+                                  >
+                                    <select name="gender">
+                                      <option value="">
+                                        --Chọn giới tính--
+                                      </option>
+                                      <option value="Male">Nam</option>
+                                      <option value="Female">Nữ</option>
+                                      <option value="Other">Khác</option>
+                                    </select>
+                                  </Form.Item>
+                                </div>
+                              </div>
                             </div>
                             <div className="billing-back-btn">
                               <div className="billing-btn">
-                                <button type="submit">Lưu thay đổi</button>
+                                <button
+                                  className={clsx({ loading: isLoadingUpdate })}
+                                  type="submit"
+                                >
+                                  <span className="loading me-3">
+                                    <LoadingOutlined />
+                                  </span>
+                                  Lưu thay đổi
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -287,54 +531,134 @@ const MyAccount = () => {
                       </Accordion.Header>
                       <Accordion.Body>
                         <div className="myaccount-info-wrapper">
-                          <div className="account-info-wrapper">
-                            <h5>Danh sách địa chỉ</h5>
-                          </div>
-                          {data && data.addressList ? (
-                            <div className="entries-wrapper">
-                              {data.addressList.map((address) => {
-                                const {
-                                  phoneNumber,
-                                  provinceName,
-                                  districtName,
-                                  wardName,
-                                  more,
-                                  isDefault,
-                                } = address;
-                                return (
-                                  <Badge.Ribbon
-                                    text="Mặc định"
-                                    placement="start"
-                                    color="green"
-                                    style={{ display: isDefault ? "" : "none" }}
-                                  >
-                                    <div className="row">
-                                      <div className="col-lg-6 col-md-6 d-flex align-items-center justify-content-start">
-                                        <div className="entries-info">
-                                          <p>Số điện thoại: {phoneNumber}</p>
-                                          <p>Tỉnh/thành phố: {provinceName}</p>
-                                          <p>Quận/huyện: {districtName}</p>
-                                          <p>Phường/xã: {wardName}</p>
-                                          <p>Chi tiết: {more}</p>
-                                        </div>
-                                      </div>
-                                      <div className="col-lg-6 col-md-6 d-flex align-items-center justify-content-center">
-                                        <div className="entries-edit-delete text-center">
-                                          <button className="edit">Sửa</button>
-                                          <button className="edit">
-                                            Đặt mặc định
-                                          </button>
-                                          <button>Xoá</button>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </Badge.Ribbon>
-                                );
-                              })}
+                          <div className="account-info-wrapper row">
+                            <div className="col">
+                              <h5>Danh sách địa chỉ</h5>
                             </div>
-                          ) : (
-                            "Bạn chưa có địa chỉ, vui lòng tạo địa chỉ trước."
-                          )}
+                            <div className="col text-end">
+                              <button
+                                onClick={() => {
+                                  createFormProps.form?.resetFields();
+                                  createModalShow();
+                                }}
+                              >
+                                Thêm địa chỉ mới
+                              </button>
+                            </div>
+                          </div>
+                          {data && data.addressList
+                            ? data.addressList
+                                .sort((a, b) =>
+                                  a.isDefault === b.isDefault
+                                    ? 0
+                                    : a.isDefault
+                                    ? -1
+                                    : 1
+                                )
+                                .map((address) => {
+                                  const {
+                                    phoneNumber,
+                                    provinceName,
+                                    districtName,
+                                    wardName,
+                                    more,
+                                    isDefault,
+                                    id,
+                                  } = address;
+
+                                  return (
+                                    <div
+                                      className="entries-wrapper mb-3"
+                                      key={id}
+                                    >
+                                      <Badge.Ribbon
+                                        key={id}
+                                        text="Mặc định"
+                                        placement="start"
+                                        color="green"
+                                        style={{
+                                          display: isDefault ? "" : "none",
+                                        }}
+                                      >
+                                        <div className="row">
+                                          <div className="col-lg-6 col-md-6 d-flex align-items-center">
+                                            <div className="entries-info">
+                                              <div className="row">
+                                                <div className="col fw-bold">
+                                                  Số điện thoại:
+                                                </div>
+                                                <div className="col text-end">
+                                                  {phoneNumber}
+                                                </div>
+                                              </div>
+                                              <div className="row">
+                                                <div className="col fw-bold">
+                                                  Tỉnh/thành phố:
+                                                </div>
+                                                <div className="col text-end">
+                                                  {provinceName}
+                                                </div>
+                                              </div>
+                                              <div className="row">
+                                                <div className="col fw-bold">
+                                                  Quận/huyện:
+                                                </div>
+                                                <div className="col text-end">
+                                                  {districtName}
+                                                </div>
+                                              </div>
+                                              <div className="row">
+                                                <div className="col fw-bold">
+                                                  Phường/xã:
+                                                </div>
+                                                <div className="col text-end">
+                                                  {wardName}
+                                                </div>
+                                              </div>
+                                              <div className="row">
+                                                <div className="col fw-bold">
+                                                  Chi tiết:
+                                                </div>
+                                                <div className="col text-end">
+                                                  {more}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="col-lg-6 col-md-6 d-flex align-items-center justify-content-center">
+                                            <div className="entries-edit-delete text-center">
+                                              <button
+                                                className="edit"
+                                                onClick={() =>
+                                                  editModalShow(id)
+                                                }
+                                              >
+                                                Sửa
+                                              </button>
+                                              <button
+                                                className="edit"
+                                                onClick={() =>
+                                                  handleAddressSetDefault(id)
+                                                }
+                                                disabled={isDefault}
+                                              >
+                                                Đặt mặc định
+                                              </button>
+                                              <button
+                                                onClick={() =>
+                                                  removeAddress(id)
+                                                }
+                                              >
+                                                Xoá
+                                              </button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </Badge.Ribbon>
+                                    </div>
+                                  );
+                                })
+                            : "Bạn chưa có địa chỉ, vui lòng tạo địa chỉ trước."}
                         </div>
                       </Accordion.Body>
                     </Accordion.Item>
@@ -368,6 +692,17 @@ const MyAccount = () => {
           </div>
         </Spin>
       </div>
+      <CreateAddressModal
+        onFinish={createOnFinish}
+        modalProps={createModalProps}
+        formProps={createFormProps}
+        customer={data}
+      />
+      <EditAddressModal
+        onFinish={editOnFinish}
+        modalProps={editModalProps}
+        formProps={editFormProps}
+      />
     </Fragment>
   );
 };

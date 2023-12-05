@@ -19,6 +19,7 @@ import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { clearOrder } from "../../redux/slices/order-slice";
 import { deleteAllFromCart } from "../../redux/slices/cart-slice";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 const Success = () => {
   const { t } = useTranslation();
@@ -244,21 +245,17 @@ const Success = () => {
                       detail?.totalPrice ?? 0,
                       0
                     );
-                    const finalProductPrice = (
-                      (detail?.totalPrice ?? 0) * currency.currencyRate
-                    ).toFixed(2);
+                    const finalProductPrice =
+                      (detail?.totalPrice ?? 0) * currency.currencyRate;
                     const finalDiscountedPrice =
                       discountedPrice !== null
-                        ? parseFloat(
-                            (discountedPrice * currency.currencyRate).toFixed(2)
-                          )
+                        ? discountedPrice * currency.currencyRate
                         : 0.0;
 
                     discountedPrice !== null
                       ? (cartTotalPrice +=
                           finalDiscountedPrice * detail.quantity)
-                      : (cartTotalPrice +=
-                          parseFloat(finalProductPrice) * detail.quantity);
+                      : (cartTotalPrice += finalProductPrice * detail.quantity);
 
                     return (
                       <tr key={key}>
@@ -300,25 +297,17 @@ const Success = () => {
                         </td>
                         <td className="value">
                           {discountedPrice !== null ? (
-                            <span className="amount">
-                              {new Intl.NumberFormat("en-US", {
-                                style: "currency",
-                                currency: currency.currencyName,
-                                currencyDisplay: "symbol",
-                              }).format(
-                                Number(finalDiscountedPrice) * detail.quantity
-                              )}
-                            </span>
+                            <CurrencyFormatter
+                              className="amount"
+                              value={finalDiscountedPrice * detail.quantity}
+                              currency={currency}
+                            />
                           ) : (
-                            <span className="amount">
-                              {new Intl.NumberFormat("en-US", {
-                                style: "currency",
-                                currency: currency.currencyName,
-                                currencyDisplay: "symbol",
-                              }).format(
-                                Number(finalProductPrice) * detail.quantity
-                              )}
-                            </span>
+                            <CurrencyFormatter
+                              className="amount"
+                              value={finalProductPrice * detail.quantity}
+                              currency={currency}
+                            />
                           )}
                         </td>
                       </tr>
@@ -333,13 +322,10 @@ const Success = () => {
                         <h5>{t(`cart.cart_total.total`)} </h5>
                       </div>
                       <div className="col-3">
-                        <span>
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: currency.currencyName,
-                            currencyDisplay: "symbol",
-                          }).format(Number(cartTotalPrice.toFixed(2)))}
-                        </span>
+                        <CurrencyFormatter
+                          value={cartTotalPrice}
+                          currency={currency}
+                        />
                       </div>
                     </div>
                     <div className="row">
@@ -347,13 +333,11 @@ const Success = () => {
                         <h5>{t(`cart.cart_total.shipping`)} </h5>
                       </div>
                       <div className="col-3">
-                        <span>
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: currency.currencyName,
-                            currencyDisplay: "symbol",
-                          }).format(order.shippingMoney)}
-                        </span>
+                        <CurrencyFormatter
+                          className="amount"
+                          value={order.shippingMoney}
+                          currency={currency}
+                        />
                       </div>
                     </div>
                     <div className="row">
@@ -361,20 +345,16 @@ const Success = () => {
                         <h5>Giảm giá</h5>
                       </div>
                       <div className="col-3">
-                        <span>
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: currency.currencyName,
-                            currencyDisplay: "symbol",
-                          }).format(
+                        <CurrencyFormatter
+                          value={
                             order.voucher
                               ? order.voucher.type == "PERCENTAGE"
-                                ? (order.voucher.value / 100) *
-                                  Number(order.totalMoney.toFixed(2))
+                                ? (order.voucher.value / 100) * order.totalMoney
                                 : order.voucher.value
                               : 0
-                          )}
-                        </span>
+                          }
+                          currency={currency}
+                        />
                       </div>
                     </div>
                     <div className="row">
@@ -384,13 +364,10 @@ const Success = () => {
                         </h4>
                       </div>
                       <div className="col-3">
-                        <span>
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: currency.currencyName,
-                            currencyDisplay: "symbol",
-                          }).format(order.totalMoney)}
-                        </span>
+                        <CurrencyFormatter
+                          value={order.totalMoney}
+                          currency={currency}
+                        />
                       </div>
                     </div>
                   </th>

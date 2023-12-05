@@ -15,3 +15,14 @@ export const CurrencyFormatter: React.FC<{
     </span>
   );
 };
+
+export const formatCurrency: (
+  value: number,
+  currency: CurrencyState
+) => string = (value, currency) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: currency.currencyName,
+    currencyDisplay: "symbol",
+  }).format(value);
+};

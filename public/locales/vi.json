@@ -18,8 +18,10 @@
         "success": "Thành công",
         "submission_failed": "Giao dịch không thành công",
         "failed": "Thất bại",
-        "order": "Hoá đơn",
-        "tracking_page": "Tra cứu đơn hàng"
+        "order": "Đơn hàng",
+        "tracking_page": "Tra cứu đơn hàng",
+        "my_orders": "Đơn hàng của tôi",
+        "reset_password": "Đặt lại mật khẩu"
       },
       "contact_us": "Liên hệ",
       "about_us": "Về chúng tôi"

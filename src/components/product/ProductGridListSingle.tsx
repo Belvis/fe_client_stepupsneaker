@@ -33,12 +33,10 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
 
   const [modalShow, setModalShow] = useState(false);
   const discountedPrice = getDiscountPrice(product.price.min, product.discount);
-  const finalProductPrice = +(
-    product.price.min * currency.currencyRate
-  ).toFixed(2);
+  const finalProductPrice = +(product.price.min * currency.currencyRate);
   const finalDiscountedPrice = +(
     (discountedPrice ?? product.discount) * currency.currencyRate
-  ).toFixed(2);
+  );
   const dispatch = useDispatch();
 
   return (

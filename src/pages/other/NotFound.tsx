@@ -19,23 +19,23 @@ const NotFound = () => {
           { label: "pages.404_page", path: pathname },
         ]}
       />
-      <div className="error-area pt-40 pb-100">
+      <div className="error-area pt-40 pb-100 bg-white">
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-xl-7 col-lg-8 text-center">
               <div className="error">
                 <h1>404</h1>
-                <h2>OPPS! PAGE NOT FOUND</h2>
+                <h2>BUỒN BAYY! TRANG KHÔNG TÌM THẤY</h2>
                 <p>
-                  Sorry but the page you are looking for does not exist, have
-                  been removed, name changed or is temporarity unavailable.
+                  Rất tiếc, nhưng trang bạn đang tìm kiếm không tồn tại, đã bị
+                  xóa, đổi tên hoặc tạm thời không khả dụng.
                 </p>
                 <form className="searchform mb-50">
                   <input
                     type="text"
                     name="search"
                     id="error_search"
-                    placeholder="Search..."
+                    placeholder="Tìm kiếm..."
                     className="searchform__input"
                   />
                   <button type="submit" className="searchform__submit">
@@ -43,7 +43,7 @@ const NotFound = () => {
                   </button>
                 </form>
                 <Link to={"/"} className="error-btn">
-                  Back to home page
+                  Trở lại trang chủ
                 </Link>
               </div>
             </div>

@@ -4,21 +4,43 @@ import MenuCart from "./sub-components/MenuCart";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { Authenticated, useLogout } from "@refinedev/core";
+import { useEffect, useState } from "react";
 
 type IconGroupProps = {
   iconWhiteClass?: string;
 };
 
 export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const { mutate: logout } = useLogout();
 
-  const handleClick = (e: React.MouseEvent) => {
-    const nextSibling = e.currentTarget.nextSibling;
+  // const handleClick = (e: React.MouseEvent) => {
+  //   const nextSibling = e.currentTarget.nextSibling;
 
-    if (nextSibling instanceof Element) {
-      nextSibling.classList.toggle("active");
+  //   if (nextSibling instanceof Element) {
+  //     nextSibling.classList.toggle("active");
+  //   }
+  // };
+
+  const handleClick = (index: number) => {
+    setActiveIndex((prevIndex) => (prevIndex === index ? null : index));
+  };
+
+  const handleOutsideClick = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+
+    if (activeIndex !== null && !target.closest(".active")) {
+      setActiveIndex(null);
     }
   };
+
+  useEffect(() => {
+    document.addEventListener("click", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [activeIndex]);
 
   const triggerMobileMenu = () => {
     const offcanvasMobileMenu = document.querySelector(
@@ -26,6 +48,7 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
     );
     if (offcanvasMobileMenu) offcanvasMobileMenu.classList.add("active");
   };
+
   const { compareItems } = useSelector((state: RootState) => state.compare);
   const { wishlistItems } = useSelector((state: RootState) => state.wishlist);
   const { cartItems } = useSelector((state: RootState) => state.cart);
@@ -33,10 +56,13 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
   return (
     <div className={clsx("header-right-wrap", iconWhiteClass)}>
       <div className="same-style header-search d-none d-lg-block">
-        <button className="search-active" onClick={(e) => handleClick(e)}>
+        <button
+          className={clsx("search-active", { active: activeIndex === 0 })}
+          onClick={() => handleClick(0)}
+        >
           <i className="pe-7s-search" />
         </button>
-        <div className="search-content">
+        <div className={clsx("search-content", { active: activeIndex === 0 })}>
           <form action="#">
             <input type="text" placeholder="Search" />
             <button className="button-search">
@@ -47,12 +73,16 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
       </div>
       <div className="same-style account-setting d-none d-lg-block">
         <button
-          className="account-setting-active"
-          onClick={(e) => handleClick(e)}
+          className={clsx("account-setting-active", {
+            active: activeIndex === 1,
+          })}
+          onClick={() => handleClick(1)}
         >
           <i className="pe-7s-user-female" />
         </button>
-        <div className="account-dropdown">
+        <div
+          className={clsx("account-dropdown", { active: activeIndex === 1 })}
+        >
           <ul>
             <Authenticated
               fallback={
@@ -68,6 +98,9 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
             >
               <li>
                 <Link to={"/pages/my-account"}>Tài khoản</Link>
+              </li>
+              <li>
+                <Link to={"/pages/my-account/orders"}>Đơn hàng</Link>
               </li>
               <li>
                 <Link to={"/"} onClick={() => logout()}>
@@ -95,14 +128,17 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
         </Link>
       </div>
       <div className="same-style cart-wrap d-none d-lg-block">
-        <button className="icon-cart" onClick={(e) => handleClick(e)}>
+        <button
+          className={clsx("icon-cart", { active: activeIndex === 2 })}
+          onClick={() => handleClick(2)}
+        >
           <i className="pe-7s-shopbag" />
           <span className="count-style">
             {cartItems && cartItems.length ? cartItems.length : 0}
           </span>
         </button>
         {/* menu cart */}
-        <MenuCart />
+        <MenuCart activeIndex={activeIndex} />
       </div>
       <div className="same-style cart-wrap d-block d-lg-none">
         <Link className="icon-cart" to={"/cart"}>

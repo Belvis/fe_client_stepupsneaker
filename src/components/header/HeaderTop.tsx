@@ -1,13 +1,15 @@
-import PropTypes from "prop-types";
 import clsx from "clsx";
 import LanguageCurrencyChanger from "./sub-components/LanguageCurrencyChanger";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 type HeaderTopProps = {
   borderStyle: string | undefined;
 };
 
 export const HeaderTop: React.FC<HeaderTopProps> = ({ borderStyle }) => {
-  // const currency = useSelector((state) => state.currency);
+  const currency = useSelector((state: RootState) => state.currency);
   return (
     <div
       className={clsx(
@@ -15,14 +17,11 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({ borderStyle }) => {
         borderStyle === "fluid-border" && "border-bottom"
       )}
     >
-      <LanguageCurrencyChanger currency={undefined} />
+      <LanguageCurrencyChanger currency={currency} />
       <div className="header-offer">
         <p>
-          Free delivery on order over{" "}
-          <span>
-            {/* {currency.currencySymbol + (200 * currency.currencyRate).toFixed(2)} */}
-            0
-          </span>
+          Miễn phí vận chuyển cho đơn hàng trên{" "}
+          <CurrencyFormatter value={20000000} currency={currency} />
         </p>
       </div>
     </div>

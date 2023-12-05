@@ -81,15 +81,6 @@ const DiscountCodeAccordion = () => {
     modalProps: { visible, ...restModalProps },
   } = useModal();
 
-  const { data, isLoading, isError } = useList<IVoucherResponse, HttpError>({
-    resource: "vouchers",
-    pagination: {
-      pageSize: 1000,
-    },
-  });
-
-  const vouchers = data?.data ? data?.data : [];
-
   return (
     <Fragment>
       <Accordion>
@@ -133,11 +124,7 @@ const DiscountCodeAccordion = () => {
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
-      <VoucherModal
-        vouchers={vouchers}
-        isLoading={isLoading}
-        restModalProps={restModalProps}
-      />
+      <VoucherModal restModalProps={restModalProps} />
     </Fragment>
   );
 };

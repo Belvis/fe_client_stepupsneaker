@@ -74,10 +74,10 @@ const ProductModal: React.FC<ProductModalProps> = ({
   );
   const finalProductPrice = +(
     selectedProductSize.price * currency.currencyRate
-  ).toFixed(2);
+  );
   const finalDiscountedPrice = +(
     (discountedPrice ?? selectedProductSize.discount) * currency.currencyRate
-  ).toFixed(2);
+  );
 
   useEffect(() => {
     const selectedVariant = product.variation.find(

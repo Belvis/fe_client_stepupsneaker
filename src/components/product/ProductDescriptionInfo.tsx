@@ -82,10 +82,10 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
   );
   const finalProductPrice = +(
     selectedProductSize.price * currency.currencyRate
-  ).toFixed(2);
+  );
   const finalDiscountedPrice = +(
     (discountedPrice ?? selectedProductSize.discount) * currency.currencyRate
-  ).toFixed(2);
+  );
 
   useEffect(() => {
     setSelectedProductSize(initialSelectedSize);

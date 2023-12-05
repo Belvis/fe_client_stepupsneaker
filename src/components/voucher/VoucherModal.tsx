@@ -5,10 +5,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import dayjs from "dayjs";
 import { CurrencyFormatter } from "../../helpers/currency";
+import { HttpError, useList } from "@refinedev/core";
 
 interface VoucherModalProps {
-  vouchers: IVoucherResponse[];
-  isLoading: boolean;
   restModalProps: {
     open?: boolean | undefined;
     confirmLoading?: boolean | undefined;
@@ -17,13 +16,18 @@ interface VoucherModalProps {
   };
 }
 
-const VoucherModal: React.FC<VoucherModalProps> = ({
-  vouchers,
-  isLoading,
-  restModalProps,
-}) => {
+const VoucherModal: React.FC<VoucherModalProps> = ({ restModalProps }) => {
   const currency = useSelector((state: RootState) => state.currency);
   const [copied, setCopied] = useState(false);
+
+  const { data, isLoading, isError } = useList<IVoucherResponse, HttpError>({
+    resource: "vouchers",
+    pagination: {
+      pageSize: 1000,
+    },
+  });
+
+  const vouchers = data?.data ? data?.data : [];
 
   function renderItem(item: IVoucherResponse) {
     const { id, code, value, constraint, image, endDate, quantity, type } =

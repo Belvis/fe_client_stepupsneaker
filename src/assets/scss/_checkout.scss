@@ -9,6 +9,25 @@
 
     color: #000;
   }
+  a,
+  button {
+    background: none;
+    border: none;
+    background-color: #df5c39;
+    color: #fff;
+    display: inline-block;
+    line-height: 1;
+    margin: 0 2px;
+    padding: 12px 15px;
+    text-transform: uppercase;
+    font-weight: 500;
+    &:hover {
+      background-color: $theme-color;
+    }
+    &:disabled {
+      opacity: 0.6;
+    }
+  }
   .billing-info,
   .billing-select {
     label {
@@ -45,6 +64,59 @@
       -webkit-appearance: none;
          -moz-appearance: none;
               appearance: none;
+    }
+  }
+  .billing-back-btn {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    .billing-back {
+      a {
+        color: #000;
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        &:hover {
+          color: $theme-color;
+        }
+        i {
+          font-size: 16px;
+          color: $theme-color;
+        }
+      }
+    }
+    .billing-btn {
+      button {
+        background-color: #f2f2f2;
+        border: medium none;
+        color: #000;
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1;
+        padding: 16px 35px 17px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 400ms ease;
+        &:hover {
+          background: $theme-color;
+          color: #fff;
+        }
+        span.loading {
+          opacity: 0;
+          display: none;
+        }
+        &.loading {
+          pointer-events: none; 
+          opacity: 0.7;
+    
+          span.loading {
+            opacity: 1;
+            display: inline;
+          }
+        }
+      }
     }
   }
   .checkout-account {

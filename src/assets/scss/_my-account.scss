@@ -76,8 +76,30 @@
         letter-spacing: 0.2px;
         margin-top: 7px;
       }
+      a,
+      button {
+        background: none;
+        border: none;
+        background-color: #000;
+        color: #fff;
+        display: inline-block;
+        line-height: 1;
+        margin: 0 2px;
+        padding: 12px 15px;
+        text-transform: uppercase;
+        font-weight: 500;
+        &:hover {
+          background-color: $theme-color;
+        }
+        &.edit {
+          background-color: #df5c39;
+          &:hover {
+            background-color: $theme-color;
+          }
+        }
+      }
     }
-    .billing-info {
+    .billing-info, .billing-select {
       margin-bottom: 20px;
       label {
         color: #000;
@@ -90,6 +112,23 @@
         color: #000;
         height: 40px;
         padding: 0 15px;
+      }
+    }
+    .billing-select {
+      select {
+        font-size: 14px;
+  
+        height: 40px;
+        padding: 0 15px;
+  
+        cursor: pointer;
+  
+        color: #333;
+        border: 1px solid #e6e6e6;
+  
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none;
       }
     }
     .billing-back-btn {
@@ -125,10 +164,23 @@
           padding: 16px 35px 17px;
           text-transform: uppercase;
           cursor: pointer;
-          transition: all 0.3s ease 0s;
+          transition: all 400ms ease;
           &:hover {
             background: $theme-color;
             color: #fff;
+          }
+          span.loading {
+            opacity: 0;
+            display: none;
+          }
+          &.loading {
+            pointer-events: none; 
+            opacity: 0.7;
+      
+            span.loading {
+              opacity: 1;
+              display: inline;
+            }
           }
         }
       }
@@ -153,12 +205,14 @@
       }
       .entries-info {
         padding: 30px 20px;
+        width: 100%;
         @media #{$xs-layout} {
           padding: 0 10px 30px;
         }
         p {
           color: #000;
           font-size: 15px;
+          // font-family: $josefin;
           margin: 0;
           text-transform: capitalize;
         }
@@ -184,6 +238,9 @@
             &:hover {
               background-color: $theme-color;
             }
+          }
+          &:disabled {
+            opacity: 0.6;
           }
         }
       }

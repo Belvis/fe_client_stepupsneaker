@@ -22,7 +22,7 @@ const TrackingPage = () => {
   const trackOrder = async (code: string) => {
     try {
       const res = await getOne({ resource: "orders/tracking", id: code });
-      navigate(`/orders/tracking/${code}`);
+      navigate(`/tracking/${code}`);
       notification.success({
         message: "Hoàn tất",
         description: "Tra cứu đơn hàng thành công",
@@ -44,7 +44,6 @@ const TrackingPage = () => {
       <Breadcrumb
         pages={[
           { label: "home", path: "/" },
-          { label: "pages.order", path: "/order" },
           { label: "pages.tracking_page", path: pathname },
         ]}
       />

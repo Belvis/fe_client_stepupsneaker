@@ -4,11 +4,15 @@ import { Link } from "react-router-dom";
 import { RootState } from "../../../redux/store";
 import { getDiscountPrice } from "../../../helpers/product";
 import { deleteFromCart } from "../../../redux/slices/cart-slice";
-import { NumberField } from "@refinedev/antd";
 import { useTranslation } from "react-i18next";
 import { CurrencyFormatter } from "../../../helpers/currency";
+import clsx from "clsx";
 
-const MenuCart = () => {
+type MenuCartProps = {
+  activeIndex: number | null;
+};
+
+const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
   const { t } = useTranslation();
 
   const dispatch = useDispatch();
@@ -17,7 +21,9 @@ const MenuCart = () => {
   let cartTotalPrice = 0;
 
   return (
-    <div className="shopping-cart-content">
+    <div
+      className={clsx("shopping-cart-content", { active: activeIndex === 2 })}
+    >
       {cartItems && cartItems.length > 0 ? (
         <Fragment>
           <ul>

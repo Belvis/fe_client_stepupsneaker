@@ -1,29 +1,18 @@
-import { Fragment, useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { getDiscountPrice } from "../../helpers/product";
-import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { RootState } from "../../redux/store";
-import { NumberField, useModal } from "@refinedev/antd";
-import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { Button, Form, RadioChangeEvent, Spin } from "antd";
+import { Fragment, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useLocation } from "react-router-dom";
+import { getDiscountPrice } from "../../helpers/product";
 import {
   ICustomerResponse,
   IDistrict,
   IProvince,
-  IVoucherResponse,
   IWard,
 } from "../../interfaces";
-import {
-  Button,
-  Form,
-  Radio,
-  RadioChangeEvent,
-  Space,
-  Spin,
-  Tooltip,
-} from "antd";
-import Accordion from "react-bootstrap/Accordion";
+import { RootState } from "../../redux/store";
+import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 
 import {
   Authenticated,
@@ -33,13 +22,14 @@ import {
   useGetIdentity,
 } from "@refinedev/core";
 import { useNavigate } from "react-router-dom";
-import { clearOrder, setOrder } from "../../redux/slices/order-slice";
-import { deleteAllFromCart } from "../../redux/slices/cart-slice";
-import { ContainerOutlined } from "@ant-design/icons";
-import VoucherModal from "../../components/voucher/VoucherModal";
-import DiscountCodeAccordion from "../../components/voucher/DiscountCodeAccordion";
 import PaymentMethodAccordion from "../../components/payment-methods/PaymentMethodAccordion";
+import DiscountCodeAccordion from "../../components/voucher/DiscountCodeAccordion";
 import { CurrencyFormatter } from "../../helpers/currency";
+import { deleteAllFromCart } from "../../redux/slices/cart-slice";
+import { clearOrder, setOrder } from "../../redux/slices/order-slice";
+import { useModal } from "@refinedev/antd";
+import { ListAddressModal } from "../../components/address/ListAddressModal";
+import dayjs from "dayjs";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -51,8 +41,6 @@ const CheckOut = () => {
   useDocumentTitle(t("nav.pages.checkout") + " | SUNS");
 
   const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
-
-  console.log(user);
 
   const { mutate, isLoading } = useCreate();
 
@@ -77,17 +65,13 @@ const CheckOut = () => {
     phone_number: string;
     email: string;
     gender: string;
-    date_of_birth: number;
+    date_of_birth: string;
     order_note: string;
   }>();
+
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
     "Cash" | "Card"
   >("Cash");
-  const [voucherCode, setVoucherCode] = useState("");
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setVoucherCode(event.target.value);
-  };
 
   const handlePaymentMethodChange = (e: RadioChangeEvent) => {
     setSelectedPaymentMethod(e.target.value);
@@ -171,6 +155,28 @@ const CheckOut = () => {
       },
     }
   );
+
+  useEffect(() => {
+    if (user) {
+      const dob = dayjs(new Date(user.dateOfBirth)).format("YYYY-MM-DD");
+      form.setFieldsValue({
+        full_name: user.fullName,
+        email: user.email,
+        gender: user.gender,
+        date_of_birth: dob,
+      });
+    }
+
+    if (order.address) {
+      form.setFieldsValue({
+        phone_number: order.address.phoneNumber,
+        provinceId: Number(order.address.provinceId),
+        districtId: Number(order.address.districtId),
+        wardCode: order.address.wardCode,
+        line: order.address.more,
+      });
+    }
+  }, [user, order]);
 
   useEffect(() => {
     setProvinces([]);
@@ -296,7 +302,7 @@ const CheckOut = () => {
     phone_number: string;
     email: string;
     gender: string;
-    date_of_birth: number;
+    date_of_birth: string;
     order_note: string;
   }): void {
     4;
@@ -309,7 +315,7 @@ const CheckOut = () => {
         return { id: productDetailId, quantity };
       });
     const submitData = {
-      customer: "",
+      customer: user?.id ?? "",
       employee: "",
       voucher: order.voucher ? order.voucher.id : "",
       phoneNumber: values.phone_number,
@@ -355,6 +361,12 @@ const CheckOut = () => {
     );
   }
 
+  const {
+    show,
+    close,
+    modalProps: { visible, ...restModalProps },
+  } = useModal();
+
   return (
     <Fragment>
       <Spin spinning={isLoading} fullscreen />
@@ -375,6 +387,17 @@ const CheckOut = () => {
                 onFinish={onFinish}
                 // onFinishFailed={onFinishFailed}
                 autoComplete="off"
+                initialValues={{
+                  full_name: "",
+                  email: "",
+                  gender: "",
+                  date_of_birth: "",
+                  phone_number: "",
+                  provinceId: "",
+                  districtId: "",
+                  wardCode: "",
+                  more: "",
+                }}
               >
                 <div className="col-lg-7">
                   <div className="billing-info-wrap">
@@ -382,11 +405,17 @@ const CheckOut = () => {
                       <div className="col">
                         <h3>{t("checkout.billing_details.title")}</h3>
                       </div>
-                      <div className="col text-center">
+                      <div className="col text-end">
                         <Authenticated fallback={false}>
-                          <Button style={{ borderRadius: 0 }}>
+                          <button
+                            style={{ marginInlineEnd: "16px" }}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              show();
+                            }}
+                          >
                             Chọn địa chỉ của bạn
-                          </Button>
+                          </button>
                         </Authenticated>
                       </div>
                     </div>
@@ -496,11 +525,6 @@ const CheckOut = () => {
                                 message: "Tỉnh/thành phố không được để trống!",
                               },
                             ]}
-                            initialValue={
-                              order.address
-                                ? Number(order.address.provinceId)
-                                : ""
-                            }
                           >
                             {provinces.length > 0 ? (
                               <select onChange={handleProvinceChange}>
@@ -539,11 +563,6 @@ const CheckOut = () => {
                                 message: "Quận/huyện không được để trống!",
                               },
                             ]}
-                            initialValue={
-                              order.address
-                                ? Number(order.address.districtId)
-                                : ""
-                            }
                           >
                             {districts.length > 0 ? (
                               <select onChange={handleDistrictChange}>
@@ -578,9 +597,6 @@ const CheckOut = () => {
                                 message: "Phường/xã không được để trống!",
                               },
                             ]}
-                            initialValue={
-                              order.address ? order.address.wardCode : ""
-                            }
                           >
                             {wards.length > 0 ? (
                               <select onChange={handleWardChange}>
@@ -661,30 +677,24 @@ const CheckOut = () => {
                                 cartItem.selectedProductSize?.price ?? 0,
                                 0
                               );
-                              const finalProductPrice = (
+                              const finalProductPrice =
                                 (cartItem.selectedProductSize?.price ?? 0) *
-                                currency.currencyRate
-                              ).toFixed(2);
+                                currency.currencyRate;
                               const finalDiscountedPrice =
                                 discountedPrice !== null
-                                  ? parseFloat(
-                                      (
-                                        discountedPrice * currency.currencyRate
-                                      ).toFixed(2)
-                                    )
+                                  ? discountedPrice * currency.currencyRate
                                   : 0.0;
 
                               discountedPrice !== null
                                 ? (cartTotalPrice +=
                                     finalDiscountedPrice * cartItem.quantity)
                                 : (cartTotalPrice +=
-                                    parseFloat(finalProductPrice) *
-                                    cartItem.quantity);
+                                    finalProductPrice * cartItem.quantity);
 
                               discount = order.voucher
                                 ? order.voucher.type == "PERCENTAGE"
                                   ? (order.voucher.value / 100) *
-                                    Number(cartTotalPrice.toFixed(2))
+                                    Number(cartTotalPrice)
                                   : order.voucher.value
                                 : 0;
 
@@ -699,8 +709,7 @@ const CheckOut = () => {
                                       discountedPrice !== null
                                         ? finalDiscountedPrice *
                                           cartItem.quantity
-                                        : parseFloat(finalProductPrice) *
-                                          cartItem.quantity
+                                        : finalProductPrice * cartItem.quantity
                                     }
                                     currency={currency}
                                   />
@@ -715,21 +724,19 @@ const CheckOut = () => {
                               {t("checkout.your_order.shipping")}
                             </li>
                             <li>
-                              {new Intl.NumberFormat("en-US", {
-                                style: "currency",
-                                currency: currency.currencyName,
-                                currencyDisplay: "symbol",
-                              }).format(shippingMoney)}
+                              <CurrencyFormatter
+                                value={shippingMoney}
+                                currency={currency}
+                              />
                             </li>
                           </ul>
                           <ul>
                             <li className="your-order-shipping">Giảm giá</li>
                             <li>
-                              {new Intl.NumberFormat("en-US", {
-                                style: "currency",
-                                currency: currency.currencyName,
-                                currencyDisplay: "symbol",
-                              }).format(discount)}
+                              <CurrencyFormatter
+                                value={discount}
+                                currency={currency}
+                              />
                             </li>
                           </ul>
                         </div>
@@ -739,15 +746,11 @@ const CheckOut = () => {
                               {t("checkout.your_order.total_money")}
                             </li>
                             <li>
-                              <NumberField
+                              <CurrencyFormatter
                                 value={
                                   cartTotalPrice + shippingMoney - discount
                                 }
-                                options={{
-                                  currency: currency.currencyName,
-                                  style: "currency",
-                                  currencyDisplay: "symbol",
-                                }}
+                                currency={currency}
                               />
                             </li>
                           </ul>
@@ -792,6 +795,13 @@ const CheckOut = () => {
           )}
         </div>
       </div>
+      <Authenticated fallback={false}>
+        <ListAddressModal
+          customer={user}
+          modalProps={restModalProps}
+          close={close}
+        />
+      </Authenticated>
     </Fragment>
   );
 };

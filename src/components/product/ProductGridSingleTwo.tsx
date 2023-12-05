@@ -32,12 +32,10 @@ const ProductGridSingleTwo: React.FC<ProductGridSingleTwoProps> = ({
 }) => {
   const [modalShow, setModalShow] = useState(false);
   const discountedPrice = getDiscountPrice(product.price.max, product.discount);
-  const finalProductPrice = +(
-    product.price.max * currency.currencyRate
-  ).toFixed(2);
+  const finalProductPrice = +(product.price.max * currency.currencyRate);
   const finalDiscountedPrice = +(
     (discountedPrice ?? product.discount) * currency.currencyRate
-  ).toFixed(2);
+  );
   const dispatch = useDispatch();
 
   return (

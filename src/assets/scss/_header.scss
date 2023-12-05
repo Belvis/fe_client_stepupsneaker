@@ -1073,6 +1073,9 @@
 
         color: #555252;
       }
+      &.phone-number {
+        color: $theme-color;
+      }
     }
     .lang-car-dropdown {
       position: absolute;
