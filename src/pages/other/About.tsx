@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import SectionTitleWithText from "../../components/section-title/SectionTitleWithText";
@@ -14,7 +14,11 @@ const About = () => {
   let { pathname } = useLocation();
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.about_us") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.about_us") + " | SUNS");
+  }, [t]);
 
   return (
     <Fragment>

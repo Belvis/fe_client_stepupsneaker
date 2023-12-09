@@ -48,7 +48,11 @@ const InitialEventData: IEvent[] = [
 const OrderTracking = () => {
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.pages.orders_tracking") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.orders_tracking") + " | SUNS");
+  }, [t]);
 
   let { pathname } = useLocation();
 

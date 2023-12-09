@@ -1,21 +1,23 @@
+import { Authenticated, useIsAuthenticated } from "@refinedev/core";
+import { Badge, Space } from "antd";
 import { Fragment, useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { EffectFade, Thumbs } from "swiper";
-import Swiper, { SwiperSlide } from "../swiper";
-import Rating from "./sub-components/ProductRating";
+import { CurrencyFormatter } from "../../helpers/currency";
 import {
   getDiscountPrice,
   getProductCartQuantity,
 } from "../../helpers/product";
 import { IColorResponse, IProductClient, ISizeClient } from "../../interfaces";
-import { addToCart, deleteAllFromCart } from "../../redux/slices/cart-slice";
+import { addToCart, addToDB, fetchCart } from "../../redux/slices/cart-slice";
 import { addToCompare } from "../../redux/slices/compare-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
-import { RootState } from "../../redux/store";
-import { Badge, Space } from "antd";
+import { AppDispatch, RootState } from "../../redux/store";
 import { SaleIcon } from "../icons/icon-sale";
-import { CurrencyFormatter } from "../../helpers/currency";
+import Swiper, { SwiperSlide } from "../swiper";
+import Rating from "./sub-components/ProductRating";
 
 type ProductModalProps = {
   currency: any;
@@ -34,8 +36,9 @@ const ProductModal: React.FC<ProductModalProps> = ({
   wishlistItem,
   compareItem,
 }) => {
+  const { t } = useTranslation();
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const { cartItems } = useSelector((state: RootState) => state.cart);
 
   const initialSelectedColor =
@@ -357,27 +360,51 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 </div>
                 <div className="pro-details-cart btn-hover">
                   {productStock && productStock > 0 ? (
-                    <button
-                      onClick={() =>
-                        dispatch(
-                          addToCart({
-                            id: "",
-                            cartItemId: product.id,
-                            quantity: quantityCount,
-                            image: selectedVariant.image[0],
-                            name: product.name,
-                            selectedProductColor: selectedProductColor,
-                            selectedProductSize: selectedProductSize,
-                          })
-                        )
+                    <Authenticated
+                      fallback={
+                        <button
+                          onClick={() =>
+                            dispatch(
+                              addToCart({
+                                id: "",
+                                cartItemId: product.id,
+                                quantity: quantityCount,
+                                image: selectedVariant.image[0],
+                                name: product.name,
+                                selectedProductColor: selectedProductColor,
+                                selectedProductSize: selectedProductSize,
+                              })
+                            )
+                          }
+                          disabled={productCartQty >= productStock}
+                        >
+                          {t(`products.buttons.add_to_cart`)}
+                        </button>
                       }
-                      disabled={productCartQty >= productStock}
                     >
-                      {" "}
-                      Add To Cart{" "}
-                    </button>
+                      <button
+                        onClick={() =>
+                          dispatch(
+                            addToDB({
+                              id: "",
+                              cartItemId: product.id,
+                              quantity: quantityCount,
+                              image: selectedVariant.image[0],
+                              name: product.name,
+                              selectedProductColor: selectedProductColor,
+                              selectedProductSize: selectedProductSize,
+                            })
+                          )
+                        }
+                        disabled={productCartQty >= productStock}
+                      >
+                        {t(`products.buttons.add_to_cart`)}
+                      </button>
+                    </Authenticated>
                   ) : (
-                    <button disabled>Out of Stock</button>
+                    <button disabled>
+                      {t(`products.buttons.out_of_stock`)}
+                    </button>
                   )}
                 </div>
                 <div className="pro-details-wishlist">

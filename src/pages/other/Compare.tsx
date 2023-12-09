@@ -1,5 +1,5 @@
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
@@ -13,7 +13,11 @@ import { CurrencyFormatter } from "../../helpers/currency";
 const Compare = () => {
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.pages.compare") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.compare") + " | SUNS");
+  }, [t]);
 
   const dispatch = useDispatch();
   let { pathname } = useLocation();

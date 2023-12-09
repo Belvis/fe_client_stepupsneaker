@@ -45,16 +45,14 @@ import { Footer, Header } from "./wrappers";
 import Contact from "./pages/other/Contact";
 import About from "./pages/other/About";
 import ResetPassword from "./pages/other/ResetPassword";
+import ForgotPassword from "./pages/other/ForgotPassword";
 
 // Icons
 
 // Pages
 
-// const API_BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
-const API_BASE_URL = import.meta.env.VITE_BACKEND_API_LOCAL_BASE_URL;
-
-// const AUTH_API_URL = import.meta.env.VITE_BACKEND_API_AUTH_URL;
-const AUTH_API_URL = import.meta.env.VITE_BACKEND_API_LOCAL_AUTH_URL;
+const API_BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
+const AUTH_API_URL = import.meta.env.VITE_BACKEND_API_AUTH_URL;
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -134,29 +132,11 @@ function App() {
                         <Route path="cart" element={<Cart />} />
                         <Route path="compare" element={<Compare />} />
                         <Route path="wishlist" element={<Wishlist />} />
-                        <Route
-                          element={
-                            <Authenticated fallback={<Outlet />}>
-                              <Navigate to="/" />
-                            </Authenticated>
-                          }
-                        >
-                          <Route
-                            path="login"
-                            element={<LoginRegister type="login" />}
-                          />
-                          <Route
-                            path="register"
-                            element={<LoginRegister type="register" />}
-                          />
-                          {/* forgot-password */}
-                          {/* update-password */}
-                        </Route>
 
                         <Route
                           element={
                             <Authenticated
-                              fallback={<CatchAllNavigate to="login" />}
+                              fallback={<CatchAllNavigate to="/login" />}
                             >
                               <Outlet />
                             </Authenticated>
@@ -181,9 +161,33 @@ function App() {
                         <Route index element={<TrackingPage />} />
                         <Route path=":code" element={<OrderTracking />} />
                       </Route>
+
+                      <Route
+                        element={
+                          <Authenticated fallback={<Outlet />}>
+                            <Navigate to="/" />
+                          </Authenticated>
+                        }
+                      >
+                        <Route
+                          path="login"
+                          element={<LoginRegister type="login" />}
+                        />
+                        <Route
+                          path="register"
+                          element={<LoginRegister type="register" />}
+                        />
+                        {/* forgot-password */}
+                        {/* update-password */}
+                      </Route>
+
                       <Route
                         path="/reset-password"
                         element={<ResetPassword />}
+                      />
+                      <Route
+                        path="/forgot-password"
+                        element={<ForgotPassword />}
                       />
 
                       <Route path="*" element={<NotFound />} />

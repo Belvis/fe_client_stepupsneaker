@@ -12,6 +12,7 @@ import {
   useGetIdentity,
   useList,
   useUpdate,
+  useUpdatePassword,
 } from "@refinedev/core";
 import clsx from "clsx";
 import {
@@ -45,6 +46,12 @@ import { getBase64Image } from "../../helpers/image";
 import { CreateAddressModal } from "../../components/address/CreateAddressModal";
 import { EditAddressModal } from "../../components/address/EditAddressModal";
 
+type updatePasswordVariables = {
+  password: string;
+  confirm: string;
+  oldPassword: string;
+};
+
 const MyAccount = () => {
   const { t } = useTranslation();
   const API_URL = useApiUrl();
@@ -52,9 +59,16 @@ const MyAccount = () => {
   const [messageApi, contextHolder] = message.useMessage();
 
   const [userInfoForm] = Form.useForm<ICustomerRequest>();
+  const [userPasswordForm] = Form.useForm<updatePasswordVariables>();
+
   const imageUrl = Form.useWatch("image", userInfoForm);
 
-  useDocumentTitle(t("nav.pages.my_account") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.my_account") + " | SUNS");
+  }, [t]);
+
   const currency = useSelector((state: RootState) => state.currency);
 
   let { pathname } = useLocation();
@@ -62,6 +76,8 @@ const MyAccount = () => {
   const { mutate: update, isLoading: isLoadingUpdate } = useUpdate();
   const { mutate: setDefault } = useCustomMutation<IAddressResponse>();
   const { mutate: remove } = useDelete();
+  const { mutate: updatePassword } =
+    useUpdatePassword<updatePasswordVariables>();
 
   const { data, refetch } = useGetIdentity<ICustomerResponse>();
 
@@ -79,6 +95,21 @@ const MyAccount = () => {
   const vouchers = dataV?.data ? dataV?.data : [];
 
   const [copied, setCopied] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleTogglePassword = (field: string) => {
+    if (field === "password") {
+      setShowPassword((prevShowPassword) => !prevShowPassword);
+    } else if (field === "confirm") {
+      setShowConfirmPassword(
+        (prevShowConfirmPassword) => !prevShowConfirmPassword
+      );
+    } else if (field === "old") {
+      setShowOldPassword((prevShowOldPassword) => !prevShowOldPassword);
+    }
+  };
 
   useEffect(() => {
     if (data) {
@@ -115,6 +146,10 @@ const MyAccount = () => {
         },
       }
     );
+  };
+
+  const updateUserPassword = (values: updatePasswordVariables) => {
+    updatePassword(values);
   };
 
   const removeAddress = (id: string) => {
@@ -301,6 +336,55 @@ const MyAccount = () => {
       }
     );
   }
+
+  const getPasswordEyeIconClass = (show: boolean) =>
+    clsx("fa", "fa-fw", "field-icon", "toggle-password", "float-icon", {
+      "fa-eye": !show,
+      "fa-eye-slash": show,
+    });
+
+  const PasswordField = (props: any) => (
+    <div>
+      <input
+        {...props}
+        id={Math.random()}
+        type={showPassword ? "text" : "password"}
+      />
+      <span
+        className={getPasswordEyeIconClass(showPassword)}
+        onClick={() => handleTogglePassword("password")}
+      />
+    </div>
+  );
+
+  const OldPasswordField = (props: any) => (
+    <div>
+      <input
+        {...props}
+        id={Math.random()}
+        type={showOldPassword ? "text" : "password"}
+      />
+      <span
+        className={getPasswordEyeIconClass(showOldPassword)}
+        onClick={() => handleTogglePassword("old")}
+      />
+    </div>
+  );
+
+  const ConfirmField = (props: any) => (
+    <div>
+      <input
+        {...props}
+        id={Math.random()}
+        type={showConfirmPassword ? "text" : "password"}
+      />
+      <span
+        className={getPasswordEyeIconClass(showConfirmPassword)}
+        onClick={() => handleTogglePassword("confirm")}
+      />
+    </div>
+  );
+
   return (
     <Fragment>
       {contextHolder}
@@ -354,7 +438,6 @@ const MyAccount = () => {
                                     listType="picture-circle"
                                     className="avatar-uploader"
                                     showUploadList={false}
-                                    action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
                                     beforeUpload={beforeUpload}
                                     onChange={handleChange}
                                     maxCount={1}
@@ -375,7 +458,6 @@ const MyAccount = () => {
                                         style={{
                                           width: "100%",
                                           height: "100%",
-                                          // maxWidth: "200px",
                                         }}
                                         src={imageUrl}
                                         alt="User avatar"
@@ -434,7 +516,7 @@ const MyAccount = () => {
                                       },
                                     ]}
                                   >
-                                    <input type="email" />
+                                    <input id="email-userinfo" type="email" />
                                   </Form.Item>
                                 </div>
                               </div>
@@ -493,31 +575,80 @@ const MyAccount = () => {
                           <div className="account-info-wrapper">
                             <h5>Nhập thông tin để thay đổi mật khẩu</h5>
                           </div>
-                          <div className="row">
-                            <div className="col-lg-12 col-md-12">
-                              <div className="billing-info">
-                                <label>Mật khẩu cũ</label>
-                                <input type="password" />
+                          <Form<updatePasswordVariables>
+                            layout="vertical"
+                            onFinish={(values) => updateUserPassword(values)}
+                            form={userPasswordForm}
+                            initialValues={{
+                              oldPassword: "",
+                              password: "",
+                              confirm: "",
+                            }}
+                          >
+                            <div className="row">
+                              <div className="col-lg-12 col-md-12">
+                                <div className="billing-info">
+                                  <label>Mật khẩu cũ</label>
+                                  <Form.Item
+                                    name="oldPassword"
+                                    rules={[{ required: true }]}
+                                  >
+                                    <OldPasswordField />
+                                  </Form.Item>
+                                </div>
+                              </div>
+                              <div className="col-lg-12 col-md-12">
+                                <div className="billing-info">
+                                  <label>Mật khẩu mới</label>
+                                  <Form.Item
+                                    name="password"
+                                    rules={[{ required: true }]}
+                                  >
+                                    <PasswordField />
+                                  </Form.Item>
+                                </div>
+                              </div>
+                              <div className="col-lg-12 col-md-12">
+                                <div className="billing-info">
+                                  <label>Xác nhận mật khẩu mới</label>
+                                  <Form.Item
+                                    name="confirm"
+                                    dependencies={["password"]}
+                                    hasFeedback
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message:
+                                          "Please confirm your password!",
+                                      },
+                                      ({ getFieldValue }) => ({
+                                        validator(_, value) {
+                                          if (
+                                            !value ||
+                                            getFieldValue("password") === value
+                                          ) {
+                                            return Promise.resolve();
+                                          }
+                                          return Promise.reject(
+                                            new Error(
+                                              "Mật khẩu mới bạn nhập không khớp!"
+                                            )
+                                          );
+                                        },
+                                      }),
+                                    ]}
+                                  >
+                                    <ConfirmField />
+                                  </Form.Item>
+                                </div>
                               </div>
                             </div>
-                            <div className="col-lg-12 col-md-12">
-                              <div className="billing-info">
-                                <label>Mật khẩu mới</label>
-                                <input type="password" />
+                            <div className="billing-back-btn">
+                              <div className="billing-btn">
+                                <button type="submit">Lưu thay đổi</button>
                               </div>
                             </div>
-                            <div className="col-lg-12 col-md-12">
-                              <div className="billing-info">
-                                <label>Xác nhận mật khẩu mới</label>
-                                <input type="password" />
-                              </div>
-                            </div>
-                          </div>
-                          <div className="billing-back-btn">
-                            <div className="billing-btn">
-                              <button type="submit">Lưu thay đổi</button>
-                            </div>
-                          </div>
+                          </Form>
                         </div>
                       </Accordion.Body>
                     </Accordion.Item>

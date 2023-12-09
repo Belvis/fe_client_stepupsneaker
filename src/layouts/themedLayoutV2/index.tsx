@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Grid, Layout as AntdLayout } from "antd";
 
 import {
@@ -8,6 +8,11 @@ import {
   RefineThemedLayoutV2Props,
 } from "@refinedev/antd";
 import ScrollToTop from "../../components/scroll-to-top";
+import { useDispatch } from "react-redux";
+import { useIsAuthenticated } from "@refinedev/core";
+import { fetchCart } from "../../redux/slices/cart-slice";
+import { AppDispatch } from "../../redux/store";
+import { TOKEN_KEY } from "../../utils";
 
 export const ThemedLayoutV2: React.FC<RefineThemedLayoutV2Props> = ({
   children,
@@ -23,6 +28,17 @@ export const ThemedLayoutV2: React.FC<RefineThemedLayoutV2Props> = ({
   const HeaderToRender = Header ?? DefaultHeader;
   const isSmall = typeof breakpoint.sm === "undefined" ? true : breakpoint.sm;
   const hasSider = !!SiderToRender({ Title });
+
+  const dispatch: AppDispatch = useDispatch();
+
+  const { isLoading, data } = useIsAuthenticated();
+
+  useEffect(() => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!isLoading && data && data.authenticated && token) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch, isLoading, data]);
 
   return (
     <ThemedLayoutContextProvider initialSiderCollapsed={initialSiderCollapsed}>

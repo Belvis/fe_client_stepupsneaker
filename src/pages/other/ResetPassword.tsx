@@ -1,24 +1,99 @@
 import { LoginFormTypes } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Form, FormProps } from "antd";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
+import { authProvider } from "../../api/authProvider";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { BlinkIcon } from "../../components/icons/icon-blink";
+import clsx from "clsx";
 
 type ResetPasswordProps = {
   formProps?: FormProps<any> | undefined;
 };
 
+type resetPasswordVariables = {
+  password: string;
+  confirm: string;
+  token: string;
+};
+
+const AUTH_API_URL = import.meta.env.VITE_BACKEND_API_LOCAL_AUTH_URL;
+
 const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.pages.reset_password") + " | SUNS");
+  const [searchParams] = useSearchParams();
+
+  const token = searchParams.get("token");
+
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.reset_password") + " | SUNS");
+  }, [t]);
 
   let { pathname } = useLocation();
 
-  const [form] = Form.useForm<LoginFormTypes>();
+  const [form] = Form.useForm<resetPasswordVariables>();
+
+  const { resetPassword } = authProvider(AUTH_API_URL);
+
+  const onSubmit = (values: resetPasswordVariables) => {
+    const submitData = {
+      ...values,
+      token,
+    };
+    const response = resetPassword(submitData);
+    console.log(response);
+  };
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleTogglePassword = (field: string) => {
+    if (field === "password") {
+      setShowPassword((prevShowPassword) => !prevShowPassword);
+    } else if (field === "confirm") {
+      setShowConfirmPassword(
+        (prevShowConfirmPassword) => !prevShowConfirmPassword
+      );
+    }
+  };
+
+  const getPasswordEyeIconClass = (show: boolean) =>
+    clsx("fa", "fa-fw", "field-icon", "toggle-password", "float-icon", {
+      "fa-eye": !show,
+      "fa-eye-slash": show,
+    });
+
+  const PasswordField = (props: any) => (
+    <div>
+      <input
+        {...props}
+        type={showPassword ? "text" : "password"}
+        placeholder="Nhập mật khẩu mới"
+      />
+      <span
+        className={getPasswordEyeIconClass(showPassword)}
+        onClick={() => handleTogglePassword("password")}
+      />
+    </div>
+  );
+
+  const ConfirmField = (props: any) => (
+    <div>
+      <input
+        {...props}
+        type={showConfirmPassword ? "text" : "password"}
+        placeholder="Xác nhận mật khẩu mới"
+      />
+      <span
+        className={getPasswordEyeIconClass(showConfirmPassword)}
+        onClick={() => handleTogglePassword("confirm")}
+      />
+    </div>
+  );
 
   return (
     <Fragment>
@@ -39,10 +114,10 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
                 </div>
                 <div className="login-form-container">
                   <div className="login-register-form">
-                    <Form<LoginFormTypes>
+                    <Form<resetPasswordVariables>
                       layout="vertical"
                       form={form}
-                      // onFinish={(values) => login(values)}
+                      onFinish={(values) => onSubmit(values)}
                       requiredMark={false}
                       initialValues={{
                         remember: false,
@@ -50,7 +125,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
                       {...formProps}
                     >
                       <Form.Item
-                        name="newPassword"
+                        name="password"
                         rules={[
                           {
                             required: true,
@@ -58,19 +133,33 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
                           },
                         ]}
                       >
-                        <input
-                          type="password"
-                          placeholder="Nhập mật khẩu mới..."
-                        />
+                        <PasswordField />
                       </Form.Item>
                       <Form.Item
-                        name="confirmPassword"
-                        rules={[{ required: true }]}
+                        name="confirm"
+                        dependencies={["password"]}
+                        hasFeedback
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please confirm your password!",
+                          },
+                          ({ getFieldValue }) => ({
+                            validator(_, value) {
+                              if (
+                                !value ||
+                                getFieldValue("password") === value
+                              ) {
+                                return Promise.resolve();
+                              }
+                              return Promise.reject(
+                                new Error("Mật khẩu mới bạn nhập không khớp!")
+                              );
+                            },
+                          }),
+                        ]}
                       >
-                        <input
-                          type="password"
-                          placeholder="Xác nhận mật khẩu mới..."
-                        />
+                        <ConfirmField />
                       </Form.Item>
                       <div className="button-box">
                         <button

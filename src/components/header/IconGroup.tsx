@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
-import clsx from "clsx";
-import MenuCart from "./sub-components/MenuCart";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
 import { Authenticated, useLogout } from "@refinedev/core";
+import clsx from "clsx";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { RootState } from "../../redux/store";
+import MenuCart from "./sub-components/MenuCart";
 
 type IconGroupProps = {
   iconWhiteClass?: string;
@@ -13,14 +13,6 @@ type IconGroupProps = {
 export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const { mutate: logout } = useLogout();
-
-  // const handleClick = (e: React.MouseEvent) => {
-  //   const nextSibling = e.currentTarget.nextSibling;
-
-  //   if (nextSibling instanceof Element) {
-  //     nextSibling.classList.toggle("active");
-  //   }
-  // };
 
   const handleClick = (index: number) => {
     setActiveIndex((prevIndex) => (prevIndex === index ? null : index));
@@ -88,10 +80,10 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
               fallback={
                 <>
                   <li>
-                    <Link to={"/pages/login"}>Đăng nhập</Link>
+                    <Link to={"/login"}>Đăng nhập</Link>
                   </li>
                   <li>
-                    <Link to={"/pages/register"}>Đăng ký</Link>
+                    <Link to={"/register"}>Đăng ký</Link>
                   </li>
                 </>
               }

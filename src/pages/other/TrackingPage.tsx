@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { useTranslation } from "react-i18next";
@@ -13,7 +13,11 @@ const TrackingPage = () => {
 
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.pages.tracking_page") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.tracking_page") + " | SUNS");
+  }, [t]);
 
   const API_URL = useApiUrl();
 

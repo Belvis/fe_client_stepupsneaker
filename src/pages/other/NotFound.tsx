@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { useTranslation } from "react-i18next";
@@ -9,7 +9,11 @@ const NotFound = () => {
 
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.pages.404_page") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.404_page") + " | SUNS");
+  }, [t]);
 
   return (
     <Fragment>

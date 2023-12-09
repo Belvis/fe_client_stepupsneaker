@@ -3,11 +3,13 @@ import axios from "axios";
 
 const axiosInstance = axios.create();
 
+export const TOKEN_KEY = "suns-auth-client-token";
+
 axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
 
 axiosInstance.interceptors.request.use(
   async (config) => {
-    const token = localStorage.getItem("suns-auth-client-token");
+    const token = localStorage.getItem(TOKEN_KEY);
     if (token && config?.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }

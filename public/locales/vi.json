@@ -12,6 +12,8 @@
         "compare": "So sánh",
         "my_account": "Tài khoản của tôi",
         "login_register": "Đăng nhập - Đăng ký",
+        "/login": "Đăng nhập",
+        "/register": "Đăng ký",
         "orders": "Đơn hàng của tôi",
         "orders_tracking": "Theo dõi đơn hàng",
         "404_page": "404",
@@ -21,7 +23,8 @@
         "order": "Đơn hàng",
         "tracking_page": "Tra cứu đơn hàng",
         "my_orders": "Đơn hàng của tôi",
-        "reset_password": "Đặt lại mật khẩu"
+        "reset_password": "Đặt lại mật khẩu",
+        "forgot_password": "Quên mật khẩu"
       },
       "contact_us": "Liên hệ",
       "about_us": "Về chúng tôi"

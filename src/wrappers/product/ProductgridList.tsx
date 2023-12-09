@@ -14,7 +14,6 @@ const ProductGridList: React.FC<ProductGridListProps> = ({
   spaceBottomClass,
 }) => {
   const currency = useSelector((state: RootState) => state.currency);
-  const { cartItems } = useSelector((state: RootState) => state.cart);
   const { wishlistItems } = useSelector((state: RootState) => state.wishlist);
   const { compareItems } = useSelector((state: RootState) => state.compare);
 

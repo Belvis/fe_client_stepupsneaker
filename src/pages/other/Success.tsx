@@ -11,21 +11,22 @@ import { Result } from "antd";
 import dayjs from "dayjs";
 import { Fragment, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Link, useLocation, useParams } from "react-router-dom";
+import { CurrencyFormatter } from "../../helpers/currency";
 import { getDiscountPrice } from "../../helpers/product";
 import { IOrderResponse } from "../../interfaces";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { clearOrder } from "../../redux/slices/order-slice";
-import { deleteAllFromCart } from "../../redux/slices/cart-slice";
-import { CurrencyFormatter } from "../../helpers/currency";
 
 const Success = () => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
 
-  useDocumentTitle(t("nav.pages.success") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.success") + " | SUNS");
+  }, [t]);
 
   let { pathname } = useLocation();
 

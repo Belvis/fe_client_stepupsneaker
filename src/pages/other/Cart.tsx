@@ -18,6 +18,7 @@ import VoucherModal from "../../components/voucher/VoucherModal";
 import { CurrencyFormatter, formatCurrency } from "../../helpers/currency";
 import { cartItemStock, getDiscountPrice } from "../../helpers/product";
 import {
+  ICartItem,
   IDistrict,
   IProvince,
   IVoucherResponse,
@@ -25,13 +26,20 @@ import {
 } from "../../interfaces";
 import {
   addToCart,
+  addToDB,
+  decreaseFromDB,
   decreaseQuantity,
   deleteAllFromCart,
+  deleteAllFromDB,
   deleteFromCart,
+  deleteFromDB,
+  updateCartItemQuantity,
+  updateFromDB,
 } from "../../redux/slices/cart-slice";
 import { setOrder } from "../../redux/slices/order-slice";
-import { RootState } from "../../redux/store";
+import { AppDispatch, RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
+import { debounce } from "lodash";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -40,18 +48,24 @@ const GHN_TOKEN = import.meta.env.VITE_GHN_USER_TOKEN;
 const Cart = () => {
   const { t } = useTranslation();
   const { open } = useNotification();
+  const dispatch: AppDispatch = useDispatch();
 
   const API_URL = useApiUrl();
+
   const { getList } = dataProvider(API_URL);
 
-  useDocumentTitle(t("nav.pages.cart") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.cart") + " | SUNS");
+  }, [t]);
+
   const { mutate: calculateFeeMutate, isLoading: isLoadingFee } =
     useCustomMutation<any>();
 
   let cartTotalPrice = 0;
 
   const [quantityCount] = useState(1);
-  const dispatch = useDispatch();
   let { pathname } = useLocation();
 
   const currency = useSelector((state: RootState) => state.currency);
@@ -295,6 +309,14 @@ const Cart = () => {
     setVoucherCode(event.target.value);
   };
 
+  const updateQuantity = (cartItem: any) => {
+    dispatch(updateCartItemQuantity(cartItem));
+  };
+
+  const updateQuantityFromDB = debounce((cartItem: ICartItem) => {
+    dispatch(updateFromDB(cartItem));
+  }, 500);
+
   return (
     <Fragment>
       <Breadcrumb
@@ -400,41 +422,118 @@ const Cart = () => {
 
                               <td className="product-quantity">
                                 <div className="cart-plus-minus">
-                                  <button
-                                    className="dec qtybutton"
-                                    onClick={() =>
-                                      dispatch(decreaseQuantity(cartItem))
+                                  <Authenticated
+                                    fallback={
+                                      <button
+                                        className="dec qtybutton"
+                                        onClick={() =>
+                                          dispatch(decreaseQuantity(cartItem))
+                                        }
+                                      >
+                                        -
+                                      </button>
                                     }
                                   >
-                                    -
-                                  </button>
-                                  <input
-                                    className="cart-plus-minus-box"
-                                    type="text"
-                                    value={cartItem.quantity}
-                                    readOnly
-                                  />
-                                  <button
-                                    className="inc qtybutton"
-                                    onClick={() =>
-                                      dispatch(
-                                        addToCart({
-                                          ...cartItem,
-                                          quantity: quantityCount,
-                                        })
-                                      )
+                                    <button
+                                      className="dec qtybutton"
+                                      onClick={() =>
+                                        dispatch(decreaseFromDB(cartItem))
+                                      }
+                                    >
+                                      -
+                                    </button>
+                                  </Authenticated>
+                                  <Authenticated
+                                    fallback={
+                                      <input
+                                        className="cart-plus-minus-box"
+                                        type="text"
+                                        value={cartItem.quantity}
+                                        onChange={(e) => {
+                                          const newValue = parseInt(
+                                            e.target.value,
+                                            10
+                                          );
+                                          if (!isNaN(newValue)) {
+                                            updateQuantity({
+                                              ...cartItem,
+                                              quantity: newValue,
+                                            });
+                                          }
+                                        }}
+                                      />
                                     }
-                                    disabled={
-                                      cartItem !== undefined &&
-                                      cartItem.quantity !== undefined &&
-                                      cartItem.quantity >=
-                                        cartItemStock(
-                                          cartItem.selectedProductSize
+                                  >
+                                    <input
+                                      className="cart-plus-minus-box"
+                                      type="text"
+                                      value={cartItem.quantity}
+                                      onChange={(e) => {
+                                        const newValue = parseInt(
+                                          e.target.value,
+                                          10
+                                        );
+                                        if (!isNaN(newValue)) {
+                                          updateQuantity({
+                                            ...cartItem,
+                                            quantity: newValue,
+                                            showNoti: false,
+                                          });
+                                          updateQuantityFromDB({
+                                            ...cartItem,
+                                            quantity: newValue,
+                                          });
+                                        }
+                                      }}
+                                    />
+                                  </Authenticated>
+                                  <Authenticated
+                                    fallback={
+                                      <button
+                                        className="inc qtybutton"
+                                        onClick={() =>
+                                          dispatch(
+                                            addToCart({
+                                              ...cartItem,
+                                              quantity: quantityCount,
+                                            })
+                                          )
+                                        }
+                                        disabled={
+                                          cartItem !== undefined &&
+                                          cartItem.quantity !== undefined &&
+                                          cartItem.quantity >=
+                                            cartItemStock(
+                                              cartItem.selectedProductSize
+                                            )
+                                        }
+                                      >
+                                        +
+                                      </button>
+                                    }
+                                  >
+                                    <button
+                                      className="inc qtybutton"
+                                      onClick={() =>
+                                        dispatch(
+                                          addToDB({
+                                            ...cartItem,
+                                            quantity: quantityCount,
+                                          })
                                         )
-                                    }
-                                  >
-                                    +
-                                  </button>
+                                      }
+                                      disabled={
+                                        cartItem !== undefined &&
+                                        cartItem.quantity !== undefined &&
+                                        cartItem.quantity >=
+                                          cartItemStock(
+                                            cartItem.selectedProductSize
+                                          )
+                                      }
+                                    >
+                                      +
+                                    </button>
+                                  </Authenticated>
                                 </div>
                               </td>
                               <td className="product-subtotal">
@@ -450,13 +549,25 @@ const Cart = () => {
                               </td>
 
                               <td className="product-remove">
-                                <button
-                                  onClick={() =>
-                                    dispatch(deleteFromCart(cartItem.id))
+                                <Authenticated
+                                  fallback={
+                                    <button
+                                      onClick={() =>
+                                        dispatch(deleteFromCart(cartItem.id))
+                                      }
+                                    >
+                                      <i className="fa fa-times"></i>
+                                    </button>
                                   }
                                 >
-                                  <i className="fa fa-times"></i>
-                                </button>
+                                  <button
+                                    onClick={() =>
+                                      dispatch(deleteFromDB(cartItem.id))
+                                    }
+                                  >
+                                    <i className="fa fa-times"></i>
+                                  </button>
+                                </Authenticated>
                               </td>
                             </tr>
                           );
@@ -475,9 +586,17 @@ const Cart = () => {
                       </Link>
                     </div>
                     <div className="cart-clear">
-                      <button onClick={() => dispatch(deleteAllFromCart())}>
-                        {t(`cart.buttons.clear_cart`)}
-                      </button>
+                      <Authenticated
+                        fallback={
+                          <button onClick={() => dispatch(deleteAllFromCart())}>
+                            {t(`cart.buttons.clear_cart`)}
+                          </button>
+                        }
+                      >
+                        <button onClick={() => dispatch(deleteAllFromDB())}>
+                          {t(`cart.buttons.clear_cart`)}
+                        </button>
+                      </Authenticated>
                     </div>
                   </div>
                 </div>

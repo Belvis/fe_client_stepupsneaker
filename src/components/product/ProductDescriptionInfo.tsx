@@ -18,7 +18,7 @@ import {
   ISizeClient,
   IVariation,
 } from "../../interfaces";
-import { addToCart } from "../../redux/slices/cart-slice";
+import { addToCart, addToDB } from "../../redux/slices/cart-slice";
 import { addToCompare } from "../../redux/slices/compare-slice";
 import { CurrencyState } from "../../redux/slices/currency-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
@@ -27,6 +27,8 @@ import { Badge, Space } from "antd";
 import { SaleIcon } from "../icons/icon-sale";
 import { useTranslation } from "react-i18next";
 import { CurrencyFormatter } from "../../helpers/currency";
+import { Authenticated } from "@refinedev/core";
+import { AppDispatch } from "../../redux/store";
 
 interface ProductDescriptionInfoProps {
   product: IProductClient;
@@ -51,7 +53,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const initialSelectedSize =
     product.variation && product.variation.length > 0
@@ -284,24 +286,47 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
         </div>
         <div className="pro-details-cart btn-hover">
           {productStock && productStock > 0 ? (
-            <button
-              onClick={() =>
-                dispatch(
-                  addToCart({
-                    id: "",
-                    cartItemId: product.id,
-                    quantity: quantityCount,
-                    image: selectedVariant.image[0],
-                    name: product.name,
-                    selectedProductColor: selectedProductColor,
-                    selectedProductSize: selectedProductSize,
-                  })
-                )
+            <Authenticated
+              fallback={
+                <button
+                  onClick={() =>
+                    dispatch(
+                      addToCart({
+                        id: "",
+                        cartItemId: product.id,
+                        quantity: quantityCount,
+                        image: selectedVariant.image[0],
+                        name: product.name,
+                        selectedProductColor: selectedProductColor,
+                        selectedProductSize: selectedProductSize,
+                      })
+                    )
+                  }
+                  disabled={productCartQty >= productStock}
+                >
+                  {t(`products.buttons.add_to_cart`)}
+                </button>
               }
-              disabled={productCartQty >= productStock}
             >
-              {t(`products.buttons.add_to_cart`)}
-            </button>
+              <button
+                onClick={() =>
+                  dispatch(
+                    addToDB({
+                      id: "",
+                      cartItemId: product.id,
+                      quantity: quantityCount,
+                      image: selectedVariant.image[0],
+                      name: product.name,
+                      selectedProductColor: selectedProductColor,
+                      selectedProductSize: selectedProductSize,
+                    })
+                  )
+                }
+                disabled={productCartQty >= productStock}
+              >
+                {t(`products.buttons.add_to_cart`)}
+              </button>
+            </Authenticated>
           ) : (
             <button disabled>{t(`products.buttons.out_of_stock`)}</button>
           )}

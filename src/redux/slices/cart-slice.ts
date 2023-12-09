@@ -1,11 +1,215 @@
+import {
+  createAsyncThunk,
+  createSlice,
+  isAnyOf,
+  PayloadAction,
+} from "@reduxjs/toolkit";
+import { AxiosInstance } from "axios";
 import { v4 as uuidv4 } from "uuid";
-import cogoToast from "cogo-toast";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ICartItem } from "../../interfaces";
+import { getDiscountInfo } from "../../helpers/product";
+import {
+  showErrorToast,
+  showInfoToast,
+  showSuccessToast,
+  showWarningToast,
+} from "../../helpers/toast";
+import {
+  ICartDetailRequest,
+  ICartDetailResponse,
+  ICartItem,
+} from "../../interfaces";
+import { axiosInstance } from "../../utils";
+
+const httpClient: AxiosInstance = axiosInstance;
+const API_BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
 
 export interface CartState {
   cartItems: ICartItem[];
 }
+
+const toCartItem = (item: ICartDetailResponse): ICartItem => {
+  const productDetail = item.productDetail;
+  const discountInfo = getDiscountInfo(productDetail.promotionProductDetails);
+
+  return {
+    id: item.id,
+    cartItemId: productDetail.id,
+    image: productDetail.image,
+    name: productDetail.product.name,
+    quantity: item.quantity,
+    selectedProductColor: productDetail.color,
+    selectedProductSize: {
+      id: productDetail.size.id,
+      name: productDetail.size.name,
+      stock: productDetail.quantity,
+      price: productDetail.price,
+      discount: discountInfo?.value ?? 0,
+      offerEnd: discountInfo?.endDate ?? 0,
+      saleCount: productDetail.saleCount,
+      productDetailId: productDetail.id,
+    },
+  };
+};
+
+const toCartRequest = (item: ICartItem): ICartDetailRequest => ({
+  productDetail: item.selectedProductSize.productDetailId,
+  quantity: item.quantity,
+});
+
+const makeApiRequest = async <T>(
+  url: string,
+  method: "get" | "post" | "put" | "delete",
+  data?: any
+): Promise<{ data: T }> => {
+  try {
+    const response = await httpClient[method](url, data);
+
+    return {
+      data: response.data.content,
+    };
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+const fetchCartFromDB = async () => {
+  const url = `${API_BASE_URL}/cart-details`;
+  return makeApiRequest<ICartDetailResponse[]>(url, "get");
+};
+
+const mergeCartToDB = async (cartItems: ICartItem[]) => {
+  const url = `${API_BASE_URL}/cart-details/merge`;
+  const variables = cartItems.map(toCartRequest);
+  return makeApiRequest<ICartDetailResponse[]>(url, "post", variables);
+};
+
+const addCartToDB = async (cartItem: ICartItem) => {
+  const url = `${API_BASE_URL}/cart-details`;
+  const variables = [cartItem].map(toCartRequest)[0];
+  return makeApiRequest<ICartDetailResponse[]>(url, "post", variables);
+};
+
+const deleteCartFromDB = async (id: string) => {
+  const url = `${API_BASE_URL}/cart-details/${id}`;
+  return makeApiRequest<ICartDetailResponse[]>(url, "delete");
+};
+
+const deleteAllCartFromDB = async () => {
+  const url = `${API_BASE_URL}/cart-details`;
+  return makeApiRequest<ICartDetailResponse[]>(url, "delete");
+};
+
+const updateCartQtyFromDB = async (cartItem: ICartItem) => {
+  const url = `${API_BASE_URL}/cart-details/update/${cartItem.id}`;
+  const variables = [cartItem].map(toCartRequest)[0];
+  return makeApiRequest<ICartDetailResponse[]>(url, "put", variables);
+};
+
+const decreaseCartQtyFromDB = async (cartItem: ICartItem) => {
+  const url = `${API_BASE_URL}/cart-details/decrease/${cartItem.id}`;
+  const variables = [cartItem].map(toCartRequest)[0];
+  return makeApiRequest<ICartDetailResponse[]>(url, "put", variables);
+};
+
+export const fetchCart = createAsyncThunk(
+  "cart/fetchCart",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await fetchCartFromDB();
+
+      console.log(res.data);
+
+      return res.data.map(toCartItem);
+    } catch (error: any) {
+      console.error("Error fetching cart:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const mergeCart = createAsyncThunk(
+  "cart/mergeCart",
+  async (cartItems: ICartItem[], { rejectWithValue }) => {
+    try {
+      const res = await mergeCartToDB(cartItems);
+
+      return res.data.map(toCartItem);
+    } catch (error: any) {
+      console.error("Error merging cart:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const addToDB = createAsyncThunk(
+  "cart/addToDB",
+  async (cartItem: ICartItem, { rejectWithValue }) => {
+    try {
+      const res = await addCartToDB(cartItem);
+
+      return res.data.map(toCartItem);
+    } catch (error: any) {
+      console.error("Error add cart to database:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const deleteFromDB = createAsyncThunk(
+  "cart/deleteFromDB",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const res = await deleteCartFromDB(id);
+
+      return res.data.map(toCartItem);
+    } catch (error: any) {
+      console.error("Error delete cart from database:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const deleteAllFromDB = createAsyncThunk(
+  "cart/deleteAllFromDB",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await deleteAllCartFromDB();
+
+      return res.data.map(toCartItem);
+    } catch (error: any) {
+      console.error("Error delete all cart from database:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const decreaseFromDB = createAsyncThunk(
+  "cart/decreaseFromDB",
+  async (cartItem: ICartItem, { rejectWithValue }) => {
+    try {
+      const res = await decreaseCartQtyFromDB(cartItem);
+
+      return res.data.map(toCartItem);
+    } catch (error: any) {
+      console.error("Error decrease cart quantity from database:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateFromDB = createAsyncThunk(
+  "cart/updateFromDB",
+  async (cartItem: ICartItem, { rejectWithValue }) => {
+    try {
+      const res = await updateCartQtyFromDB(cartItem);
+
+      return res.data.map(toCartItem);
+    } catch (error: any) {
+      console.error("Error update cart from database:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const cartSlice = createSlice({
   name: "cart",
@@ -25,7 +229,7 @@ const cartSlice = createSlice({
           ...product,
           quantity: product.quantity ? product.quantity : 1,
           cartItemId: product.cartItemId,
-          id: uuidv4(),
+          id: product.id ?? uuidv4(),
         });
       } else if (
         cartItem !== undefined &&
@@ -39,7 +243,7 @@ const cartSlice = createSlice({
             ...product,
             quantity: product.quantity ? product.quantity : 1,
             cartItemId: product.cartItemId,
-            id: uuidv4(),
+            id: product.id ?? uuidv4(),
           },
         ];
       } else {
@@ -58,13 +262,35 @@ const cartSlice = createSlice({
         });
       }
 
-      cogoToast.success("Added To Cart", { position: "top-center" });
+      showSuccessToast("Thêm vào giỏ hàng thành công");
+    },
+    updateCartItemQuantity(state, action: PayloadAction<any>) {
+      const { cartItemId, quantity, showNoti = true } = action.payload;
+
+      const updatedCartItems = state.cartItems.map((item) =>
+        item.cartItemId === cartItemId ? { ...item, quantity: quantity } : item
+      );
+
+      const itemUpdated = updatedCartItems.some(
+        (item) => item.cartItemId === cartItemId
+      );
+
+      if (itemUpdated) {
+        state.cartItems = updatedCartItems;
+        if (showNoti) {
+          showInfoToast("Cập nhật số lượng thành công");
+        }
+      } else {
+        if (showNoti) {
+          showErrorToast("Không tìm thấy sản phẩm trong giỏ hàng");
+        }
+      }
     },
     deleteFromCart(state, action: PayloadAction<string | undefined>) {
       state.cartItems = state.cartItems.filter(
         (item) => item.id !== action.payload
       );
-      cogoToast.error("Removed From Cart", { position: "top-center" });
+      showWarningToast("Loại bỏ sản phẩm khỏi giỏ hàng thành công");
     },
     decreaseQuantity(state, action: PayloadAction<ICartItem>) {
       const product = action.payload;
@@ -72,28 +298,99 @@ const cartSlice = createSlice({
         state.cartItems = state.cartItems.filter(
           (item) => item.cartItemId !== product.cartItemId
         );
-        cogoToast.error("Removed From Cart", { position: "top-center" });
+        showErrorToast("Sản phẩm không hợp lệ");
       } else {
         state.cartItems = state.cartItems.map((item) =>
           item.cartItemId === product.cartItemId
             ? { ...item, quantity: item.quantity - 1 }
             : item
         );
-        cogoToast.warn("Item Decremented From Cart", {
-          position: "top-center",
-        });
+        showWarningToast("Mặt hàng đã giảm từ giỏ hàng");
       }
     },
     deleteAllFromCart(state) {
       state.cartItems = [];
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(fetchCart.fulfilled, (state, action) => {
+      state.cartItems = action.payload;
+    });
+    builder.addMatcher(
+      isAnyOf(
+        mergeCart.fulfilled,
+        addToDB.fulfilled,
+        deleteFromDB.fulfilled,
+        deleteAllFromDB.fulfilled,
+        decreaseFromDB.fulfilled,
+        updateFromDB.fulfilled
+      ),
+      (state, action) => {
+        state.cartItems = action.payload;
+        console.log(action);
+
+        switch (action.type) {
+          case "cart/mergeCart/fulfilled":
+          case "cart/updateFromDB/fulfilled":
+            showInfoToast(successMessages[action.type]);
+            break;
+          case "cart/deleteFromDB/fulfilled":
+          case "cart/decreaseFromDB/fulfilled":
+            showWarningToast(successMessages[action.type]);
+            break;
+          default:
+            showSuccessToast(successMessages[action.type]);
+            break;
+        }
+      }
+    );
+    builder.addMatcher(
+      isAnyOf(
+        mergeCart.rejected,
+        addToDB.rejected,
+        deleteFromDB.rejected,
+        deleteAllFromDB.rejected,
+        decreaseFromDB.rejected,
+        updateFromDB.rejected,
+        fetchCart.rejected
+      ),
+      (_, action) => {
+        console.error(
+          `Error: ${errorMessages[action.type]}`,
+          action.error.message
+        );
+        showErrorToast(errorMessages[action.type]);
+      }
+    );
+  },
 });
 
 export const {
   addToCart,
+  updateCartItemQuantity,
   deleteFromCart,
   decreaseQuantity,
   deleteAllFromCart,
 } = cartSlice.actions;
 export default cartSlice.reducer;
+
+const successMessages: Record<string, string> = {
+  [String(mergeCart.fulfilled)]: "Giỏ hàng đã được đồng bộ",
+  [String(addToDB.fulfilled)]: "Thêm vào giỏ hàng thành công",
+  [String(deleteFromDB.fulfilled)]: "Loại bỏ sản phẩm khỏi giỏ hàng thành công",
+  [String(deleteAllFromDB.fulfilled)]: "Làm mới giỏ hàng thành công",
+  [String(decreaseFromDB.fulfilled)]: "Mặt hàng đã giảm từ giỏ hàng",
+  [String(updateFromDB.fulfilled)]: "Cập nhật số lượng thành công",
+  [String(fetchCart.fulfilled)]: "",
+};
+
+const errorMessages: Record<string, string> = {
+  [String(mergeCart.rejected)]: "Xảy ra lỗi khi đồng bộ giỏ hàng",
+  [String(addToDB.rejected)]: "Xảy ra lỗi khi thêm vào giỏ hàng",
+  [String(deleteFromDB.rejected)]:
+    "Xảy ra lỗi khi loại bỏ sản phẩm khỏi giỏ hàng",
+  [String(deleteAllFromDB.rejected)]: "Xảy ra lỗi khi làm mới giỏ hàng",
+  [String(decreaseFromDB.rejected)]: "Xảy ra lỗi khi giảm số lượng từ giỏ hàng",
+  [String(updateFromDB.rejected)]: "Xảy ra lỗi khi cập nh số lượng từ giỏ hàng",
+  [String(fetchCart.rejected)]: "Không thể lấy giỏ hàng từ cơ sở dữ liệu",
+};

@@ -5,7 +5,7 @@ import {
 } from "@ant-design/icons";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Result, Typography } from "antd";
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
@@ -15,7 +15,11 @@ const { Paragraph, Text } = Typography;
 const SubmissionFailed: React.FC = ({}) => {
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.pages.submission_failed") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.submission_failed") + " | SUNS");
+  }, [t]);
 
   let { pathname } = useLocation();
 

@@ -1,11 +1,30 @@
-import { AuthBindings } from "@refinedev/core";
 import { notification } from "antd";
 import { AxiosInstance } from "axios";
-import { axiosInstance } from "../utils";
-
-export const TOKEN_KEY = "suns-auth-client-token";
+import { TOKEN_KEY, axiosInstance } from "../utils";
+import {
+  AuthActionResponse,
+  CheckResponse,
+  IdentityResponse,
+  OnErrorResponse,
+  PermissionResponse,
+} from "@refinedev/core/dist/interfaces";
+import { store } from "../redux/store";
+import { deleteAllFromCart, mergeCart } from "../redux/slices/cart-slice";
 
 const httpClient: AxiosInstance = axiosInstance;
+
+type AuthBindings = {
+  login: (params: any) => Promise<AuthActionResponse>;
+  logout: (params: any) => Promise<AuthActionResponse>;
+  check: (params?: any) => Promise<CheckResponse>;
+  onError: (error: any) => Promise<OnErrorResponse>;
+  register?: (params: any) => Promise<AuthActionResponse>;
+  forgotPassword?: (params: any) => Promise<AuthActionResponse>;
+  updatePassword?: (params: any) => Promise<AuthActionResponse>;
+  resetPassword: (params: any) => Promise<AuthActionResponse>;
+  getPermissions?: (params?: any) => Promise<PermissionResponse>;
+  getIdentity?: (params?: any) => Promise<IdentityResponse>;
+};
 
 export const authProvider = (url: string): AuthBindings => ({
   login: async ({ email, password }) => {
@@ -13,20 +32,36 @@ export const authProvider = (url: string): AuthBindings => ({
       email,
       password,
     });
+
     const token = response.data.token ?? null;
 
-    if (token) localStorage.setItem(TOKEN_KEY, token);
-
-    return {
-      success: true,
-      redirectTo: "/",
-    };
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token);
+      const cartState = store.getState().cart;
+      store.dispatch(mergeCart(cartState.cartItems));
+      return {
+        success: true,
+        redirectTo: "/",
+      };
+    } else {
+      return {
+        success: false,
+        error: {
+          message: "Login Error",
+          name: "Invalid email or password",
+        },
+      };
+    }
   },
-  register: async ({ email, password }) => {
+
+  register: async ({ email, password, fullName, dateOfBirth, gender }) => {
     try {
-      const response = await httpClient.post(`${url}/login`, {
+      const response = await httpClient.post(`${url}/register-customers`, {
         email,
         password,
+        fullName,
+        dateOfBirth,
+        gender,
       });
 
       const token = response.data.token ?? null;
@@ -47,29 +82,100 @@ export const authProvider = (url: string): AuthBindings => ({
       };
     }
   },
-  updatePassword: async () => {
-    notification.success({
-      message: "Updated Password",
-      description: "Password updated successfully",
-    });
-    return {
-      success: true,
-    };
+
+  updatePassword: async ({ password, confirm, oldPassword }) => {
+    try {
+      const response = await httpClient.put(
+        `http://localhost:8080/client/customers/change-password`,
+        {
+          currentPassword: oldPassword,
+          newPassword: password,
+          enterThePassword: confirm,
+        }
+      );
+      if (response.status == 200) {
+        notification.success({
+          message: "Updated Password",
+          description: "Password updated successfully",
+        });
+        return {
+          success: true,
+        };
+      } else {
+        return Promise.reject();
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        error: {
+          message: "Cập nhật thất bại",
+          name: error.message,
+        },
+      };
+    }
   },
+
+  resetPassword: async ({ password, confirm, token }) => {
+    try {
+      const response = await httpClient
+        .post(`${url}/reset-password?token=${token}`, {
+          newPassword: password,
+          confirmPassword: confirm,
+        })
+        .then((res) => {
+          return res.data.content;
+        });
+
+      notification.success({
+        message: "Đặt lại mật khẩu",
+        description: "Mật khẩu được đặt lại thành công",
+      });
+      return {
+        success: true,
+        redirectTo: "/login",
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: {
+          message: "Đã xảy ra lỗi",
+          name: error.message,
+        },
+      };
+    }
+  },
+
   forgotPassword: async ({ email }) => {
-    notification.success({
-      message: "Reset Password",
-      description: `Reset password link sent to "${email}"`,
-    });
-    return {
-      success: true,
-    };
+    try {
+      const response = await httpClient
+        .post(`${url}/forgot-password?email=${email}`)
+        .then((res) => {
+          return res.data.content;
+        });
+
+      notification.success({
+        message: "Đặt lại mật khẩu",
+        description: `Liên kết đặt lại mật khẩu đã được gửi tới "${email}"`,
+      });
+      return {
+        success: true,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: {
+          message: "Đã xảy ra lỗi",
+          name: error.message,
+        },
+      };
+    }
   },
   logout: async () => {
     localStorage.removeItem(TOKEN_KEY);
+    store.dispatch(deleteAllFromCart());
     return {
       success: true,
-      redirectTo: "pages/login",
+      redirectTo: "/login",
     };
   },
   onError: async (error) => {
@@ -112,8 +218,8 @@ export const authProvider = (url: string): AuthBindings => ({
         });
 
       return response;
-    } catch (error) {
-      console.error("Error fetching identity:", error);
+    } catch (error: any) {
+      console.error("Error fetching identity:", error.message);
       return null;
     }
   },

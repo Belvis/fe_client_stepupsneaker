@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "image": "/assets/img/banner/banner-1.jpg",
+    "image": "",
     "title": "Watches",
     "subtitle": "Starting at",
     "price": "$99.00",
@@ -9,7 +9,7 @@
   },
   {
     "id": 2,
-    "image": "/assets/img/banner/banner-2.jpg",
+    "image": "",
     "title": "Plo Bag",
     "subtitle": "Starting at",
     "price": "$79.00",
@@ -17,7 +17,7 @@
   },
   {
     "id": 3,
-    "image": "/assets/img/banner/banner-3.jpg",
+    "image": "",
     "title": "Sunglass",
     "subtitle": "Starting at",
     "price": "$29.00",

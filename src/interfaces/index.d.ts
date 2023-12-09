@@ -46,6 +46,7 @@ export interface IProductDetailResponse {
   image: string;
   price: number;
   quantity: number;
+  saleCount: number;
   promotionProductDetails: IPromotionProductDetailResponse[];
 }
 export interface IPromotionProductDetailResponse {
@@ -129,6 +130,30 @@ export interface IOrderResponse {
   payments: IPaymentResponse[];
   status: OrderStatus;
 }
+
+export interface ICartItem {
+  id: string;
+  cartItemId: string;
+  image: string;
+  name: string;
+  quantity: number;
+  selectedProductColor: IColorResponse;
+  selectedProductSize: ISizeClient;
+}
+export interface ICartDetailResponse {
+  id: string;
+  cart: ICartResponse;
+  productDetail: IProductDetailResponse;
+  quantity: number;
+}
+export interface ICartDetailRequest {
+  productDetail: string;
+  quantity: number;
+}
+export interface ICartResponse {
+  id: string;
+  cartDetails: ICartDetailResponse[];
+}
 export interface ICustomerResponse {
   id: string;
   fullName: string;
@@ -137,6 +162,7 @@ export interface ICustomerResponse {
   gender: string;
   image: string;
   addressList: IAddressResponse[];
+  cart: ICartItem;
 }
 export interface IAddressResponse {
   id: string;
@@ -185,10 +211,11 @@ export interface IPaymentMethodResponse {
 
 export interface ICustomerRequest {
   fullName: string;
+  password: string;
   email: string;
   dateOfBirth: number | string;
   gender: string;
-  image: string;
+  image?: string;
 }
 export interface IAddressRequest {
   phoneNumber: string;
@@ -233,15 +260,6 @@ export interface ISizeClient {
   saleCount: number;
   offerEnd: number;
   productDetailId: string;
-}
-export interface ICartItem {
-  id: string;
-  cartItemId: string;
-  image: string;
-  name: string;
-  quantity: number;
-  selectedProductColor: IColorResponse;
-  selectedProductSize: ISizeClient;
 }
 export interface IOrderRequest {
   voucher: IVoucherResponse;

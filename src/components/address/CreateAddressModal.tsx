@@ -194,7 +194,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                     },
                   ]}
                 >
-                  <input type="text" />
+                  <input id="phoneNumber-create" type="text" />
                 </Form.Item>
               </div>
             </div>
@@ -210,7 +210,10 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                   ]}
                 >
                   {provinces.length > 0 ? (
-                    <select onChange={handleProvinceChange}>
+                    <select
+                      id="provinceId-create"
+                      onChange={handleProvinceChange}
+                    >
                       <option value="">--Chọn tỉnh/thành phố--</option>
                       {provinces.map((province, index) => (
                         <option key={index} value={province.ProvinceID}>
@@ -219,7 +222,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                       ))}
                     </select>
                   ) : (
-                    <select>
+                    <select id="provinceId-create">
                       <option value="">Đang tải tỉnh/thành phố...</option>
                     </select>
                   )}
@@ -238,7 +241,10 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                   ]}
                 >
                   {districts.length > 0 ? (
-                    <select onChange={handleDistrictChange}>
+                    <select
+                      id="districtId-create"
+                      onChange={handleDistrictChange}
+                    >
                       <option value="">--Chọn quận/huyện--</option>
                       {districts.map((district, index) => (
                         <option key={index} value={district.DistrictID}>
@@ -247,7 +253,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                       ))}
                     </select>
                   ) : (
-                    <select>
+                    <select id="districtId-create">
                       <option value="">Đang tải quận/huyện...</option>
                     </select>
                   )}
@@ -266,7 +272,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                   ]}
                 >
                   {wards.length > 0 ? (
-                    <select onChange={handleWardChange}>
+                    <select id="wardCode-create" onChange={handleWardChange}>
                       <option value="">--Chọn phường/xã--</option>
                       {wards.map((ward, index) => (
                         <option key={index} value={ward.WardCode}>
@@ -275,7 +281,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                       ))}
                     </select>
                   ) : (
-                    <select>
+                    <select id="wardCode-create">
                       <option value="">Đang tải phường/...</option>
                     </select>
                   )}
@@ -293,7 +299,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                     },
                   ]}
                 >
-                  <input type="text" />
+                  <input id="more-create" type="text" />
                 </Form.Item>
               </div>
             </div>

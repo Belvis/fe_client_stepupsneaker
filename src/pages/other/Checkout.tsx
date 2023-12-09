@@ -11,7 +11,7 @@ import {
   IProvince,
   IWard,
 } from "../../interfaces";
-import { RootState } from "../../redux/store";
+import { AppDispatch, RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 
 import {
@@ -20,16 +20,22 @@ import {
   useCustom,
   useCustomMutation,
   useGetIdentity,
+  useIsAuthenticated,
 } from "@refinedev/core";
 import { useNavigate } from "react-router-dom";
 import PaymentMethodAccordion from "../../components/payment-methods/PaymentMethodAccordion";
 import DiscountCodeAccordion from "../../components/voucher/DiscountCodeAccordion";
 import { CurrencyFormatter } from "../../helpers/currency";
-import { deleteAllFromCart } from "../../redux/slices/cart-slice";
+import {
+  deleteAllFromCart,
+  deleteAllFromDB,
+  fetchCart,
+} from "../../redux/slices/cart-slice";
 import { clearOrder, setOrder } from "../../redux/slices/order-slice";
 import { useModal } from "@refinedev/antd";
 import { ListAddressModal } from "../../components/address/ListAddressModal";
 import dayjs from "dayjs";
+import { TOKEN_KEY } from "../../utils";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -37,15 +43,19 @@ const GHN_TOKEN = import.meta.env.VITE_GHN_USER_TOKEN;
 
 const CheckOut = () => {
   const { t } = useTranslation();
+  const dispatch: AppDispatch = useDispatch();
 
-  useDocumentTitle(t("nav.pages.checkout") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.checkout") + " | SUNS");
+  }, [t]);
 
   const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
 
   const { mutate, isLoading } = useCreate();
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   let { pathname } = useLocation();
   const currency = useSelector((state: RootState) => state.currency);
@@ -349,7 +359,14 @@ const CheckOut = () => {
         },
         onSuccess: (data, variables, context) => {
           dispatch(clearOrder());
-          dispatch(deleteAllFromCart());
+
+          const token = localStorage.getItem(TOKEN_KEY);
+
+          if (token) {
+            dispatch(deleteAllFromDB());
+          } else {
+            dispatch(deleteAllFromCart());
+          }
 
           if (selectedPaymentMethod === "Cash") {
             navigate("/success/" + data.data.id);
@@ -648,9 +665,11 @@ const CheckOut = () => {
                         </label>
                         <Form.Item name="order_note">
                           <textarea
-                            placeholder={t(
-                              "checkout.billing_details.additional_information.order_note.place_holder"
-                            )}
+                            placeholder={
+                              t(
+                                "checkout.billing_details.additional_information.order_note.place_holder"
+                              ) ?? ""
+                            }
                             name="message"
                           />
                         </Form.Item>

@@ -13,7 +13,7 @@
       font-size: 25px;
       font-weight: 700;
       margin: 0 20px;
-      text-transform: uppercase;
+      text-transform: capitalize;
       transition: all 0.3s ease 0s;
       color: $theme-color;
     }
@@ -81,7 +81,8 @@
           color: #333;
           font-size: 14px;
           height: 45px;
-          margin-bottom: 30px;
+          margin-top: 5px;
+          margin-bottom: 15px;
           padding: 0 15px;
         }
         input[type="checkbox"] {
@@ -90,6 +91,22 @@
           position: relative;
           top: 1px;
           width: 17px;
+        }
+        select {
+          font-size: 14px;
+    
+          height: 45px;
+          padding: 2px 20px;
+          margin-bottom: 15px;
+    
+          cursor: pointer;
+    
+          color: #333;
+          border: 1px solid #e6e6e6;
+    
+          -webkit-appearance: none;
+             -moz-appearance: none;
+                  appearance: none;
         }
         .button-box {
           .login-toggle-btn {
@@ -148,6 +165,14 @@
     $xs-layout} {
       background-image: none;
     }
+}
+
+.float-icon {
+  cursor: pointer;
+  margin-left: -25px;
+  margin-top: -25px;
+  position: relative;
+  z-index: 2;
 }
 
 .login-register-area {

@@ -1,12 +1,13 @@
-import { HttpError, useList } from "@refinedev/core";
+import { HttpError, useIsAuthenticated, useList } from "@refinedev/core";
 import { Spin } from "antd";
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import ProductGridSingle from "../../components/product/ProductGridSingle";
 import Swiper, { SwiperSlide } from "../../components/swiper";
 import { IProductResponse } from "../../interfaces";
-import { RootState } from "../../redux/store";
+import { AppDispatch, RootState } from "../../redux/store";
 import { mapProductsToClients } from "../../helpers/product";
+import { fetchCart } from "../../redux/slices/cart-slice";
 
 type ProductGridProps = {
   spaceBottomClass?: string;

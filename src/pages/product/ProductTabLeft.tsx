@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import RelatedProductSlider from "../../wrappers/product/RelatedProductSlider";
@@ -13,7 +13,11 @@ import { useDocumentTitle } from "@refinedev/react-router-v6";
 const ProductTabLeft = () => {
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.product") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.product") + " | SUNS");
+  }, [t]);
 
   let { pathname } = useLocation();
   let { id } = useParams();

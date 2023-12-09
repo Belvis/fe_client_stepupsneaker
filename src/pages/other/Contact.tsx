@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import GoogleMap from "../../components/google-map";
@@ -9,7 +9,11 @@ const Contact = () => {
   let { pathname } = useLocation();
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.contact_us") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.contact_us") + " | SUNS");
+  }, [t]);
 
   return (
     <Fragment>

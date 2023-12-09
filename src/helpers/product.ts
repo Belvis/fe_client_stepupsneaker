@@ -162,7 +162,7 @@ const getProductCartQuantity = (
 export const getDiscountInfo = (
   promotionProductDetails: IPromotionProductDetailResponse[]
 ): IDiscountInfo | null => {
-  if (promotionProductDetails.length === 0) {
+  if (!promotionProductDetails || promotionProductDetails.length === 0) {
     return null;
   }
 

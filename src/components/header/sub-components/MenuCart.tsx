@@ -1,12 +1,17 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { RootState } from "../../../redux/store";
+import { AppDispatch, RootState } from "../../../redux/store";
 import { getDiscountPrice } from "../../../helpers/product";
-import { deleteFromCart } from "../../../redux/slices/cart-slice";
+import {
+  deleteFromCart,
+  deleteFromDB,
+  fetchCart,
+} from "../../../redux/slices/cart-slice";
 import { useTranslation } from "react-i18next";
 import { CurrencyFormatter } from "../../../helpers/currency";
 import clsx from "clsx";
+import { Authenticated, useIsAuthenticated } from "@refinedev/core";
 
 type MenuCartProps = {
   activeIndex: number | null;
@@ -15,9 +20,10 @@ type MenuCartProps = {
 const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
   const { t } = useTranslation();
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const currency = useSelector((state: RootState) => state.currency);
   const { cartItems } = useSelector((state: RootState) => state.cart);
+
   let cartTotalPrice = 0;
 
   return (
@@ -82,9 +88,19 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
                     )}
                   </div>
                   <div className="shopping-cart-delete">
-                    <button onClick={() => dispatch(deleteFromCart(item?.id))}>
-                      <i className="fa fa-times-circle" />
-                    </button>
+                    <Authenticated
+                      fallback={
+                        <button
+                          onClick={() => dispatch(deleteFromCart(item?.id))}
+                        >
+                          <i className="fa fa-times-circle" />
+                        </button>
+                      }
+                    >
+                      <button onClick={() => dispatch(deleteFromDB(item?.id))}>
+                        <i className="fa fa-times-circle" />
+                      </button>
+                    </Authenticated>
                   </div>
                 </li>
               );
