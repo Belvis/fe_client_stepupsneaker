@@ -367,7 +367,7 @@ const Cart = () => {
                           return (
                             <tr key={key}>
                               <td className="product-thumbnail">
-                                <Link to={"/product/" + cartItem.id}>
+                                <Link to={"/product/" + cartItem.cartItemId}>
                                   <img
                                     className="img-fluid"
                                     src={cartItem.image}
@@ -377,7 +377,7 @@ const Cart = () => {
                               </td>
 
                               <td className="product-name">
-                                <Link to={"/product/" + cartItem.id}>
+                                <Link to={"/product/" + cartItem.cartItemId}>
                                   {cartItem.name}
                                 </Link>
                                 {cartItem.selectedProductColor &&

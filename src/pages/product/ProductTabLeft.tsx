@@ -16,7 +16,7 @@ const ProductTabLeft = () => {
   const setTitle = useDocumentTitle();
 
   useEffect(() => {
-    setTitle(t("nav.pages.product") + " | SUNS");
+    setTitle(t("nav.product") + " | SUNS");
   }, [t]);
 
   let { pathname } = useLocation();

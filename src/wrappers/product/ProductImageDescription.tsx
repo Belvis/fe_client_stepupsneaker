@@ -1,14 +1,12 @@
-import { useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
-import ProductImageGallery from "../../components/product/ProductImageGallery";
-import ProductDescriptionInfo from "../../components/product/ProductDescriptionInfo";
-import ProductImageGallerySideThumb from "../../components/product/ProductImageGallerySideThumb";
-import ProductImageFixed from "../../components/product/ProductImageFixed";
-import { IColorResponse, IProductClient } from "../../interfaces";
-import { AppDispatch, RootState } from "../../redux/store";
 import { useEffect, useState } from "react";
-import { useIsAuthenticated } from "@refinedev/core";
-import { fetchCart } from "../../redux/slices/cart-slice";
+import { useSelector } from "react-redux";
+import ProductDescriptionInfo from "../../components/product/ProductDescriptionInfo";
+import ProductImageFixed from "../../components/product/ProductImageFixed";
+import ProductImageGallery from "../../components/product/ProductImageGallery";
+import ProductImageGallerySideThumb from "../../components/product/ProductImageGallerySideThumb";
+import { IColorResponse, IProductClient } from "../../interfaces";
+import { RootState } from "../../redux/store";
 
 interface ProductImageDescriptionProps {
   spaceTopClass: string;

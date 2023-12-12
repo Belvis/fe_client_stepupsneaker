@@ -33,7 +33,7 @@ const toCartItem = (item: ICartDetailResponse): ICartItem => {
 
   return {
     id: item.id,
-    cartItemId: productDetail.id,
+    cartItemId: productDetail.product.id,
     image: productDetail.image,
     name: productDetail.product.name,
     quantity: item.quantity,
@@ -116,8 +116,6 @@ export const fetchCart = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await fetchCartFromDB();
-
-      console.log(res.data);
 
       return res.data.map(toCartItem);
     } catch (error: any) {
@@ -229,7 +227,7 @@ const cartSlice = createSlice({
           ...product,
           quantity: product.quantity ? product.quantity : 1,
           cartItemId: product.cartItemId,
-          id: product.id ?? uuidv4(),
+          id: product.id || uuidv4(),
         });
       } else if (
         cartItem !== undefined &&
@@ -243,7 +241,7 @@ const cartSlice = createSlice({
             ...product,
             quantity: product.quantity ? product.quantity : 1,
             cartItemId: product.cartItemId,
-            id: product.id ?? uuidv4(),
+            id: product.id || uuidv4(),
           },
         ];
       } else {

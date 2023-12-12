@@ -26,7 +26,7 @@ const ShopStyles: React.FC<ShopStylesProps> = ({
                     <div className="sidebar-widget-list-left">
                       <button
                         onClick={(e) => {
-                          updateFilterParams("style", style.id);
+                          updateFilterParams("styles", style.id);
                           setActiveSort(e);
                         }}
                       >

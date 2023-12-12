@@ -133,7 +133,14 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
           để đôi sneaker này làm nổi bật phong cách cá nhân của bạn.
         </p>
       </div>
-
+      <div className="pro-details-meta">
+        <span>Mã :</span>
+        <span className="fw-bold">{product.code}</span>
+      </div>
+      <div className="pro-details-meta">
+        <span>Số lượng tồn :</span>
+        <span className="fw-bold">{productStock}</span>
+      </div>
       {product.variation ? (
         <div className="pro-details-size-color">
           <div className="pro-details-color-wrap">

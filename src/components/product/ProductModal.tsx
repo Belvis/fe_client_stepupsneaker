@@ -1,4 +1,4 @@
-import { Authenticated, useIsAuthenticated } from "@refinedev/core";
+import { Authenticated } from "@refinedev/core";
 import { Badge, Space } from "antd";
 import { Fragment, useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
@@ -11,7 +11,7 @@ import {
   getProductCartQuantity,
 } from "../../helpers/product";
 import { IColorResponse, IProductClient, ISizeClient } from "../../interfaces";
-import { addToCart, addToDB, fetchCart } from "../../redux/slices/cart-slice";
+import { addToCart, addToDB } from "../../redux/slices/cart-slice";
 import { addToCompare } from "../../redux/slices/compare-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
 import { AppDispatch, RootState } from "../../redux/store";
@@ -202,12 +202,15 @@ const ProductModal: React.FC<ProductModalProps> = ({
               <div className="pro-details-list">
                 <p>{product.description}</p>
               </div>
-
+              <div className="pro-details-meta">
+                <span>Số lượng tồn :</span>
+                <span className="fw-bold">{productStock}</span>
+              </div>
               {product.variation ? (
                 <div className="pro-details-size-color">
                   <div className="pro-details-color-wrap">
                     <Space direction="vertical">
-                      <span>Color</span>
+                      <span>Màu sắc</span>
                       <div className="pro-details-color-content">
                         {product.variation.map((single, key) => {
                           const hasSale = single.size.some(
@@ -271,7 +274,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                   </div>
                   <div className="pro-details-size">
                     <Space direction="vertical">
-                      <span>Size</span>
+                      <span>Kích cỡ</span>
                       <div className="pro-details-size-content">
                         {product.variation &&
                           product.variation.map((single) => {

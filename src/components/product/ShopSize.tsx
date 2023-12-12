@@ -24,7 +24,7 @@ const ShopSize: React.FC<ShopSizeProps> = ({ sizes, updateFilterParams }) => {
                       <button
                         className="text-uppercase"
                         onClick={(e) => {
-                          updateFilterParams("size", size.id);
+                          updateFilterParams("sizes", size.id);
                           setActiveSort(e);
                         }}
                       >

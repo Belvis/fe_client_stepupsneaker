@@ -27,7 +27,7 @@ const ShopBrand: React.FC<ShopBrandProps> = ({
                       <button
                         className="text-uppercase"
                         onClick={(e) => {
-                          updateFilterParams("brand", brand.id);
+                          updateFilterParams("brands", brand.id);
                           setActiveSort(e);
                         }}
                       >

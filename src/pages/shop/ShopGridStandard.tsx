@@ -1,23 +1,21 @@
-import React, { Fragment, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import {
   CrudFilter,
   CrudFilters,
   CrudSorting,
   HttpError,
   useList,
-  useParsed,
 } from "@refinedev/core";
+import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Pagination, PaginationProps, Spin } from "antd";
+import React, { Fragment, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { mapProductsToClients } from "../../helpers/product";
 import { IProductResponse } from "../../interfaces";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import ShopProducts from "../../wrappers/product/ShopProducts";
 import ShopSidebar from "../../wrappers/product/ShopSidebar";
 import ShopTopbar from "../../wrappers/product/ShopTopbar";
-import { useTranslation } from "react-i18next";
-import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { useSearchParams } from "react-router-dom";
 
 const ShopGridStandard: React.FC = () => {
   const { t } = useTranslation();
@@ -46,15 +44,15 @@ const ShopGridStandard: React.FC = () => {
   const pageLimit: number = 15;
 
   const layout = searchParams.get("layout") ?? "grid three-column";
-  const currentPage = Number(searchParams.get("page")) ?? 1;
+  const currentPage = Number(searchParams.get("page")) || 1;
 
   const filterFieldsMappings = {
-    style: "style",
-    color: "color",
-    size: "size",
-    brand: "brand",
-    material: "material",
-    sole: "sole",
+    styles: "styles",
+    colors: "colors",
+    sizes: "sizes",
+    brands: "brands",
+    materials: "materials",
+    soles: "soles",
   };
 
   const getFiltersFromSearchParams = (): CrudFilters => {
@@ -81,6 +79,8 @@ const ShopGridStandard: React.FC = () => {
         value: q,
       });
     }
+
+    console.log(filters);
 
     return filters;
   };

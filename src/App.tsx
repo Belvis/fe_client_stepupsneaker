@@ -1,4 +1,4 @@
-import { Authenticated, Refine } from "@refinedev/core";
+import { Action, Authenticated, IResourceItem, Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
 import { useNotificationProvider } from "@refinedev/antd";
@@ -61,6 +61,18 @@ function App() {
     translate: (key: string, params: object) => t(key, params),
     changeLocale: (lang: string) => i18n.changeLanguage(lang),
     getLocale: () => i18n.language,
+  };
+
+  const titleHandler = ({
+    resource,
+    action,
+    params,
+  }: {
+    resource?: IResourceItem;
+    action?: Action;
+    params?: Record<string, string | undefined>;
+  }): string => {
+    return "SUNS";
   };
 
   return (
@@ -197,7 +209,7 @@ function App() {
               </ScrollToTop>
               <RefineKbar />
               <UnsavedChangesNotifier />
-              <DocumentTitleHandler />
+              <DocumentTitleHandler handler={titleHandler} />
             </Refine>
           </AntdApp>
         </ColorModeContextProvider>

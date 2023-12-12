@@ -171,9 +171,9 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
                             <div className="col-md-6">
                               <div className="rating-form-style mb-10">
                                 <input
-                                  placeholder={t(
-                                    `products.desc_tab.fields.name`
-                                  )}
+                                  placeholder={
+                                    t(`products.desc_tab.fields.name`) || ""
+                                  }
                                   type="text"
                                 />
                               </div>
@@ -181,9 +181,9 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
                             <div className="col-md-6">
                               <div className="rating-form-style mb-10">
                                 <input
-                                  placeholder={t(
-                                    `products.desc_tab.fields.email`
-                                  )}
+                                  placeholder={
+                                    t("products.desc_tab.fields.email") || ""
+                                  }
                                   type="email"
                                 />
                               </div>
@@ -192,14 +192,16 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
                               <div className="rating-form-style form-submit">
                                 <textarea
                                   name="message"
-                                  placeholder={t(
-                                    `products.desc_tab.fields.message`
-                                  )}
+                                  placeholder={
+                                    t(`products.desc_tab.fields.message`) || ""
+                                  }
                                   defaultValue={""}
                                 />
                                 <input
                                   type="submit"
-                                  value={t(`products.desc_tab.buttons.submit`)}
+                                  value={
+                                    t(`products.desc_tab.buttons.submit`) || ""
+                                  }
                                 />
                               </div>
                             </div>

@@ -26,7 +26,7 @@ const ShopColor: React.FC<ShopColorProps> = ({
                     <div className="sidebar-widget-list-left">
                       <button
                         onClick={(e) => {
-                          updateFilterParams("color", color.id);
+                          updateFilterParams("colors", color.id);
                           setActiveSort(e);
                         }}
                       >

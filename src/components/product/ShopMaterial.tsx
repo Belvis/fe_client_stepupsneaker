@@ -20,19 +20,6 @@ const ShopMaterial: React.FC<ShopMaterialProps> = ({
         <div className="sidebar-widget-list mt-20">
           {materials ? (
             <ul>
-              <li>
-                <div className="sidebar-widget-list-left">
-                  <button
-                    onClick={(e) => {
-                      updateFilterParams("material", "");
-                      setActiveSort(e);
-                    }}
-                  >
-                    <span className="checkmark" />
-                    Tất cả
-                  </button>
-                </div>
-              </li>
               {materials.map((material, key) => {
                 return (
                   <li key={key}>
@@ -40,7 +27,7 @@ const ShopMaterial: React.FC<ShopMaterialProps> = ({
                       <button
                         className="text-uppercase"
                         onClick={(e) => {
-                          updateFilterParams("material", material.id);
+                          updateFilterParams("materials", material.id);
                           setActiveSort(e);
                         }}
                       >

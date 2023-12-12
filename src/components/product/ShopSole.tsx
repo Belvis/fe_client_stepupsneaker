@@ -24,7 +24,7 @@ const ShopSole: React.FC<ShopSoleProps> = ({ soles, updateFilterParams }) => {
                       <button
                         className="text-uppercase"
                         onClick={(e) => {
-                          updateFilterParams("sole", sole.id);
+                          updateFilterParams("soles", sole.id);
                           setActiveSort(e);
                         }}
                       >
