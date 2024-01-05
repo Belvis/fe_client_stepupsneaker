@@ -8,7 +8,7 @@ import {
 } from "@ant-design/icons";
 import { HttpError, useOne } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { Grid, Steps, Tooltip } from "antd";
+import { Button, Flex, Grid, Space, Steps, Tooltip } from "antd";
 import dayjs from "dayjs";
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -19,6 +19,8 @@ import { IEvent, IOrderResponse, OrderStatus } from "../../interfaces";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { CurrencyFormatter } from "../../helpers/currency";
+import { useModal } from "@refinedev/antd";
+import MyOrderModal from "../../components/order/MyOrderModal";
 
 const { useBreakpoint } = Grid;
 
@@ -73,6 +75,12 @@ const OrderTracking = () => {
   const currency = useSelector((state: RootState) => state.currency);
 
   let cartTotalPrice = 0;
+
+  const {
+    show,
+    close,
+    modalProps: { visible, ...restModalProps },
+  } = useModal();
 
   const [events, setEvents] = useState<IEvent[]>(InitialEventData);
 
@@ -206,7 +214,13 @@ const OrderTracking = () => {
         ]}
       />
       <div className="bg-white p-100">
-        <h3>Trạng thái đơn hàng: #{order && order.code}</h3>
+        <Flex gap="middle" align="center" justify="space-between">
+          <h3>Trạng thái đơn hàng: #{order && order.code}</h3>
+          <Space>
+            <Button>Huỷ</Button>
+            <Button onClick={show}>Sửa đơn hàng</Button>
+          </Space>
+        </Flex>
         <hr />
         <div className="table-content table-responsive order-tracking-table-content">
           <table className="w-100">
@@ -401,6 +415,7 @@ const OrderTracking = () => {
           </table>
         </div>
       </div>
+      <MyOrderModal restModalProps={restModalProps} code={code} />
     </Fragment>
   );
 };

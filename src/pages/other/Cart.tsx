@@ -40,6 +40,7 @@ import { setOrder } from "../../redux/slices/order-slice";
 import { AppDispatch, RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { debounce } from "lodash";
+import { showErrorToast } from "../../helpers/toast";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -426,9 +427,9 @@ const Cart = () => {
                                     fallback={
                                       <button
                                         className="dec qtybutton"
-                                        onClick={() =>
-                                          dispatch(decreaseQuantity(cartItem))
-                                        }
+                                        onClick={() => {
+                                          dispatch(decreaseQuantity(cartItem));
+                                        }}
                                       >
                                         -
                                       </button>
@@ -454,6 +455,21 @@ const Cart = () => {
                                             e.target.value,
                                             10
                                           );
+                                          if (
+                                            newValue >=
+                                            cartItemStock(
+                                              cartItem.selectedProductSize
+                                            )
+                                          ) {
+                                            return showErrorToast(
+                                              "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                                            );
+                                          }
+                                          if (newValue > 5) {
+                                            return showErrorToast(
+                                              "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                                            );
+                                          }
                                           if (!isNaN(newValue)) {
                                             updateQuantity({
                                               ...cartItem,
@@ -473,6 +489,21 @@ const Cart = () => {
                                           e.target.value,
                                           10
                                         );
+                                        if (
+                                          newValue >=
+                                          cartItemStock(
+                                            cartItem.selectedProductSize
+                                          )
+                                        ) {
+                                          return showErrorToast(
+                                            "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                                          );
+                                        }
+                                        if (newValue > 5) {
+                                          return showErrorToast(
+                                            "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                                          );
+                                        }
                                         if (!isNaN(newValue)) {
                                           updateQuantity({
                                             ...cartItem,
@@ -491,22 +522,32 @@ const Cart = () => {
                                     fallback={
                                       <button
                                         className="inc qtybutton"
-                                        onClick={() =>
+                                        onClick={() => {
+                                          if (
+                                            cartItem !== undefined &&
+                                            cartItem.quantity !== undefined &&
+                                            cartItem.quantity >=
+                                              cartItemStock(
+                                                cartItem.selectedProductSize
+                                              )
+                                          ) {
+                                            return showErrorToast(
+                                              "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                                            );
+                                          }
+
+                                          if (cartItem.quantity >= 5) {
+                                            return showErrorToast(
+                                              "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                                            );
+                                          }
                                           dispatch(
                                             addToCart({
                                               ...cartItem,
                                               quantity: quantityCount,
                                             })
-                                          )
-                                        }
-                                        disabled={
-                                          cartItem !== undefined &&
-                                          cartItem.quantity !== undefined &&
-                                          cartItem.quantity >=
-                                            cartItemStock(
-                                              cartItem.selectedProductSize
-                                            )
-                                        }
+                                          );
+                                        }}
                                       >
                                         +
                                       </button>
@@ -514,22 +555,32 @@ const Cart = () => {
                                   >
                                     <button
                                       className="inc qtybutton"
-                                      onClick={() =>
+                                      onClick={() => {
+                                        if (
+                                          cartItem !== undefined &&
+                                          cartItem.quantity !== undefined &&
+                                          cartItem.quantity >=
+                                            cartItemStock(
+                                              cartItem.selectedProductSize
+                                            )
+                                        ) {
+                                          return showErrorToast(
+                                            "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                                          );
+                                        }
+
+                                        if (cartItem.quantity >= 5) {
+                                          return showErrorToast(
+                                            "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                                          );
+                                        }
                                         dispatch(
                                           addToDB({
                                             ...cartItem,
                                             quantity: quantityCount,
                                           })
-                                        )
-                                      }
-                                      disabled={
-                                        cartItem !== undefined &&
-                                        cartItem.quantity !== undefined &&
-                                        cartItem.quantity >=
-                                          cartItemStock(
-                                            cartItem.selectedProductSize
-                                          )
-                                      }
+                                        );
+                                      }}
                                     >
                                       +
                                     </button>

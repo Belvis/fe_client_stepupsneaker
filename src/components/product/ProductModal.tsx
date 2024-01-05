@@ -18,6 +18,7 @@ import { AppDispatch, RootState } from "../../redux/store";
 import { SaleIcon } from "../icons/icon-sale";
 import Swiper, { SwiperSlide } from "../swiper";
 import Rating from "./sub-components/ProductRating";
+import { showErrorToast } from "../../helpers/toast";
 
 type ProductModalProps = {
   currency: any;
@@ -333,11 +334,12 @@ const ProductModal: React.FC<ProductModalProps> = ({
               <div className="pro-details-quality">
                 <div className="cart-plus-minus">
                   <button
-                    onClick={() =>
-                      setQuantityCount(
-                        quantityCount > 1 ? quantityCount - 1 : 1
-                      )
-                    }
+                    onClick={() => {
+                      if (quantityCount <= 1) {
+                        return showErrorToast("Đã đạt số lượng nhỏ nhất");
+                      }
+                      setQuantityCount(quantityCount - 1);
+                    }}
                     className="dec qtybutton"
                   >
                     -
@@ -349,13 +351,20 @@ const ProductModal: React.FC<ProductModalProps> = ({
                     readOnly
                   />
                   <button
-                    onClick={() =>
-                      setQuantityCount(
-                        quantityCount < productStock - productCartQty
-                          ? quantityCount + 1
-                          : quantityCount
-                      )
-                    }
+                    onClick={() => {
+                      if (quantityCount + productCartQty >= 5) {
+                        return showErrorToast(
+                          "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                        );
+                      }
+
+                      if (quantityCount >= productStock - productCartQty) {
+                        return showErrorToast(
+                          "Rất tiếc, đã đạt giới hạn số lượng sản phẩm!"
+                        );
+                      }
+                      setQuantityCount(quantityCount + 1);
+                    }}
                     className="inc qtybutton"
                   >
                     +

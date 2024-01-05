@@ -142,6 +142,11 @@ export const mergeCart = createAsyncThunk(
 export const addToDB = createAsyncThunk(
   "cart/addToDB",
   async (cartItem: ICartItem, { rejectWithValue }) => {
+    console.log("hehe");
+
+    if (cartItem.quantity === cartItem.selectedProductSize.stock) {
+      return rejectWithValue("Rất tiếc, đã đạt giới hạn số lượng sản phẩm");
+    }
     try {
       const res = await addCartToDB(cartItem);
 
@@ -296,7 +301,7 @@ const cartSlice = createSlice({
         state.cartItems = state.cartItems.filter(
           (item) => item.cartItemId !== product.cartItemId
         );
-        showErrorToast("Sản phẩm không hợp lệ");
+        showErrorToast("Mặt hàng đã được loại bỏ khỏi giỏ hàng");
       } else {
         state.cartItems = state.cartItems.map((item) =>
           item.cartItemId === product.cartItemId

@@ -53,13 +53,16 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
               return (
                 <li className="single-shopping-cart" key={item.id}>
                   <div className="shopping-cart-img">
-                    <Link to={"/product/" + item.id}>
+                    <Link to={"/product/" + item.cartItemId}>
                       <img alt="" src={item.image} className="img-fluid" />
                     </Link>
                   </div>
                   <div className="shopping-cart-title">
                     <h4>
-                      <Link to={"/product/" + item.id}> {item.name} </Link>
+                      <Link to={"/product/" + item.cartItemId}>
+                        {" "}
+                        {item.name}{" "}
+                      </Link>
                     </h4>
                     <h6>
                       {t("header.menu_cart.qty")}: {item.quantity}

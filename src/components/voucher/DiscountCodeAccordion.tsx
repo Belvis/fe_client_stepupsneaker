@@ -86,7 +86,7 @@ const DiscountCodeAccordion = () => {
       <Accordion>
         <Accordion.Item eventKey="0" className="single-my-account mb-20">
           <Accordion.Header className="panel-heading">
-            Bạn có mã giảm giá?, sử dụng tại đây.
+            Bạn có mã giảm giá? Sử dụng tại đây.
           </Accordion.Header>
           <Accordion.Body style={{ padding: 0 }}>
             <div className="checkout-discount-code-wrapper">

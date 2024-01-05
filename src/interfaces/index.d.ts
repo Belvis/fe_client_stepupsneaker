@@ -31,7 +31,7 @@ export interface IProductResponse {
   image: string;
   productDetails: IProductDetailResponse[];
   saleCount: number;
-  createdAt;
+  createdAt: number;
 }
 export interface IProductDetailResponse {
   id: string;

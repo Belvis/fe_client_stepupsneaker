@@ -131,12 +131,14 @@ const getProductCartQuantity = (
   size: ISizeClient
 ): number => {
   const productInCart = cartItems.find(
-    (single: any) =>
-      single.id === product.id &&
+    (single: ICartItem) =>
+      single.cartItemId === product.id &&
       (single.selectedProductColor
-        ? single.selectedProductColor === color
+        ? single.selectedProductColor.id === color.id
         : true) &&
-      (single.selectedProductSize ? single.selectedProductSize === size : true)
+      (single.selectedProductSize
+        ? single.selectedProductSize.id === size.id
+        : true)
   );
 
   if (cartItems.length >= 1 && productInCart) {
@@ -144,14 +146,15 @@ const getProductCartQuantity = (
       return (
         cartItems.find(
           (single: any) =>
-            single.id === product.id &&
-            single.selectedProductColor === color &&
-            single.selectedProductSize === size
+            single.cartItemId === product.id &&
+            single.selectedProductColor.id === color.id &&
+            single.selectedProductSize.id === size.id
         )?.quantity || 0
       );
     } else {
       return (
-        cartItems.find((single: any) => product.id === single.id)?.quantity || 0
+        cartItems.find((single: any) => product.id === single.cartItemId)
+          ?.quantity || 0
       );
     }
   } else {
@@ -197,12 +200,6 @@ export const cartItemStock = (size: ISizeClient | undefined) => {
 export const setActiveSort = (
   e: React.MouseEvent<HTMLButtonElement, MouseEvent>
 ) => {
-  const filterButtons = document.querySelectorAll(
-    ".sidebar-widget-list-left button, .sidebar-widget-tag button, .product-filter button"
-  );
-  // filterButtons.forEach((item) => {
-  //   item.classList.remove("active");
-  // });
   e.currentTarget.classList.toggle("active");
 };
 
