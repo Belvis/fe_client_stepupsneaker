@@ -142,8 +142,6 @@ export const mergeCart = createAsyncThunk(
 export const addToDB = createAsyncThunk(
   "cart/addToDB",
   async (cartItem: ICartItem, { rejectWithValue }) => {
-    console.log("hehe");
-
     if (cartItem.quantity === cartItem.selectedProductSize.stock) {
       return rejectWithValue("Rất tiếc, đã đạt giới hạn số lượng sản phẩm");
     }

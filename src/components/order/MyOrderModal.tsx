@@ -1,14 +1,35 @@
-import { HttpError, useCustom, useOne } from "@refinedev/core";
-import { Button, Form, Input, Modal, Select, Space, Typography } from "antd";
+import {
+  InfoCircleOutlined,
+  CaretUpOutlined,
+  CaretDownOutlined,
+} from "@ant-design/icons";
+import {
+  HttpError,
+  useCustom,
+  useCustomMutation,
+  useOne,
+  useUpdate,
+} from "@refinedev/core";
+import {
+  Badge,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Space,
+  Tooltip,
+  Typography,
+} from "antd";
 import React, { Fragment, ReactNode, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { showWarningConfirmDialog } from "../../helpers/confirm";
+import { CurrencyFormatter } from "../../helpers/currency";
+import { getDiscountPrice } from "../../helpers/product";
+import { showErrorToast } from "../../helpers/toast";
 import { IDistrict, IOrderResponse, IProvince, IWard } from "../../interfaces";
 import { RootState } from "../../redux/store";
-import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import { CurrencyFormatter } from "../../helpers/currency";
-import { showErrorToast } from "../../helpers/toast";
-import { getDiscountPrice } from "../../helpers/product";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -22,6 +43,8 @@ interface MyOrderModalProps {
     closable?: boolean | undefined;
   };
   code: string | undefined;
+  callBack: any;
+  close: () => void;
 }
 
 const { Title } = Typography;
@@ -29,10 +52,12 @@ const { Title } = Typography;
 const MyOrderModal: React.FC<MyOrderModalProps> = ({
   restModalProps,
   code,
+  callBack,
 }) => {
   const { t } = useTranslation();
   const currency = useSelector((state: RootState) => state.currency);
 
+  const { mutate: update, isLoading: isLoadingUpdate } = useUpdate();
   const { data, isLoading, isError } = useOne<IOrderResponse, HttpError>({
     resource: "orders/tracking",
     id: code,
@@ -61,9 +86,31 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
   const [wards, setWards] = useState<IWard[]>([]);
   const provinceId = Form.useWatch("provinceId", form);
   const districtId = Form.useWatch("districtId", form);
+  const wardCode = Form.useWatch("wardCode", form);
   const [provinceName, setProvinceName] = useState("");
   const [districtName, setDistrictName] = useState("");
   const [wardName, setWardName] = useState("");
+
+  const [viewOrder, setViewOrder] = useState<IOrderResponse>(order);
+
+  const [quantityCount, setQuantityCount] = useState<{
+    [productId: string]: number;
+  }>({});
+
+  useEffect(() => {
+    if (order) setViewOrder(order);
+    if (order?.orderDetails && order.orderDetails.length > 0) {
+      const updatedQuantityCount = order.orderDetails.reduce((acc, single) => {
+        acc[single.id] = single.quantity || 0;
+        return acc;
+      }, {} as { [productId: string]: number });
+
+      setQuantityCount(updatedQuantityCount);
+    }
+  }, [order]);
+
+  const { mutate: calculateFeeMutate, isLoading: isLoadingFee } =
+    useCustomMutation<any>();
 
   const { isLoading: isLoadingProvince, refetch: refetchProvince } = useCustom<
     IProvince[]
@@ -144,6 +191,54 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
     }
   }, [districtId]);
 
+  useEffect(() => {
+    if (provinceId && districtId && wardCode) {
+      calculateFeeMutate(
+        {
+          url: `${GHN_API_BASE_URL}/v2/shipping-order/fee`,
+          method: "post",
+          values: {
+            from_district_id: 1542,
+            service_id: 53321,
+            to_district_id: Number(districtId),
+            to_ward_code: wardCode,
+            height: 15,
+            length: 15,
+            weight: 500,
+            width: 15,
+            insurance_value: 500000,
+          },
+          config: {
+            headers: {
+              "Content-Type": "application/json",
+              Token: GHN_TOKEN,
+              ShopId: GHN_SHOP_ID,
+            },
+          },
+          successNotification: false,
+          errorNotification: (data, values) => {
+            return {
+              message: `Đã xảy ra lỗi`,
+              description: "Lỗi tính tiền ship",
+              type: "error",
+            };
+          },
+        },
+        {
+          onError: (error, variables, context) => {
+            console.log("An error occurred! ", +error);
+          },
+          onSuccess: (data: any, variables, context) => {
+            setViewOrder((prev) => ({
+              ...prev,
+              shippingMoney: data?.response.data.total as number,
+            }));
+          },
+        }
+      );
+    }
+  }, [provinceId, districtId, wardCode]);
+
   const handleProvinceChange = (value: number, option: any) => {
     setProvinceName(option.label);
   };
@@ -156,14 +251,70 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
     setWardName(option.label);
   };
 
+  const handleUpdateOrder = () => {
+    const simplifiedCartItems: { id: string; quantity: number }[] =
+      viewOrder.orderDetails.map((item) => {
+        return { id: item.productDetail.id, quantity: quantityCount[item.id] };
+      });
+    const submitData = {
+      fullName: form.getFieldValue("fullName"),
+      email: form.getFieldValue("email"),
+      phoneNumber: form.getFieldValue("phoneNumber"),
+      note: form.getFieldValue("orderNote"),
+      addressShipping: {
+        phoneNumber: form.getFieldValue("phoneNumber"),
+        districtId: form.getFieldValue("districtId"),
+        districtName: districtName,
+        provinceId: form.getFieldValue("provinceId"),
+        provinceName: provinceName,
+        wardCode: form.getFieldValue("wardCode"),
+        wardName: wardName,
+        more: form.getFieldValue("line"),
+      },
+      cartItems: simplifiedCartItems,
+    };
+
+    update(
+      {
+        resource: `orders`,
+        values: submitData,
+        id: viewOrder.id,
+      },
+      {
+        onError: (error, variables, context) => {},
+        onSuccess: (data, variables, context) => {
+          callBack();
+          close();
+        },
+      }
+    );
+  };
+  const handleOk = () => {
+    showWarningConfirmDialog({
+      options: {
+        accept: () => handleUpdateOrder,
+        reject: () => {},
+      },
+      t: t,
+    });
+  };
+
   return (
     <Modal
-      title="Đơn hàng của bạn"
+      title={
+        <Space align="baseline">
+          <Title level={5}>Đơn hàng của bạn</Title>
+          <Tooltip title="Bạn chỉ có thể 1 số thông tin cơ bản của đơn hàng, mọi trường hợp xin vui lòng liên hệ với chúng tôi hoặc tạo đơn mới.">
+            <InfoCircleOutlined />
+          </Tooltip>
+        </Space>
+      }
       {...restModalProps}
       open={restModalProps.open}
       width="1200px"
       centered
       okText="Xác nhận thay đổi"
+      onOk={handleOk}
     >
       <div className="row">
         <div className="col-12">
@@ -180,7 +331,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {order?.orderDetails?.map((single, key) => {
+                {viewOrder?.orderDetails?.map((single, key) => {
                   const discountedPrice = getDiscountPrice(
                     single.price ?? 0,
                     0
@@ -194,8 +345,10 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       : 0.0;
 
                   discountedPrice !== null
-                    ? (cartTotalPrice += finalDiscountedPrice * single.quantity)
-                    : (cartTotalPrice += finalProductPrice * single.quantity);
+                    ? (cartTotalPrice +=
+                        finalDiscountedPrice * quantityCount[single.id])
+                    : (cartTotalPrice +=
+                        finalProductPrice * quantityCount[single.id]);
 
                   return (
                     <tr key={key}>
@@ -256,68 +409,112 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                         <div className="cart-plus-minus">
                           <button
                             className="dec qtybutton"
-                            // onClick={() => dispatch(decreaseFromDB(cartItem))}
+                            onClick={() => {
+                              setQuantityCount((prevQuantityCount) => {
+                                const updatedQuantityCount = {
+                                  ...prevQuantityCount,
+                                };
+
+                                if (updatedQuantityCount[single.id] > 1) {
+                                  updatedQuantityCount[single.id] -= 1;
+                                } else {
+                                  if ((quantityCount.length = 1)) {
+                                    showWarningConfirmDialog({
+                                      options: {
+                                        message:
+                                          "Giảm số lượng về 0 khi giỏ hàng còn 1 sản phẩm tương đương với việc huỷ đơn hàng",
+                                        accept: () => {
+                                          console.log("Đồng ý");
+                                        },
+                                        reject: () => {
+                                          console.log("Huỷ");
+                                        },
+                                      },
+                                      t: t,
+                                    });
+                                  } else {
+                                    showWarningConfirmDialog({
+                                      options: {
+                                        message:
+                                          "Giảm số lượng về 0 tương đương với việc loại bỏ sản phẩm khỏi giỏ",
+                                        accept: () => {
+                                          console.log("Đồng ý");
+                                        },
+                                        reject: () => {
+                                          console.log("Huỷ");
+                                        },
+                                      },
+                                      t: t,
+                                    });
+                                  }
+                                }
+
+                                return updatedQuantityCount;
+                              });
+                            }}
                           >
                             -
                           </button>
+
                           <input
                             className="cart-plus-minus-box"
                             type="text"
-                            value={single.quantity}
-                            // onChange={(e) => {
-                            //   const newValue = parseInt(e.target.value, 10);
-                            //   if (
-                            //     newValue >=
-                            //     cartItemStock(cartItem.selectedProductSize)
-                            //   ) {
-                            //     return showErrorToast(
-                            //       "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
-                            //     );
-                            //   }
-                            //   if (newValue > 5) {
-                            //     return showErrorToast(
-                            //       "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
-                            //     );
-                            //   }
-                            //   if (!isNaN(newValue)) {
-                            //     updateQuantity({
-                            //       ...cartItem,
-                            //       quantity: newValue,
-                            //       showNoti: false,
-                            //     });
-                            //     updateQuantityFromDB({
-                            //       ...cartItem,
-                            //       quantity: newValue,
-                            //     });
-                            //   }
-                            // }}
+                            value={quantityCount[single.id]}
+                            onChange={(e) => {
+                              const newValue = parseInt(e.target.value, 10);
+                              if (newValue >= single.productDetail.quantity) {
+                                return showErrorToast(
+                                  "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                                );
+                              }
+                              if (newValue > 5) {
+                                return showErrorToast(
+                                  "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                                );
+                              }
+                              if (!isNaN(newValue)) {
+                                setQuantityCount((prevQuantityCount) => {
+                                  const updatedQuantityCount = {
+                                    ...prevQuantityCount,
+                                  };
+                                  if (updatedQuantityCount[single.id]) {
+                                    updatedQuantityCount[single.id] = newValue;
+                                  }
+
+                                  return updatedQuantityCount;
+                                });
+                              }
+                            }}
                           />
                           <button
                             className="inc qtybutton"
-                            // onClick={() => {
-                            //   if (
-                            //     cartItem !== undefined &&
-                            //     cartItem.quantity !== undefined &&
-                            //     cartItem.quantity >=
-                            //       cartItemStock(cartItem.selectedProductSize)
-                            //   ) {
-                            //     return showErrorToast(
-                            //       "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
-                            //     );
-                            //   }
+                            onClick={() => {
+                              if (
+                                quantityCount[single.id] >=
+                                single.productDetail.quantity
+                              ) {
+                                return showErrorToast(
+                                  "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                                );
+                              }
 
-                            //   if (cartItem.quantity >= 5) {
-                            //     return showErrorToast(
-                            //       "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
-                            //     );
-                            //   }
-                            //   dispatch(
-                            //     addToDB({
-                            //       ...cartItem,
-                            //       quantity: quantityCount,
-                            //     })
-                            //   );
-                            // }}
+                              if (quantityCount[single.id] >= 5) {
+                                return showErrorToast(
+                                  "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                                );
+                              }
+                              setQuantityCount((prevQuantityCount) => {
+                                const updatedQuantityCount = {
+                                  ...prevQuantityCount,
+                                };
+                                if (updatedQuantityCount[single.id]) {
+                                  updatedQuantityCount[single.id] += 1;
+                                }
+                                console.log(updatedQuantityCount);
+
+                                return updatedQuantityCount;
+                              });
+                            }}
                           >
                             +
                           </button>
@@ -328,8 +525,8 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                           className="amount"
                           value={
                             discountedPrice !== null
-                              ? finalDiscountedPrice * single.quantity
-                              : finalProductPrice * single.quantity
+                              ? finalDiscountedPrice * quantityCount[single.id]
+                              : finalProductPrice * quantityCount[single.id]
                           }
                           currency={currency}
                         />
@@ -337,7 +534,23 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
 
                       <td className="product-remove">
                         <button
-                        // onClick={() => dispatch(deleteFromDB(cartItem.id))}
+                          onClick={() => {
+                            if ((quantityCount.length = 1)) {
+                              showWarningConfirmDialog({
+                                options: {
+                                  message:
+                                    "Loại bỏ sản phẩm duy nhất tương đương với việc huỷ đơn hàng",
+                                  accept: () => {
+                                    console.log("Đồng ý");
+                                  },
+                                  reject: () => {
+                                    console.log("Huỷ");
+                                  },
+                                },
+                                t: t,
+                              });
+                            }
+                          }}
                         >
                           <i className="fa fa-times"></i>
                         </button>
@@ -346,6 +559,111 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                   );
                 })}
               </tbody>
+              <tfoot>
+                <tr>
+                  <th colSpan={6} style={{ textAlign: "end" }}>
+                    <div className="row">
+                      <div className="col-9">
+                        <Badge
+                          count={
+                            cartTotalPrice !== order.shippingMoney ? (
+                              cartTotalPrice > order.shippingMoney ? (
+                                <CaretUpOutlined style={{ color: "red" }} />
+                              ) : (
+                                <CaretDownOutlined style={{ color: "green" }} />
+                              )
+                            ) : (
+                              0
+                            )
+                          }
+                        >
+                          <h5>{t(`cart.cart_total.total`)} </h5>
+                        </Badge>
+                      </div>
+                      <div className="col-3">
+                        <CurrencyFormatter
+                          className="amount"
+                          value={cartTotalPrice}
+                          currency={currency}
+                        />
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-9">
+                        <Badge
+                          count={
+                            viewOrder.shippingMoney !== order.shippingMoney ? (
+                              viewOrder.shippingMoney > order.shippingMoney ? (
+                                <CaretUpOutlined style={{ color: "red" }} />
+                              ) : (
+                                <CaretDownOutlined style={{ color: "green" }} />
+                              )
+                            ) : (
+                              0
+                            )
+                          }
+                        >
+                          <h5>{t(`cart.cart_total.shipping`)} </h5>
+                        </Badge>
+                      </div>
+                      <div className="col-3">
+                        <CurrencyFormatter
+                          className="amount"
+                          value={viewOrder.shippingMoney}
+                          currency={currency}
+                        />
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-9">
+                        <h5>Giảm giá</h5>
+                      </div>
+                      <div className="col-3">
+                        <CurrencyFormatter
+                          className="amount"
+                          value={
+                            viewOrder.voucher
+                              ? viewOrder.voucher.type == "PERCENTAGE"
+                                ? (viewOrder.voucher.value / 100) *
+                                  viewOrder.totalMoney
+                                : viewOrder.voucher.value
+                              : 0
+                          }
+                          currency={currency}
+                        />
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-9">
+                        <Badge
+                          count={
+                            viewOrder.totalMoney !== order.totalMoney ? (
+                              viewOrder.totalMoney > order.totalMoney ? (
+                                <CaretUpOutlined style={{ color: "red" }} />
+                              ) : (
+                                <CaretDownOutlined style={{ color: "green" }} />
+                              )
+                            ) : (
+                              0
+                            )
+                          }
+                        >
+                          <h4 className="grand-totall-title">
+                            {t(`cart.cart_total.grand_total`)}{" "}
+                          </h4>
+                        </Badge>
+                      </div>
+                      <div className="col-3">
+                        <CurrencyFormatter
+                          className="amount"
+                          value={viewOrder.totalMoney}
+                          currency={currency}
+                        />
+                      </div>
+                    </div>
+                  </th>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
@@ -355,21 +673,21 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
             form={form}
             layout="vertical"
             initialValues={{
-              districtId: order.address?.districtId,
-              districtName: order.address?.districtName,
-              wardCode: order.address?.wardCode,
-              wardName: order.address?.wardName,
-              provinceId: order.address?.provinceId,
-              provinceName: order.address?.provinceName,
-              line: order.address?.more,
-              fullName: order.fullName,
-              phoneNumber: order.phoneNumber,
-              email: order.customer?.email,
-              orderNote: order.note,
+              districtId: Number(viewOrder.address?.districtId),
+              districtName: viewOrder.address?.districtName,
+              wardCode: viewOrder.address?.wardCode,
+              wardName: viewOrder.address?.wardName,
+              provinceId: Number(viewOrder.address?.provinceId),
+              provinceName: viewOrder.address?.provinceName,
+              line: viewOrder.address?.more,
+              fullName: viewOrder.fullName,
+              phoneNumber: viewOrder.phoneNumber,
+              email: viewOrder.customer?.email,
+              orderNote: viewOrder.note,
             }}
           >
             <Form.Item label="Mã hoá đơn">
-              <Input value={order.code} disabled />
+              <Input value={viewOrder.code} disabled />
             </Form.Item>
             <Form.Item label="Tên đầy đủ" name="fullName">
               <Input />
@@ -389,9 +707,6 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                   message: "Hãy chọn tỉnh/thành phố trước!",
                 },
               ]}
-              initialValue={
-                order.address ? Number(order.address.provinceId) : ""
-              }
             >
               <Select
                 className="email s-email s-wid"
@@ -415,9 +730,6 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                   message: "Vui lòng chọn quận/huyện!",
                 },
               ]}
-              initialValue={
-                order.address ? Number(order.address.districtId) : ""
-              }
             >
               <Select
                 className="email s-email s-wid"
@@ -441,7 +753,6 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                   message: "Vui lòng chọn phường/xã!",
                 },
               ]}
-              initialValue={order.address ? order.address.wardCode : ""}
             >
               <Select
                 className="email s-email s-wid"
@@ -455,6 +766,17 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                   value: ward.WardCode,
                 }))}
               />
+            </Form.Item>
+            <Form.Item
+              label="Chi tiết địa chỉ"
+              name="line"
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            >
+              <Input />
             </Form.Item>
             <Form.Item label="Ghi chú hoá đơn" name="orderNote">
               <Input.TextArea />

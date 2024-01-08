@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import PersistProvider from "./redux/providers/persist-provider";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
+import "primeicons/primeicons.css";
+
 import WeekDay from "dayjs/plugin/weekday";
 import LocaleData from "dayjs/plugin/localeData";
 import LocalizedFormat from "dayjs/plugin/localizedFormat";

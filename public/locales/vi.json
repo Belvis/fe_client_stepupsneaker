@@ -334,6 +334,20 @@
       "buttons": {
         "add_to_cart":"Thêm vào giỏ hàng"
       }
+    },
+    "confirmDialog": {
+      "delete": {
+        "message": "Bạn có chắc không?",
+        "header": "Xác nhận xóa!",
+        "acceptLabel": "Đồng ý",
+        "rejectLabel": "Huỷ"
+      },
+      "edit": {
+        "message": "Bạn có chắc muốn tiếp tục?",
+        "header": "Xác nhận!",
+        "acceptLabel": "Đồng ý",
+        "rejectLabel": "Huỷ"
+      }
     }
   }
   

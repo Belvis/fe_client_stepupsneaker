@@ -6,7 +6,7 @@ import {
   LoadingOutlined,
   QuestionOutlined,
 } from "@ant-design/icons";
-import { HttpError, useOne } from "@refinedev/core";
+import { HttpError, useOne, useUpdate } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Button, Flex, Grid, Space, Steps, Tooltip } from "antd";
 import dayjs from "dayjs";
@@ -21,6 +21,8 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { CurrencyFormatter } from "../../helpers/currency";
 import { useModal } from "@refinedev/antd";
 import MyOrderModal from "../../components/order/MyOrderModal";
+import { showWarningConfirmDialog } from "../../helpers/confirm";
+import CancelReasonModal from "../../components/order/CancelReasonModal";
 
 const { useBreakpoint } = Grid;
 
@@ -65,7 +67,10 @@ const OrderTracking = () => {
     .filter((screen) => !!screen[1])
     .map((screen) => screen[0]);
 
-  const { data, isLoading, isError } = useOne<IOrderResponse, HttpError>({
+  const { data, isLoading, isError, refetch } = useOne<
+    IOrderResponse,
+    HttpError
+  >({
     resource: "orders/tracking",
     id: code,
   });
@@ -80,6 +85,12 @@ const OrderTracking = () => {
     show,
     close,
     modalProps: { visible, ...restModalProps },
+  } = useModal();
+
+  const {
+    show: showCancel,
+    close: closeCancle,
+    modalProps: { visible: vi, ...restProps },
   } = useModal();
 
   const [events, setEvents] = useState<IEvent[]>(InitialEventData);
@@ -121,6 +132,8 @@ const OrderTracking = () => {
                   orderHistory.actionStatus
                 )
             );
+            console.log(canceledReturnedOrExchangedOrder);
+            console.log(order.orderHistories);
             if (canceledReturnedOrExchangedOrder) {
               return {
                 ...event,
@@ -217,8 +230,18 @@ const OrderTracking = () => {
         <Flex gap="middle" align="center" justify="space-between">
           <h3>Trạng thái đơn hàng: #{order && order.code}</h3>
           <Space>
-            <Button>Huỷ</Button>
-            <Button onClick={show}>Sửa đơn hàng</Button>
+            <Button
+              disabled={order.status !== "WAIT_FOR_CONFIRMATION"}
+              onClick={showCancel}
+            >
+              Huỷ
+            </Button>
+            <Button
+              disabled={order.status !== "WAIT_FOR_CONFIRMATION"}
+              onClick={show}
+            >
+              Sửa đơn hàng
+            </Button>
           </Space>
         </Flex>
         <hr />
@@ -415,7 +438,18 @@ const OrderTracking = () => {
           </table>
         </div>
       </div>
-      <MyOrderModal restModalProps={restModalProps} code={code} />
+      <MyOrderModal
+        restModalProps={restModalProps}
+        close={close}
+        code={code}
+        callBack={refetch}
+      />
+      <CancelReasonModal
+        restModalProps={restProps}
+        close={closeCancle}
+        code={code}
+        callBack={refetch}
+      />
     </Fragment>
   );
 };
