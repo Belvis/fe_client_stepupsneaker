@@ -18,18 +18,18 @@ const wishlistSlice = createSlice({
       );
       if (isInWishlist > -1) {
         cogoToast.info("Product already in wishlist", {
-          position: "bottom-left",
+          position: "top-center",
         });
       } else {
         state.wishlistItems.push(action.payload);
-        cogoToast.success("Added To wishlist", { position: "bottom-left" });
+        cogoToast.success("Added To wishlist", { position: "top-center" });
       }
     },
     deleteFromWishlist(state, action: PayloadAction<string>) {
       state.wishlistItems = state.wishlistItems.filter(
         (item) => item.id !== action.payload
       );
-      cogoToast.error("Removed From Wishlist", { position: "bottom-left" });
+      cogoToast.error("Removed From Wishlist", { position: "top-center" });
     },
     deleteAllFromWishlist(state) {
       state.wishlistItems = [];

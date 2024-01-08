@@ -1,20 +1,24 @@
+import { Authenticated } from "@refinedev/core";
+import { Badge, Space } from "antd";
 import { Fragment, useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { EffectFade, Thumbs } from "swiper";
-import Swiper, { SwiperSlide } from "../swiper";
-import Rating from "./sub-components/ProductRating";
+import { CurrencyFormatter } from "../../helpers/currency";
 import {
   getDiscountPrice,
   getProductCartQuantity,
 } from "../../helpers/product";
 import { IColorResponse, IProductClient, ISizeClient } from "../../interfaces";
-import { addToCart, deleteAllFromCart } from "../../redux/slices/cart-slice";
+import { addToCart, addToDB } from "../../redux/slices/cart-slice";
 import { addToCompare } from "../../redux/slices/compare-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
-import { RootState } from "../../redux/store";
-import { Badge, Space } from "antd";
+import { AppDispatch, RootState } from "../../redux/store";
 import { SaleIcon } from "../icons/icon-sale";
+import Swiper, { SwiperSlide } from "../swiper";
+import Rating from "./sub-components/ProductRating";
+import { showErrorToast } from "../../helpers/toast";
 
 type ProductModalProps = {
   currency: any;
@@ -33,8 +37,9 @@ const ProductModal: React.FC<ProductModalProps> = ({
   wishlistItem,
   compareItem,
 }) => {
+  const { t } = useTranslation();
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const { cartItems } = useSelector((state: RootState) => state.cart);
 
   const initialSelectedColor =
@@ -73,10 +78,10 @@ const ProductModal: React.FC<ProductModalProps> = ({
   );
   const finalProductPrice = +(
     selectedProductSize.price * currency.currencyRate
-  ).toFixed(2);
+  );
   const finalDiscountedPrice = +(
     (discountedPrice ?? selectedProductSize.discount) * currency.currencyRate
-  ).toFixed(2);
+  );
 
   useEffect(() => {
     const selectedVariant = product.variation.find(
@@ -133,7 +138,8 @@ const ProductModal: React.FC<ProductModalProps> = ({
           <div className="col-md-5 col-sm-12 col-xs-12">
             <div className="product-large-image-wrapper">
               <Swiper options={gallerySwiperParams}>
-                {selectedVariant.image &&
+                {selectedVariant &&
+                  selectedVariant.image &&
                   selectedVariant.image.length > 0 &&
                   selectedVariant.image.map((img, i) => {
                     return (
@@ -148,7 +154,8 @@ const ProductModal: React.FC<ProductModalProps> = ({
             </div>
             <div className="product-small-image-wrapper mt-15">
               <Swiper options={thumbnailSwiperParams}>
-                {selectedVariant.image &&
+                {selectedVariant &&
+                  selectedVariant.image &&
                   selectedVariant.image.map((image, i) => {
                     return (
                       <SwiperSlide key={i}>
@@ -167,29 +174,21 @@ const ProductModal: React.FC<ProductModalProps> = ({
               <div className="product-details-price">
                 {discountedPrice !== null ? (
                   <Fragment>
-                    <span>
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: currency.currencyName,
-                        currencyDisplay: "symbol",
-                      }).format(finalDiscountedPrice)}
-                    </span>
-                    <span className="old">
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: currency.currencyName,
-                        currencyDisplay: "symbol",
-                      }).format(finalProductPrice)}
-                    </span>
+                    <CurrencyFormatter
+                      value={finalDiscountedPrice}
+                      currency={currency}
+                    />
+                    <CurrencyFormatter
+                      className="old"
+                      value={finalProductPrice}
+                      currency={currency}
+                    />
                   </Fragment>
                 ) : (
-                  <span>
-                    {new Intl.NumberFormat("en-US", {
-                      style: "currency",
-                      currency: currency.currencyName,
-                      currencyDisplay: "symbol",
-                    }).format(finalProductPrice)}
-                  </span>
+                  <CurrencyFormatter
+                    value={finalProductPrice}
+                    currency={currency}
+                  />
                 )}
               </div>
               {/* {product.rating && product.rating > 0 ? ( */}
@@ -204,12 +203,15 @@ const ProductModal: React.FC<ProductModalProps> = ({
               <div className="pro-details-list">
                 <p>{product.description}</p>
               </div>
-
+              <div className="pro-details-meta">
+                <span>Số lượng tồn :</span>
+                <span className="fw-bold">{productStock}</span>
+              </div>
               {product.variation ? (
                 <div className="pro-details-size-color">
                   <div className="pro-details-color-wrap">
                     <Space direction="vertical">
-                      <span>Color</span>
+                      <span>Màu sắc</span>
                       <div className="pro-details-color-content">
                         {product.variation.map((single, key) => {
                           const hasSale = single.size.some(
@@ -273,7 +275,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                   </div>
                   <div className="pro-details-size">
                     <Space direction="vertical">
-                      <span>Size</span>
+                      <span>Kích cỡ</span>
                       <div className="pro-details-size-content">
                         {product.variation &&
                           product.variation.map((single) => {
@@ -332,11 +334,12 @@ const ProductModal: React.FC<ProductModalProps> = ({
               <div className="pro-details-quality">
                 <div className="cart-plus-minus">
                   <button
-                    onClick={() =>
-                      setQuantityCount(
-                        quantityCount > 1 ? quantityCount - 1 : 1
-                      )
-                    }
+                    onClick={() => {
+                      if (quantityCount <= 1) {
+                        return showErrorToast("Đã đạt số lượng nhỏ nhất");
+                      }
+                      setQuantityCount(quantityCount - 1);
+                    }}
                     className="dec qtybutton"
                   >
                     -
@@ -348,13 +351,20 @@ const ProductModal: React.FC<ProductModalProps> = ({
                     readOnly
                   />
                   <button
-                    onClick={() =>
-                      setQuantityCount(
-                        quantityCount < productStock - productCartQty
-                          ? quantityCount + 1
-                          : quantityCount
-                      )
-                    }
+                    onClick={() => {
+                      if (quantityCount + productCartQty >= 5) {
+                        return showErrorToast(
+                          "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                        );
+                      }
+
+                      if (quantityCount >= productStock - productCartQty) {
+                        return showErrorToast(
+                          "Rất tiếc, đã đạt giới hạn số lượng sản phẩm!"
+                        );
+                      }
+                      setQuantityCount(quantityCount + 1);
+                    }}
                     className="inc qtybutton"
                   >
                     +
@@ -362,30 +372,51 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 </div>
                 <div className="pro-details-cart btn-hover">
                   {productStock && productStock > 0 ? (
-                    <button
-                      onClick={() =>
-                        dispatch(
-                          addToCart({
-                            cartItemId: product.id,
-                            quantity: quantityCount,
-                            image: selectedVariant.image[0],
-                            name: product.name,
-                            selectedProductColor: selectedProductColor
-                              ? selectedProductColor
-                              : undefined,
-                            selectedProductSize: selectedProductSize
-                              ? selectedProductSize
-                              : undefined,
-                          })
-                        )
+                    <Authenticated
+                      fallback={
+                        <button
+                          onClick={() =>
+                            dispatch(
+                              addToCart({
+                                id: "",
+                                cartItemId: product.id,
+                                quantity: quantityCount,
+                                image: selectedVariant.image[0],
+                                name: product.name,
+                                selectedProductColor: selectedProductColor,
+                                selectedProductSize: selectedProductSize,
+                              })
+                            )
+                          }
+                          disabled={productCartQty >= productStock}
+                        >
+                          {t(`products.buttons.add_to_cart`)}
+                        </button>
                       }
-                      disabled={productCartQty >= productStock}
                     >
-                      {" "}
-                      Add To Cart{" "}
-                    </button>
+                      <button
+                        onClick={() =>
+                          dispatch(
+                            addToDB({
+                              id: "",
+                              cartItemId: product.id,
+                              quantity: quantityCount,
+                              image: selectedVariant.image[0],
+                              name: product.name,
+                              selectedProductColor: selectedProductColor,
+                              selectedProductSize: selectedProductSize,
+                            })
+                          )
+                        }
+                        disabled={productCartQty >= productStock}
+                      >
+                        {t(`products.buttons.add_to_cart`)}
+                      </button>
+                    </Authenticated>
                   ) : (
-                    <button disabled>Out of Stock</button>
+                    <button disabled>
+                      {t(`products.buttons.out_of_stock`)}
+                    </button>
                   )}
                 </div>
                 <div className="pro-details-wishlist">

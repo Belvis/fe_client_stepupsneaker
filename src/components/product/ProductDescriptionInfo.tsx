@@ -18,7 +18,7 @@ import {
   ISizeClient,
   IVariation,
 } from "../../interfaces";
-import { addToCart } from "../../redux/slices/cart-slice";
+import { addToCart, addToDB } from "../../redux/slices/cart-slice";
 import { addToCompare } from "../../redux/slices/compare-slice";
 import { CurrencyState } from "../../redux/slices/currency-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
@@ -26,6 +26,10 @@ import Rating from "./sub-components/ProductRating";
 import { Badge, Space } from "antd";
 import { SaleIcon } from "../icons/icon-sale";
 import { useTranslation } from "react-i18next";
+import { CurrencyFormatter } from "../../helpers/currency";
+import { Authenticated } from "@refinedev/core";
+import { AppDispatch } from "../../redux/store";
+import { showErrorToast } from "../../helpers/toast";
 
 interface ProductDescriptionInfoProps {
   product: IProductClient;
@@ -50,7 +54,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const initialSelectedSize =
     product.variation && product.variation.length > 0
@@ -81,10 +85,10 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
   );
   const finalProductPrice = +(
     selectedProductSize.price * currency.currencyRate
-  ).toFixed(2);
+  );
   const finalDiscountedPrice = +(
     (discountedPrice ?? selectedProductSize.discount) * currency.currencyRate
-  ).toFixed(2);
+  );
 
   useEffect(() => {
     setSelectedProductSize(initialSelectedSize);
@@ -97,29 +101,18 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
       <div className="product-details-price">
         {discountedPrice !== null ? (
           <Fragment>
-            <span>
-              {new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: currency.currencyName,
-                currencyDisplay: "symbol",
-              }).format(finalDiscountedPrice)}
-            </span>{" "}
-            <span className="old">
-              {new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: currency.currencyName,
-                currencyDisplay: "symbol",
-              }).format(finalProductPrice)}
-            </span>
+            <CurrencyFormatter
+              value={finalDiscountedPrice}
+              currency={currency}
+            />{" "}
+            <CurrencyFormatter
+              className="old"
+              value={finalProductPrice}
+              currency={currency}
+            />
           </Fragment>
         ) : (
-          <span>
-            {new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: currency.currencyName,
-              currencyDisplay: "symbol",
-            }).format(finalProductPrice)}
-          </span>
+          <CurrencyFormatter value={finalProductPrice} currency={currency} />
         )}
       </div>
       {/* {product.rating && product.rating > 0 ? ( */}
@@ -141,7 +134,14 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
           để đôi sneaker này làm nổi bật phong cách cá nhân của bạn.
         </p>
       </div>
-
+      <div className="pro-details-meta">
+        <span>Mã :</span>
+        <span className="fw-bold">{product.code}</span>
+      </div>
+      <div className="pro-details-meta">
+        <span>Số lượng tồn :</span>
+        <span className="fw-bold">{productStock}</span>
+      </div>
       {product.variation ? (
         <div className="pro-details-size-color">
           <div className="pro-details-color-wrap">
@@ -266,9 +266,12 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
       <div className="pro-details-quality">
         <div className="cart-plus-minus">
           <button
-            onClick={() =>
-              setQuantityCount(quantityCount > 1 ? quantityCount - 1 : 1)
-            }
+            onClick={() => {
+              if (quantityCount <= 1) {
+                return showErrorToast("Đã đạt số lượng nhỏ nhất");
+              }
+              setQuantityCount(quantityCount - 1);
+            }}
             className="dec qtybutton"
           >
             -
@@ -280,13 +283,20 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
             readOnly
           />
           <button
-            onClick={() =>
-              setQuantityCount(
-                quantityCount < productStock - productCartQty
-                  ? quantityCount + 1
-                  : quantityCount
-              )
-            }
+            onClick={() => {
+              if (quantityCount + productCartQty >= 5) {
+                return showErrorToast(
+                  "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                );
+              }
+
+              if (quantityCount >= productStock - productCartQty) {
+                return showErrorToast(
+                  "Rất tiếc, đã đạt giới hạn số lượng sản phẩm!"
+                );
+              }
+              setQuantityCount(quantityCount + 1);
+            }}
             className="inc qtybutton"
           >
             +
@@ -294,27 +304,47 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
         </div>
         <div className="pro-details-cart btn-hover">
           {productStock && productStock > 0 ? (
-            <button
-              onClick={() =>
-                dispatch(
-                  addToCart({
-                    cartItemId: product.id,
-                    quantity: quantityCount,
-                    image: selectedVariant.image[0],
-                    name: product.name,
-                    selectedProductColor: selectedProductColor
-                      ? selectedProductColor
-                      : undefined,
-                    selectedProductSize: selectedProductSize
-                      ? selectedProductSize
-                      : undefined,
-                  })
-                )
+            <Authenticated
+              fallback={
+                <button
+                  onClick={() =>
+                    dispatch(
+                      addToCart({
+                        id: "",
+                        cartItemId: product.id,
+                        quantity: quantityCount,
+                        image: selectedVariant.image[0],
+                        name: product.name,
+                        selectedProductColor: selectedProductColor,
+                        selectedProductSize: selectedProductSize,
+                      })
+                    )
+                  }
+                  disabled={productCartQty >= productStock}
+                >
+                  {t(`products.buttons.add_to_cart`)}
+                </button>
               }
-              disabled={productCartQty >= productStock}
             >
-              {t(`products.buttons.add_to_cart`)}
-            </button>
+              <button
+                onClick={() =>
+                  dispatch(
+                    addToDB({
+                      id: "",
+                      cartItemId: product.id,
+                      quantity: quantityCount,
+                      image: selectedVariant.image[0],
+                      name: product.name,
+                      selectedProductColor: selectedProductColor,
+                      selectedProductSize: selectedProductSize,
+                    })
+                  )
+                }
+                disabled={productCartQty >= productStock}
+              >
+                {t(`products.buttons.add_to_cart`)}
+              </button>
+            </Authenticated>
           ) : (
             <button disabled>{t(`products.buttons.out_of_stock`)}</button>
           )}

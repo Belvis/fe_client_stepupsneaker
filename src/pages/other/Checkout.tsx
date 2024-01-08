@@ -1,26 +1,59 @@
-import { Fragment, useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { getDiscountPrice } from "../../helpers/product";
-import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { RootState } from "../../redux/store";
-import { NumberField } from "@refinedev/antd";
-import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { IDistrict, IProvince, IWard } from "../../interfaces";
-import { Form } from "antd";
-import { useCreate, useCustom } from "@refinedev/core";
+import { Button, Form, RadioChangeEvent, Spin } from "antd";
+import { Fragment, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useLocation } from "react-router-dom";
+import { getDiscountPrice } from "../../helpers/product";
+import {
+  ICustomerResponse,
+  IDistrict,
+  IProvince,
+  IWard,
+} from "../../interfaces";
+import { AppDispatch, RootState } from "../../redux/store";
+import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
+
+import {
+  Authenticated,
+  useCreate,
+  useCustom,
+  useCustomMutation,
+  useGetIdentity,
+  useIsAuthenticated,
+} from "@refinedev/core";
 import { useNavigate } from "react-router-dom";
+import PaymentMethodAccordion from "../../components/payment-methods/PaymentMethodAccordion";
+import DiscountCodeAccordion from "../../components/voucher/DiscountCodeAccordion";
+import { CurrencyFormatter } from "../../helpers/currency";
+import {
+  deleteAllFromCart,
+  deleteAllFromDB,
+  fetchCart,
+} from "../../redux/slices/cart-slice";
+import { clearOrder, setOrder } from "../../redux/slices/order-slice";
+import { useModal } from "@refinedev/antd";
+import { ListAddressModal } from "../../components/address/ListAddressModal";
+import dayjs from "dayjs";
+import { TOKEN_KEY } from "../../utils";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
 const GHN_TOKEN = import.meta.env.VITE_GHN_USER_TOKEN;
 
-const Checkout = () => {
+const CheckOut = () => {
   const { t } = useTranslation();
+  const dispatch: AppDispatch = useDispatch();
 
-  useDocumentTitle(t("nav.pages.checkout") + " | SUNS");
-  const { mutate } = useCreate();
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.checkout") + " | SUNS");
+  }, [t]);
+
+  const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
+
+  const { mutate, isLoading } = useCreate();
 
   const navigate = useNavigate();
 
@@ -42,18 +75,36 @@ const Checkout = () => {
     phone_number: string;
     email: string;
     gender: string;
-    date_of_birth: number;
+    date_of_birth: string;
     order_note: string;
   }>();
+
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    "Cash" | "Card"
+  >("Cash");
+
+  const handlePaymentMethodChange = (e: RadioChangeEvent) => {
+    setSelectedPaymentMethod(e.target.value);
+  };
 
   const [provinces, setProvinces] = useState<IProvince[]>([]);
   const [districts, setDistricts] = useState<IDistrict[]>([]);
   const [wards, setWards] = useState<IWard[]>([]);
   const provinceId = Form.useWatch("provinceId", form);
   const districtId = Form.useWatch("districtId", form);
-  const [provinceName, setProvinceName] = useState("");
-  const [districtName, setDistrictName] = useState("");
-  const [wardName, setWardName] = useState("");
+  const wardCode = Form.useWatch("wardCode", form);
+  const [provinceName, setProvinceName] = useState(
+    order.address ? order.address.provinceName || "" : ""
+  );
+  const [districtName, setDistrictName] = useState(
+    order.address ? order.address.districtName || "" : ""
+  );
+  const [wardName, setWardName] = useState(
+    order.address ? order.address.wardName || "" : ""
+  );
+
+  const { mutate: calculateFeeMutate, isLoading: isLoadingFee } =
+    useCustomMutation<any>();
 
   const { isLoading: isLoadingProvince, refetch: refetchProvince } = useCustom<
     IProvince[]
@@ -116,6 +167,28 @@ const Checkout = () => {
   );
 
   useEffect(() => {
+    if (user) {
+      const dob = dayjs(new Date(user.dateOfBirth)).format("YYYY-MM-DD");
+      form.setFieldsValue({
+        full_name: user.fullName,
+        email: user.email,
+        gender: user.gender,
+        date_of_birth: dob,
+      });
+    }
+
+    if (order.address) {
+      form.setFieldsValue({
+        phone_number: order.address.phoneNumber,
+        provinceId: Number(order.address.provinceId),
+        districtId: Number(order.address.districtId),
+        wardCode: order.address.wardCode,
+        line: order.address.more,
+      });
+    }
+  }, [user, order]);
+
+  useEffect(() => {
     setProvinces([]);
     refetchProvince();
   }, []);
@@ -134,16 +207,100 @@ const Checkout = () => {
     }
   }, [districtId]);
 
-  const handleProvinceChange = (value: number, option: any) => {
-    setProvinceName(option.label);
+  useEffect(() => {
+    if (provinceId && districtId && wardCode) {
+      calculateFeeMutate(
+        {
+          url: `${GHN_API_BASE_URL}/v2/shipping-order/fee`,
+          method: "post",
+          values: {
+            from_district_id: 1542,
+            service_id: 53321,
+            to_district_id: Number(districtId),
+            to_ward_code: wardCode,
+            height: 15,
+            length: 15,
+            weight: 500,
+            width: 15,
+            insurance_value: 500000,
+          },
+          config: {
+            headers: {
+              "Content-Type": "application/json",
+              Token: GHN_TOKEN,
+              ShopId: GHN_SHOP_ID,
+            },
+          },
+          successNotification: false,
+          errorNotification: (data, values) => {
+            return {
+              message: `Đã xảy ra lỗi`,
+              description: "Lỗi tính tiền ship",
+              type: "error",
+            };
+          },
+        },
+        {
+          onError: (error, variables, context) => {
+            console.log("An error occurred! ", +error);
+          },
+          onSuccess: (data: any, variables, context) => {
+            dispatch(
+              setOrder({
+                ...order,
+                address: {
+                  ...order.address,
+                  provinceName: provinceName,
+                  districtName: districtName,
+                  wardName: wardName,
+                  provinceId: provinceId,
+                  districtId: districtId,
+                  wardCode: form.getFieldValue("wardCode"),
+                },
+                shippingMoney: data?.response.data.total as number,
+              })
+            );
+          },
+        }
+      );
+    }
+  }, [provinceId, districtId, wardCode]);
+
+  const handleProvinceChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedProvinceID = Number(event.target.value);
+    const selectedProvince = provinces.find(
+      (p) => p.ProvinceID === selectedProvinceID
+    );
+
+    if (selectedProvince) {
+      const provinceName = selectedProvince.ProvinceName;
+      setProvinceName(provinceName);
+    }
   };
 
-  const handleDistrictChange = (value: number, option: any) => {
-    setDistrictName(option.label);
+  const handleDistrictChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedDistrictID = Number(event.target.value);
+    const selectedDistrict = districts.find(
+      (d) => d.DistrictID === selectedDistrictID
+    );
+
+    if (selectedDistrict) {
+      const districtName = selectedDistrict.DistrictName;
+      setDistrictName(districtName);
+    }
   };
 
-  const handleWardChange = (value: string, option: any) => {
-    setWardName(option.label);
+  const handleWardChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedWard = wards.find((w) => w.WardCode === event.target.value);
+
+    if (selectedWard) {
+      const wardName = selectedWard.WardName;
+      setWardName(wardName);
+    }
   };
 
   function onFinish(values: {
@@ -155,56 +312,81 @@ const Checkout = () => {
     phone_number: string;
     email: string;
     gender: string;
-    date_of_birth: number;
+    date_of_birth: string;
     order_note: string;
   }): void {
     4;
     const simplifiedCartItems: { id: string; quantity: number }[] =
       cartItems.map((item) => {
-        const { id, quantity } = item;
-        return { id, quantity };
+        const {
+          selectedProductSize: { productDetailId },
+          quantity,
+        } = item;
+        return { id: productDetailId, quantity };
       });
     const submitData = {
-      customer: "",
+      customer: user?.id ?? "",
       employee: "",
-      voucher: order.voucher.id,
+      voucher: order.voucher ? order.voucher.id : "",
       phoneNumber: values.phone_number,
       fullName: values.full_name,
       shippingMoney,
       note: values.order_note,
+      paymentMethod: selectedPaymentMethod,
       addressShipping: {
         phoneNumber: values.phone_number,
         districtId: values.districtId,
-        districtName: "",
+        districtName: districtName,
         provinceId: values.provinceId,
-        provinceName: "",
+        provinceName: provinceName,
         wardCode: values.wardCode,
-        wardName: "",
+        wardName: wardName,
         more: values.line,
       },
       cartItems: simplifiedCartItems,
     };
-    console.log(submitData);
 
-    return;
     mutate(
       {
         resource: "orders",
         values: submitData,
+        successNotification: false,
+        errorNotification: false,
       },
       {
         onError: (error, variables, context) => {
           console.log("An error occurred! " + error.message);
         },
         onSuccess: (data, variables, context) => {
-          navigate("/success/" + data.data.id);
+          dispatch(clearOrder());
+
+          const token = localStorage.getItem(TOKEN_KEY);
+
+          if (token) {
+            dispatch(deleteAllFromDB());
+          } else {
+            dispatch(deleteAllFromCart());
+          }
+
+          if (selectedPaymentMethod === "Cash") {
+            navigate("/success/" + data.data.id);
+          } else {
+            window.location.href = data.data + "";
+          }
         },
       }
     );
   }
 
+  const {
+    show,
+    close,
+    modalProps: { visible, ...restModalProps },
+  } = useModal();
+
   return (
     <Fragment>
+      <Spin spinning={isLoading} fullscreen />
       <Breadcrumb
         pages={[
           { label: "home", path: "/" },
@@ -222,10 +404,39 @@ const Checkout = () => {
                 onFinish={onFinish}
                 // onFinishFailed={onFinishFailed}
                 autoComplete="off"
+                initialValues={{
+                  full_name: "",
+                  email: "",
+                  gender: "",
+                  date_of_birth: "",
+                  phone_number: "",
+                  provinceId: "",
+                  districtId: "",
+                  wardCode: "",
+                  more: "",
+                }}
               >
                 <div className="col-lg-7">
                   <div className="billing-info-wrap">
-                    <h3>{t("checkout.billing_details.title")}</h3>
+                    <div className="row">
+                      <div className="col">
+                        <h3>{t("checkout.billing_details.title")}</h3>
+                      </div>
+                      <div className="col text-end">
+                        <Authenticated fallback={false}>
+                          <button
+                            style={{ marginInlineEnd: "16px" }}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              show();
+                            }}
+                          >
+                            Chọn địa chỉ của bạn
+                          </button>
+                        </Authenticated>
+                      </div>
+                    </div>
+
                     <div className="row">
                       <div className="col-lg-12">
                         <div className="billing-info mb-20">
@@ -333,8 +544,10 @@ const Checkout = () => {
                             ]}
                           >
                             {provinces.length > 0 ? (
-                              <select>
-                                <option>--Chọn tỉnh/thành phố--</option>
+                              <select onChange={handleProvinceChange}>
+                                <option value="">
+                                  --Chọn tỉnh/thành phố--
+                                </option>
                                 {provinces.map((province, index) => (
                                   <option
                                     key={index}
@@ -369,8 +582,8 @@ const Checkout = () => {
                             ]}
                           >
                             {districts.length > 0 ? (
-                              <select>
-                                <option>--Chọn quận/huyện--</option>
+                              <select onChange={handleDistrictChange}>
+                                <option value="">--Chọn quận/huyện--</option>
                                 {districts.map((district, index) => (
                                   <option
                                     key={index}
@@ -403,8 +616,8 @@ const Checkout = () => {
                             ]}
                           >
                             {wards.length > 0 ? (
-                              <select>
-                                <option>--Chọn phường/xã--</option>
+                              <select onChange={handleWardChange}>
+                                <option value="">--Chọn phường/xã--</option>
                                 {wards.map((ward, index) => (
                                   <option key={index} value={ward.WardCode}>
                                     {ward.WardName}
@@ -452,9 +665,11 @@ const Checkout = () => {
                         </label>
                         <Form.Item name="order_note">
                           <textarea
-                            placeholder={t(
-                              "checkout.billing_details.additional_information.order_note.place_holder"
-                            )}
+                            placeholder={
+                              t(
+                                "checkout.billing_details.additional_information.order_note.place_holder"
+                              ) ?? ""
+                            }
                             name="message"
                           />
                         </Form.Item>
@@ -464,7 +679,7 @@ const Checkout = () => {
                 </div>
 
                 <div className="col-lg-5">
-                  <div className="your-order-area">
+                  <div className="your-order-area mb-2">
                     <h3>{t("checkout.your_order.title")}</h3>
                     <div className="your-order-wrap gray-bg-4">
                       <div className="your-order-product-info">
@@ -481,30 +696,24 @@ const Checkout = () => {
                                 cartItem.selectedProductSize?.price ?? 0,
                                 0
                               );
-                              const finalProductPrice = (
+                              const finalProductPrice =
                                 (cartItem.selectedProductSize?.price ?? 0) *
-                                currency.currencyRate
-                              ).toFixed(2);
+                                currency.currencyRate;
                               const finalDiscountedPrice =
                                 discountedPrice !== null
-                                  ? parseFloat(
-                                      (
-                                        discountedPrice * currency.currencyRate
-                                      ).toFixed(2)
-                                    )
+                                  ? discountedPrice * currency.currencyRate
                                   : 0.0;
 
                               discountedPrice !== null
                                 ? (cartTotalPrice +=
                                     finalDiscountedPrice * cartItem.quantity)
                                 : (cartTotalPrice +=
-                                    parseFloat(finalProductPrice) *
-                                    cartItem.quantity);
+                                    finalProductPrice * cartItem.quantity);
 
                               discount = order.voucher
                                 ? order.voucher.type == "PERCENTAGE"
                                   ? (order.voucher.value / 100) *
-                                    Number(cartTotalPrice.toFixed(2))
+                                    Number(cartTotalPrice)
                                   : order.voucher.value
                                 : 0;
 
@@ -513,22 +722,16 @@ const Checkout = () => {
                                   <span className="order-middle-left">
                                     {cartItem.name} X {cartItem.quantity}
                                   </span>{" "}
-                                  <span className="order-price">
-                                    <NumberField
-                                      value={
-                                        discountedPrice !== null
-                                          ? finalDiscountedPrice *
-                                            cartItem.quantity
-                                          : parseFloat(finalProductPrice) *
-                                            cartItem.quantity
-                                      }
-                                      options={{
-                                        currency: currency.currencyName,
-                                        style: "currency",
-                                        currencyDisplay: "symbol",
-                                      }}
-                                    />
-                                  </span>
+                                  <CurrencyFormatter
+                                    className="order-price"
+                                    value={
+                                      discountedPrice !== null
+                                        ? finalDiscountedPrice *
+                                          cartItem.quantity
+                                        : finalProductPrice * cartItem.quantity
+                                    }
+                                    currency={currency}
+                                  />
                                 </li>
                               );
                             })}
@@ -540,21 +743,19 @@ const Checkout = () => {
                               {t("checkout.your_order.shipping")}
                             </li>
                             <li>
-                              {new Intl.NumberFormat("en-US", {
-                                style: "currency",
-                                currency: currency.currencyName,
-                                currencyDisplay: "symbol",
-                              }).format(shippingMoney)}
+                              <CurrencyFormatter
+                                value={shippingMoney}
+                                currency={currency}
+                              />
                             </li>
                           </ul>
                           <ul>
                             <li className="your-order-shipping">Giảm giá</li>
                             <li>
-                              {new Intl.NumberFormat("en-US", {
-                                style: "currency",
-                                currency: currency.currencyName,
-                                currencyDisplay: "symbol",
-                              }).format(discount)}
+                              <CurrencyFormatter
+                                value={discount}
+                                currency={currency}
+                              />
                             </li>
                           </ul>
                         </div>
@@ -564,15 +765,11 @@ const Checkout = () => {
                               {t("checkout.your_order.total_money")}
                             </li>
                             <li>
-                              <NumberField
+                              <CurrencyFormatter
                                 value={
                                   cartTotalPrice + shippingMoney - discount
                                 }
-                                options={{
-                                  currency: currency.currencyName,
-                                  style: "currency",
-                                  currencyDisplay: "symbol",
-                                }}
+                                currency={currency}
                               />
                             </li>
                           </ul>
@@ -580,6 +777,17 @@ const Checkout = () => {
                       </div>
                       <div className="payment-method"></div>
                     </div>
+                  </div>
+                  <div className="your-order-area mb-2 payment-methods-wrapper">
+                    <Authenticated fallback={false}>
+                      <DiscountCodeAccordion />
+                    </Authenticated>
+                  </div>
+                  <div className="your-order-area">
+                    <PaymentMethodAccordion
+                      selectedPaymentMethod={selectedPaymentMethod}
+                      handlePaymentMethodChange={handlePaymentMethodChange}
+                    />
                     <div className="place-order mt-25">
                       <button className="btn-hover" type="submit">
                         {t("checkout.buttons.place_order")}
@@ -606,8 +814,15 @@ const Checkout = () => {
           )}
         </div>
       </div>
+      <Authenticated fallback={false}>
+        <ListAddressModal
+          customer={user}
+          modalProps={restModalProps}
+          close={close}
+        />
+      </Authenticated>
     </Fragment>
   );
 };
 
-export default Checkout;
+export default CheckOut;

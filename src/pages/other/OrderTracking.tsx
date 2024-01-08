@@ -1,72 +1,249 @@
+import {
+  CarOutlined,
+  CheckOutlined,
+  DropboxOutlined,
+  FileProtectOutlined,
+  LoadingOutlined,
+  QuestionOutlined,
+} from "@ant-design/icons";
+import { HttpError, useOne, useUpdate } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { Button, Flex, Grid, Space, Steps, Tooltip } from "antd";
+import dayjs from "dayjs";
+import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
-import { RootState } from "../../redux/store";
-import { Fragment } from "react";
-import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import {
-  LoadingOutlined,
-  DropboxOutlined,
-  CarryOutOutlined,
-  CarOutlined,
-  FileProtectOutlined,
-} from "@ant-design/icons";
-import { Steps } from "antd";
-import { StepsProps } from "antd/lib";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { getDiscountPrice } from "../../helpers/product";
+import { IEvent, IOrderResponse, OrderStatus } from "../../interfaces";
+import { RootState } from "../../redux/store";
+import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
+import { CurrencyFormatter } from "../../helpers/currency";
+import { useModal } from "@refinedev/antd";
+import MyOrderModal from "../../components/order/MyOrderModal";
+import { showWarningConfirmDialog } from "../../helpers/confirm";
+import CancelReasonModal from "../../components/order/CancelReasonModal";
+
+const { useBreakpoint } = Grid;
+
+const InitialEventData: IEvent[] = [
+  {
+    date: undefined,
+    status: "PLACE_ORDER",
+  },
+  {
+    date: undefined,
+    status: "WAIT_FOR_CONFIRMATION",
+  },
+  {
+    date: undefined,
+    status: "WAIT_FOR_DELIVERY",
+  },
+  {
+    date: undefined,
+    status: "DELIVERING",
+  },
+  {
+    date: undefined,
+    status: "COMPLETED",
+  },
+];
 
 const OrderTracking = () => {
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.pages.my_account") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.orders_tracking") + " | SUNS");
+  }, [t]);
 
   let { pathname } = useLocation();
 
-  const { cartItems } = useSelector((state: RootState) => state.cart);
+  let { code } = useParams();
+
+  const screens = useBreakpoint();
+  const currentBreakPoints = Object.entries(screens)
+    .filter((screen) => !!screen[1])
+    .map((screen) => screen[0]);
+
+  const { data, isLoading, isError, refetch } = useOne<
+    IOrderResponse,
+    HttpError
+  >({
+    resource: "orders/tracking",
+    id: code,
+  });
+
+  const order = data?.data ? data?.data : ({} as IOrderResponse);
+
   const currency = useSelector((state: RootState) => state.currency);
 
   let cartTotalPrice = 0;
 
-  const items: StepsProps["items"] = [
-    {
-      title: "Đặt hàng",
-      status: "finish",
-      icon: <DropboxOutlined />,
-      subTitle: "20/10/2023",
-      description: "Khách đặt hàng online.",
-    },
-    {
-      title: "Chờ xác nhận",
-      status: "process",
-      icon: <LoadingOutlined />,
-    },
-    {
-      title: "Sẵn sàng",
-      status: "wait",
-      icon: <CarryOutOutlined />,
-    },
-    {
-      title: "Đang giao",
-      status: "wait",
-      icon: <CarOutlined />,
-    },
-    {
-      title: "Hoàn tất",
-      status: "wait",
-      icon: <FileProtectOutlined />,
-    },
-  ];
+  const {
+    show,
+    close,
+    modalProps: { visible, ...restModalProps },
+  } = useModal();
+
+  const {
+    show: showCancel,
+    close: closeCancle,
+    modalProps: { visible: vi, ...restProps },
+  } = useModal();
+
+  const [events, setEvents] = useState<IEvent[]>(InitialEventData);
+
+  const getIconByStatus = (status: OrderStatus) => {
+    switch (status) {
+      case "PLACE_ORDER":
+        return <DropboxOutlined />;
+      case "WAIT_FOR_CONFIRMATION":
+        return <QuestionOutlined />;
+      case "WAIT_FOR_DELIVERY":
+        return <CheckOutlined />;
+      case "DELIVERING":
+        return <CarOutlined />;
+      case "COMPLETED":
+        return <FileProtectOutlined />;
+      default:
+        return null;
+    }
+  };
+  useEffect(() => {
+    if (
+      order &&
+      order.orderHistories &&
+      order.orderHistories.length > 0 &&
+      !isError
+    ) {
+      const updatedEvents = InitialEventData.map((event) => {
+        switch (event.status) {
+          case "PLACE_ORDER":
+            return {
+              ...event,
+              date: order.createdAt,
+            };
+          case "COMPLETED":
+            const canceledReturnedOrExchangedOrder = order.orderHistories.find(
+              (orderHistory) =>
+                ["CANCELED", "RETURNED", "EXCHANGED"].includes(
+                  orderHistory.actionStatus
+                )
+            );
+            console.log(canceledReturnedOrExchangedOrder);
+            console.log(order.orderHistories);
+            if (canceledReturnedOrExchangedOrder) {
+              return {
+                ...event,
+                status: canceledReturnedOrExchangedOrder.actionStatus,
+                date: canceledReturnedOrExchangedOrder.createdAt,
+              };
+            }
+            {
+              const matchedOrderHistory = order.orderHistories.find(
+                (orderHistory) => orderHistory.actionStatus === event.status
+              );
+              if (matchedOrderHistory) {
+                return {
+                  ...event,
+                  date: matchedOrderHistory.createdAt,
+                };
+              }
+            }
+          default:
+            const matchedOrderHistory = order.orderHistories.find(
+              (orderHistory) => orderHistory.actionStatus === event.status
+            );
+            if (matchedOrderHistory) {
+              return {
+                ...event,
+                date: matchedOrderHistory.createdAt,
+              };
+            }
+        }
+        return event;
+      });
+
+      setEvents(updatedEvents);
+    }
+  }, [order]);
+
+  const renderOrderSteps = () => {
+    const notFinishedCurrentStep = (event: IEvent, index: number) =>
+      event.status !== "CANCELED" &&
+      event.status !== "COMPLETED" &&
+      events.findIndex((el) => el.status === order?.status) === index;
+
+    const stepStatus = (event: IEvent, index: number) => {
+      if (!event.date) return "wait";
+      if (event.status === "CANCELED") return "error";
+      if (notFinishedCurrentStep(event, index)) return "process";
+      return "finish";
+    };
+
+    return (
+      <Steps
+        direction={
+          currentBreakPoints.includes("lg") ? "horizontal" : "vertical"
+        }
+        current={events.findIndex((el) => el.status === order?.status)}
+        type={currentBreakPoints.includes("lg") ? "navigation" : "default"}
+      >
+        {events.map((event: IEvent, index: number) => (
+          <Steps.Step
+            status={stepStatus(event, index)}
+            key={index}
+            title={t(`order_tracking.steps.${event.status}.title`)}
+            description={t(`order_tracking.steps.${event.status}.description`)}
+            subTitle={
+              <Tooltip
+                title={event.date && dayjs(new Date(event.date)).format("LLL")}
+              >
+                {event.date && dayjs(new Date(event.date)).format("DD/MM/YYYY")}
+              </Tooltip>
+            }
+            icon={
+              notFinishedCurrentStep(event, index) ? (
+                <LoadingOutlined />
+              ) : (
+                getIconByStatus(event.status)
+              )
+            }
+          />
+        ))}
+      </Steps>
+    );
+  };
+
   return (
     <Fragment>
       <Breadcrumb
         pages={[
           { label: "home", path: "/" },
-          { label: "pages.my_account", path: pathname },
+          { label: "pages.orders", path: "/orders" },
+          { label: "pages.orders_tracking", path: pathname },
         ]}
       />
       <div className="bg-white p-100">
-        <h3>Trạng thái đơn hàng: #000000</h3>
+        <Flex gap="middle" align="center" justify="space-between">
+          <h3>Trạng thái đơn hàng: #{order && order.code}</h3>
+          <Space>
+            <Button
+              disabled={order.status !== "WAIT_FOR_CONFIRMATION"}
+              onClick={showCancel}
+            >
+              Huỷ
+            </Button>
+            <Button
+              disabled={order.status !== "WAIT_FOR_CONFIRMATION"}
+              onClick={show}
+            >
+              Sửa đơn hàng
+            </Button>
+          </Space>
+        </Flex>
         <hr />
         <div className="table-content table-responsive order-tracking-table-content">
           <table className="w-100">
@@ -76,7 +253,7 @@ const OrderTracking = () => {
                   <p>Số điện thoại khách hàng</p>
                 </td>
                 <td className="value">
-                  <p>092857889</p>
+                  <p>{order.phoneNumber}</p>
                 </td>
               </tr>
               <tr>
@@ -84,7 +261,7 @@ const OrderTracking = () => {
                   <p>Ngày đặt hàng</p>
                 </td>
                 <td className="value">
-                  <p>20/10</p>
+                  <p>{dayjs(new Date(order.createdAt)).format("LLL")}</p>
                 </td>
               </tr>
               <tr>
@@ -92,7 +269,9 @@ const OrderTracking = () => {
                   <p>Ngày dự kiến giao hàng</p>
                 </td>
                 <td className="value">
-                  <p>30/10</p>
+                  <p>
+                    {dayjs(new Date(order.expectedDeliveryDate)).format("LLL")}
+                  </p>
                 </td>
               </tr>
               <tr>
@@ -100,58 +279,56 @@ const OrderTracking = () => {
                   <p>Địa chỉ giao hàng</p>
                 </td>
                 <td className="value">
-                  <p>123 Hoàng Bà Hà Nội</p>
+                  <p>
+                    {order.address &&
+                      `${order.address.more}, ${order.address.wardName}, ${order.address.districtName}, ${order.address.provinceName}`}
+                  </p>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
         <hr />
-        <Steps items={items} type="navigation" />
+        {renderOrderSteps()}
         <h3 className="cart-page-title mt-3">Đơn đặt hàng</h3>
-        <div className="order-summary table-content table-responsive cart-table-content ">
+        <div className="order-summary table-content table-responsive order-tracking-table-content ">
           <table className="w-100">
             <thead>
               <tr>
-                <th>{t(`cart.table.head.product_name`)}</th>
+                <th style={{ textAlign: "start" }}>Sản phẩm</th>
                 <th style={{ textAlign: "end" }}>
                   {t(`cart.table.head.subtotal`)}
                 </th>
               </tr>
             </thead>
             <tbody>
-              {cartItems.map((cartItem, key) => {
-                const discountedPrice = getDiscountPrice(
-                  cartItem.selectedProductSize?.price ?? 0,
-                  0
-                );
-                const finalProductPrice = (
-                  (cartItem.selectedProductSize?.price ?? 0) *
-                  currency.currencyRate
-                ).toFixed(2);
-                const finalDiscountedPrice =
+              {order.orderDetails &&
+                order.orderDetails.length > 0 &&
+                order.orderDetails.map((detail, key) => {
+                  const discountedPrice = getDiscountPrice(
+                    detail?.totalPrice ?? 0,
+                    0
+                  );
+                  const finalProductPrice =
+                    (detail?.totalPrice ?? 0) * currency.currencyRate;
+                  const finalDiscountedPrice =
+                    discountedPrice !== null
+                      ? discountedPrice * currency.currencyRate
+                      : 0.0;
+
                   discountedPrice !== null
-                    ? parseFloat(
-                        (discountedPrice * currency.currencyRate).toFixed(2)
-                      )
-                    : 0.0;
+                    ? (cartTotalPrice += finalDiscountedPrice * detail.quantity)
+                    : (cartTotalPrice += finalProductPrice * detail.quantity);
 
-                discountedPrice !== null
-                  ? (cartTotalPrice += finalDiscountedPrice * cartItem.quantity)
-                  : (cartTotalPrice +=
-                      parseFloat(finalProductPrice) * cartItem.quantity);
-
-                return (
-                  <tr key={key}>
-                    <td className="product-name">
-                      {cartItem.selectedProductColor &&
-                      cartItem.selectedProductSize ? (
+                  return (
+                    <tr key={key}>
+                      <td className="product">
                         <div className="row">
                           <div className="product-thumbnail col-3">
-                            <Link to={"/product/" + cartItem.id}>
+                            <Link to={"/product/" + detail.id}>
                               <img
                                 className="img-fluid"
-                                src={cartItem.image}
+                                src={detail.productDetail.image}
                                 alt=""
                               />
                             </Link>
@@ -159,99 +336,100 @@ const OrderTracking = () => {
                           <div className="cart-item-variation col-9">
                             <span>
                               {t(`cart.table.head.product_name`)}:{" "}
-                              <Link to={"/product/" + cartItem.id}>
-                                {cartItem.name}
+                              <Link to={"/product/" + detail.id}>
+                                {detail.productDetail.product.name}
                               </Link>
                             </span>
                             <span>
                               {t(`cart.table.head.color`)}:{" "}
-                              {cartItem.selectedProductColor.name}
+                              {detail.productDetail.color.name}
                             </span>
                             <span>
                               {t(`cart.table.head.size`)}:{" "}
-                              {cartItem.selectedProductSize.name}
+                              {detail.productDetail.size.name}
                             </span>
                             <span>
-                              {t(`cart.table.head.qty`)}: {cartItem.quantity}
+                              {t(`cart.table.head.qty`)}: {detail.quantity}
                             </span>
                           </div>
                         </div>
-                      ) : (
-                        ""
-                      )}
-                    </td>
-                    <td className="product-subtotal">
-                      {discountedPrice !== null ? (
-                        <span className="amount">
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: currency.currencyName,
-                            currencyDisplay: "symbol",
-                          }).format(
-                            Number(finalDiscountedPrice) * cartItem.quantity
-                          )}
-                        </span>
-                      ) : (
-                        <span className="amount">
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: currency.currencyName,
-                            currencyDisplay: "symbol",
-                          }).format(
-                            Number(finalProductPrice) * cartItem.quantity
-                          )}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                      <td className="product-subtotal value">
+                        {discountedPrice !== null ? (
+                          <CurrencyFormatter
+                            className="amount"
+                            value={finalDiscountedPrice * detail.quantity}
+                            currency={currency}
+                          />
+                        ) : (
+                          <CurrencyFormatter
+                            className="amount"
+                            value={finalProductPrice * detail.quantity}
+                            currency={currency}
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
             <tfoot>
               <tr>
                 <th colSpan={2} style={{ textAlign: "end" }}>
                   <div className="row">
-                    <div className="col-10">
+                    <div className="col-9">
                       <h5>{t(`cart.cart_total.total`)} </h5>
                     </div>
-                    <div className="col-2">
-                      <span>
-                        {new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: currency.currencyName,
-                          currencyDisplay: "symbol",
-                        }).format(Number(cartTotalPrice.toFixed(2)))}
-                      </span>
+                    <div className="col-3">
+                      <CurrencyFormatter
+                        className="amount"
+                        value={cartTotalPrice}
+                        currency={currency}
+                      />
                     </div>
                   </div>
                   <div className="row">
-                    <div className="col-10">
+                    <div className="col-9">
                       <h5>{t(`cart.cart_total.shipping`)} </h5>
                     </div>
-                    <div className="col-2">
-                      <span>
-                        {new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: currency.currencyName,
-                          currencyDisplay: "symbol",
-                        }).format(0)}
-                      </span>
+                    <div className="col-3">
+                      <CurrencyFormatter
+                        className="amount"
+                        value={order.shippingMoney}
+                        currency={currency}
+                      />
                     </div>
                   </div>
                   <div className="row">
-                    <div className="col-10">
+                    <div className="col-9">
+                      <h5>Giảm giá</h5>
+                    </div>
+                    <div className="col-3">
+                      <CurrencyFormatter
+                        className="amount"
+                        value={
+                          order.voucher
+                            ? order.voucher.type == "PERCENTAGE"
+                              ? (order.voucher.value / 100) * order.totalMoney
+                              : order.voucher.value
+                            : 0
+                        }
+                        currency={currency}
+                      />
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-9">
                       <h4 className="grand-totall-title">
                         {t(`cart.cart_total.grand_total`)}{" "}
                       </h4>
                     </div>
-                    <div className="col-2">
-                      <span>
-                        {new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: currency.currencyName,
-                          currencyDisplay: "symbol",
-                        }).format(Number(cartTotalPrice.toFixed(2)))}
-                      </span>
+                    <div className="col-3">
+                      <CurrencyFormatter
+                        className="amount"
+                        value={order.totalMoney}
+                        currency={currency}
+                      />
                     </div>
                   </div>
                 </th>
@@ -260,6 +438,18 @@ const OrderTracking = () => {
           </table>
         </div>
       </div>
+      <MyOrderModal
+        restModalProps={restModalProps}
+        close={close}
+        code={code}
+        callBack={refetch}
+      />
+      <CancelReasonModal
+        restModalProps={restProps}
+        close={closeCancle}
+        code={code}
+        callBack={refetch}
+      />
     </Fragment>
   );
 };

@@ -19,13 +19,13 @@ const compareSlice = createSlice({
   reducers: {
     addToCompare(state, action: PayloadAction<IProductClient>) {
       state.compareItems.push(action.payload);
-      cogoToast.success("Added To compare", { position: "bottom-left" });
+      cogoToast.success("Added To compare", { position: "top-center" });
     },
     deleteFromCompare(state, action: PayloadAction<string>) {
       state.compareItems = state.compareItems.filter(
         (item) => item.id !== action.payload
       );
-      cogoToast.error("Removed From Compare", { position: "bottom-left" });
+      cogoToast.error("Removed From Compare", { position: "top-center" });
     },
   },
 });

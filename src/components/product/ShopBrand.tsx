@@ -1,36 +1,39 @@
 import React from "react";
 import { setActiveSort } from "../../helpers/product";
-import { IColorResponse } from "../../interfaces";
+import { IBrandResponse } from "../../interfaces";
 import { Collapse, CollapseProps } from "antd";
 
-interface ShopColorProps {
-  colors: IColorResponse[];
+interface ShopBrandProps {
+  brands: IBrandResponse[];
   updateFilterParams: (field: string, value: string) => void;
 }
 
-const ShopColor: React.FC<ShopColorProps> = ({
-  colors,
+const ShopBrand: React.FC<ShopBrandProps> = ({
+  brands,
   updateFilterParams,
 }) => {
   const items: CollapseProps["items"] = [
     {
-      key: "color",
-      label: <h4 className="pro-sidebar-title">Màu sắc</h4>,
+      key: "brand",
+      label: <h4 className="pro-sidebar-title">Nhãn hiệu</h4>,
       children: (
         <div className="sidebar-widget-list mt-20">
-          {colors ? (
+          {brands ? (
             <ul>
-              {colors.map((color, key) => {
+              {brands.map((brand, key) => {
                 return (
                   <li key={key}>
                     <div className="sidebar-widget-list-left">
                       <button
+                        className="text-uppercase"
                         onClick={(e) => {
-                          updateFilterParams("colors", color.id);
+                          updateFilterParams("brands", brand.id);
                           setActiveSort(e);
                         }}
                       >
-                        <span className="checkmark" /> {color.name}{" "}
+                        {" "}
+                        <span className="checkmark" />
+                        {brand.name}{" "}
                       </button>
                     </div>
                   </li>
@@ -38,17 +41,17 @@ const ShopColor: React.FC<ShopColorProps> = ({
               })}
             </ul>
           ) : (
-            "Không tìm thấy màu sắc"
+            "Không tìm thấy nhãn hiệu"
           )}
         </div>
       ),
     },
   ];
   return (
-    <div className="sidebar-widget mt-50">
+    <div className="sidebar-widget mt-40">
       <Collapse ghost items={items} />
     </div>
   );
 };
 
-export default ShopColor;
+export default ShopBrand;

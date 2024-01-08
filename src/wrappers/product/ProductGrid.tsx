@@ -4,9 +4,9 @@ import React from "react";
 import { useSelector } from "react-redux";
 import ProductGridSingle from "../../components/product/ProductGridSingle";
 import Swiper, { SwiperSlide } from "../../components/swiper";
+import { mapProductsToClients } from "../../helpers/product";
 import { IProductResponse } from "../../interfaces";
 import { RootState } from "../../redux/store";
-import { mapProductsToClients } from "../../helpers/product";
 
 type ProductGridProps = {
   spaceBottomClass?: string;

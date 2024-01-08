@@ -1,35 +1,47 @@
-import { Fragment } from "react";
-import { useTranslation } from "react-i18next";
-import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { Button, Result } from "antd";
-import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { Link, useLocation, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
-import { getDiscountPrice } from "../../helpers/product";
 import {
-  HomeFilled,
   CarFilled,
-  CreditCardFilled,
   CaretLeftOutlined,
+  CreditCardFilled,
+  HomeFilled,
   PrinterOutlined,
 } from "@ant-design/icons";
 import { HttpError, useOne } from "@refinedev/core";
+import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { Result } from "antd";
+import dayjs from "dayjs";
+import { Fragment, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import { Link, useLocation, useParams } from "react-router-dom";
+import { CurrencyFormatter } from "../../helpers/currency";
+import { getDiscountPrice } from "../../helpers/product";
+import { IOrderResponse } from "../../interfaces";
+import { RootState } from "../../redux/store";
+import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 
 const Success = () => {
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.pages.my_account") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.success") + " | SUNS");
+  }, [t]);
 
   let { pathname } = useLocation();
+
   let { id } = useParams();
 
-  const { data, isLoading, isError } = useOne<any, HttpError>({
+  const { data, isLoading, isError } = useOne<IOrderResponse, HttpError>({
     resource: "orders",
     id: id,
   });
 
-  const order = data?.data ? data?.data : {};
+  const order = data?.data ? data?.data : ({} as IOrderResponse);
+
+  const currency = useSelector((state: RootState) => state.currency);
+
+  let cartTotalPrice = 0;
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -39,25 +51,18 @@ const Success = () => {
     return <div>Something went wrong!</div>;
   }
 
-  console.log(order);
-
-  const { cartItems } = useSelector((state: RootState) => state.cart);
-  const currency = useSelector((state: RootState) => state.currency);
-  const dispatch = useDispatch();
-
-  let cartTotalPrice = 0;
-
   return (
     <Fragment>
       <Breadcrumb
         pages={[
           { label: "home", path: "/" },
-          { label: "pages.my_account", path: pathname },
+          { label: "pages.checkout", path: "/checkout" },
+          { label: "pages.success", path: pathname },
         ]}
       />
 
       <div
-        className="success-area pb-80 pt-100 bg-white"
+        className="success-area pb-80 bg-white"
         style={{ padding: "80px 30px 100px 30px" }}
       >
         <Result
@@ -72,9 +77,14 @@ const Success = () => {
               </p>
               <p>Chúng tôi sẽ liên hệ với bạn trong 24h, xin hãy chờ đợi.</p>
               <div className="order-code">
-                <Link to={"/shop"}>Mã đơn hàng: 2017182818828182881</Link>
+                <Link to={"/orders/tracking/" + order.code}>
+                  Mã đơn hàng: {order.code.toUpperCase()}
+                </Link>
               </div>
-              <p>Ngày mua hàng: 22/11/2023</p>
+              <p>
+                Ngày mua hàng:{" "}
+                {dayjs(new Date(order.createdAt ?? 0)).format("DD/MM/YYYY")}
+              </p>
             </div>
           }
           extra={[
@@ -90,8 +100,8 @@ const Success = () => {
           <div className="col-lg-6 col-md-6">
             <div className="row">
               <div className="col-lg-6 col-md-6 mb-4">
-                <div className="table-content table-responsive cart-table-content">
-                  <table>
+                <div className="table-content table-responsive order-tracking-table-content">
+                  <table className="w-100">
                     <thead>
                       <tr>
                         <th style={{ textAlign: "start" }}>
@@ -101,13 +111,18 @@ const Success = () => {
                     </thead>
                     <tbody>
                       <tr>
-                        <td className="product-name">
-                          <p>Street: 1676 Dai lo Hung Vuong, Viet Tri</p>
-                          <p>City: Viet Tri</p>
-                          <p>State/province/area: Vinh Phuc</p>
-                          <p>Phone number: 0210. 381 6131</p>
-                          <p>Country calling code: +94</p>
-                          <p>Country: Vietnam</p>
+                        <td className="field">
+                          {order.address && (
+                            <>
+                              <p>
+                                Tỉnh/thành phố: {order.address.provinceName}
+                              </p>
+                              <p>Quận/huyện: {order.address.districtName}</p>
+                              <p>Phường/xã: {order.address.wardName}</p>
+                              <p>Số điện thoại: {order.address.phoneNumber}</p>
+                              <p>Địa chỉ chi tiết: {order.address.more}</p>
+                            </>
+                          )}
                         </td>
                       </tr>
                     </tbody>
@@ -115,8 +130,8 @@ const Success = () => {
                 </div>
               </div>
               <div className="col-lg-6 col-md-6 mb-4">
-                <div className="table-content table-responsive cart-table-content">
-                  <table>
+                <div className="table-content table-responsive order-tracking-table-content">
+                  <table className="w-100">
                     <thead>
                       <tr>
                         <th style={{ textAlign: "start" }}>
@@ -126,13 +141,33 @@ const Success = () => {
                     </thead>
                     <tbody>
                       <tr>
-                        <td className="product-name">
-                          <p>Street: 1676 Dai lo Hung Vuong, Viet Tri</p>
-                          <p>City: Viet Tri</p>
-                          <p>State/province/area: Vinh Phuc</p>
-                          <p>Phone number: 0210. 381 6131</p>
-                          <p>Country calling code: +94</p>
-                          <p>Country: Vietnam</p>
+                        <td className="field">
+                          {order.address &&
+                            order.customer &&
+                            order.customer.addressList.length > 0 && (
+                              <>
+                                <p>
+                                  Tỉnh/thành phố:{" "}
+                                  {order.customer.addressList[0].provinceName}
+                                </p>
+                                <p>
+                                  Quận/huyện:{" "}
+                                  {order.customer.addressList[0].districtName}
+                                </p>
+                                <p>
+                                  Phường/xã:{" "}
+                                  {order.customer.addressList[0].wardName}
+                                </p>
+                                <p>
+                                  Số điện thoại:{" "}
+                                  {order.customer.addressList[0].phoneNumber}
+                                </p>
+                                <p>
+                                  Địa chỉ chi tiết:{" "}
+                                  {order.customer.addressList[0].more}
+                                </p>
+                              </>
+                            )}
                         </td>
                       </tr>
                     </tbody>
@@ -141,8 +176,8 @@ const Success = () => {
               </div>
             </div>
             <div className="row">
-              <div className="col-lg-6 col-md-6">
-                <div className="table-content table-responsive cart-table-content">
+              <div className="col-lg-6 col-md-6 mb-4">
+                <div className="table-content table-responsive order-tracking-table-content">
                   <table>
                     <thead>
                       <tr>
@@ -153,15 +188,15 @@ const Success = () => {
                     </thead>
                     <tbody>
                       <tr>
-                        <td className="product-name">Giao hàng tiết kiệm</td>
+                        <td className="field">Giao hàng tiết kiệm</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
 
-              <div className="col-lg-6 col-md-6">
-                <div className="table-content table-responsive cart-table-content">
+              <div className="col-lg-6 col-md-6 mb-4">
+                <div className="table-content table-responsive order-tracking-table-content">
                   <table>
                     <thead>
                       <tr>
@@ -172,7 +207,20 @@ const Success = () => {
                     </thead>
                     <tbody>
                       <tr>
-                        <td className="product-name">Tiền mặt (Ship COD)</td>
+                        <td className="field">
+                          {order?.payments &&
+                            order.payments.map((payment, index) => (
+                              <span key={index}>
+                                {t(
+                                  `success.payment.methods.options.${payment.paymentMethod.name}`
+                                )}{" "}
+                                - {t("success.payment.transaction_code")}
+                                {": "}
+                                {payment.transactionCode}
+                                {index < order.payments.length - 1 ? ", " : ""}
+                              </span>
+                            ))}
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -180,50 +228,49 @@ const Success = () => {
               </div>
             </div>
           </div>
-          <div className="col-lg-6 col-md-6 order-summary table-content table-responsive cart-table-content ">
+          <div className="col-lg-6 col-md-6 order-summary table-content table-responsive order-tracking-table-content ">
             <table className="w-100">
               <thead>
                 <tr>
-                  <th>{t(`cart.table.head.product_name`)}</th>
+                  <th style={{ textAlign: "start" }}>Sản phẩm</th>
                   <th style={{ textAlign: "end" }}>
                     {t(`cart.table.head.subtotal`)}
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {cartItems.map((cartItem, key) => {
-                  const discountedPrice = getDiscountPrice(
-                    cartItem.selectedProductSize?.price ?? 0,
-                    0
-                  );
-                  const finalProductPrice = (
-                    (cartItem.selectedProductSize?.price ?? 0) *
-                    currency.currencyRate
-                  ).toFixed(2);
-                  const finalDiscountedPrice =
+                {order.orderDetails &&
+                  order.orderDetails.length > 0 &&
+                  order.orderDetails.map((detail, key) => {
+                    const discountedPrice = getDiscountPrice(
+                      detail?.totalPrice ?? 0,
+                      0
+                    );
+                    const finalProductPrice =
+                      (detail?.totalPrice ?? 0) * currency.currencyRate;
+                    const finalDiscountedPrice =
+                      discountedPrice !== null
+                        ? discountedPrice * currency.currencyRate
+                        : 0.0;
+
                     discountedPrice !== null
-                      ? parseFloat(
-                          (discountedPrice * currency.currencyRate).toFixed(2)
-                        )
-                      : 0.0;
+                      ? (cartTotalPrice +=
+                          finalDiscountedPrice * detail.quantity)
+                      : (cartTotalPrice += finalProductPrice * detail.quantity);
 
-                  discountedPrice !== null
-                    ? (cartTotalPrice +=
-                        finalDiscountedPrice * cartItem.quantity)
-                    : (cartTotalPrice +=
-                        parseFloat(finalProductPrice) * cartItem.quantity);
-
-                  return (
-                    <tr key={key}>
-                      <td className="product-name">
-                        {cartItem.selectedProductColor &&
-                        cartItem.selectedProductSize ? (
+                    return (
+                      <tr key={key}>
+                        <td className="product">
                           <div className="row">
                             <div className="product-thumbnail col-3">
-                              <Link to={"/product/" + cartItem.id}>
+                              <Link
+                                to={
+                                  "/product/" + detail.productDetail.product.id
+                                }
+                              >
                                 <img
                                   className="img-fluid"
-                                  src={cartItem.image}
+                                  src={detail.productDetail.image}
                                   alt=""
                                 />
                               </Link>
@@ -231,99 +278,97 @@ const Success = () => {
                             <div className="cart-item-variation col-9">
                               <span>
                                 {t(`cart.table.head.product_name`)}:{" "}
-                                <Link to={"/product/" + cartItem.id}>
-                                  {cartItem.name}
+                                <Link to={"/product/" + detail.id}>
+                                  {detail.productDetail.product.name}
                                 </Link>
                               </span>
                               <span>
                                 {t(`cart.table.head.color`)}:{" "}
-                                {cartItem.selectedProductColor.name}
+                                {detail.productDetail.color.name}
                               </span>
                               <span>
                                 {t(`cart.table.head.size`)}:{" "}
-                                {cartItem.selectedProductSize.name}
+                                {detail.productDetail.size.name}
                               </span>
                               <span>
-                                {t(`cart.table.head.qty`)}: {cartItem.quantity}
+                                {t(`cart.table.head.qty`)}: {detail.quantity}
                               </span>
                             </div>
                           </div>
-                        ) : (
-                          ""
-                        )}
-                      </td>
-                      <td className="product-subtotal">
-                        {discountedPrice !== null ? (
-                          <span className="amount">
-                            {new Intl.NumberFormat("en-US", {
-                              style: "currency",
-                              currency: currency.currencyName,
-                              currencyDisplay: "symbol",
-                            }).format(
-                              Number(finalDiscountedPrice) * cartItem.quantity
-                            )}
-                          </span>
-                        ) : (
-                          <span className="amount">
-                            {new Intl.NumberFormat("en-US", {
-                              style: "currency",
-                              currency: currency.currencyName,
-                              currencyDisplay: "symbol",
-                            }).format(
-                              Number(finalProductPrice) * cartItem.quantity
-                            )}
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
+                        </td>
+                        <td className="value">
+                          {discountedPrice !== null ? (
+                            <CurrencyFormatter
+                              className="amount"
+                              value={finalDiscountedPrice * detail.quantity}
+                              currency={currency}
+                            />
+                          ) : (
+                            <CurrencyFormatter
+                              className="amount"
+                              value={finalProductPrice * detail.quantity}
+                              currency={currency}
+                            />
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
               <tfoot>
                 <tr>
                   <th colSpan={2} style={{ textAlign: "end" }}>
                     <div className="row">
-                      <div className="col-10">
+                      <div className="col-9">
                         <h5>{t(`cart.cart_total.total`)} </h5>
                       </div>
-                      <div className="col-2">
-                        <span>
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: currency.currencyName,
-                            currencyDisplay: "symbol",
-                          }).format(Number(cartTotalPrice.toFixed(2)))}
-                        </span>
+                      <div className="col-3">
+                        <CurrencyFormatter
+                          value={cartTotalPrice}
+                          currency={currency}
+                        />
                       </div>
                     </div>
                     <div className="row">
-                      <div className="col-10">
+                      <div className="col-9">
                         <h5>{t(`cart.cart_total.shipping`)} </h5>
                       </div>
-                      <div className="col-2">
-                        <span>
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: currency.currencyName,
-                            currencyDisplay: "symbol",
-                          }).format(0)}
-                        </span>
+                      <div className="col-3">
+                        <CurrencyFormatter
+                          className="amount"
+                          value={order.shippingMoney}
+                          currency={currency}
+                        />
                       </div>
                     </div>
                     <div className="row">
-                      <div className="col-10">
+                      <div className="col-9">
+                        <h5>Giảm giá</h5>
+                      </div>
+                      <div className="col-3">
+                        <CurrencyFormatter
+                          value={
+                            order.voucher
+                              ? order.voucher.type == "PERCENTAGE"
+                                ? (order.voucher.value / 100) * order.totalMoney
+                                : order.voucher.value
+                              : 0
+                          }
+                          currency={currency}
+                        />
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-9">
                         <h4 className="grand-totall-title">
                           {t(`cart.cart_total.grand_total`)}{" "}
                         </h4>
                       </div>
-                      <div className="col-2">
-                        <span>
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: currency.currencyName,
-                            currencyDisplay: "symbol",
-                          }).format(Number(cartTotalPrice.toFixed(2)))}
-                        </span>
+                      <div className="col-3">
+                        <CurrencyFormatter
+                          value={order.totalMoney}
+                          currency={currency}
+                        />
                       </div>
                     </div>
                   </th>
