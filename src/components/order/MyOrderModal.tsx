@@ -313,7 +313,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
   const handleOk = () => {
     showWarningConfirmDialog({
       options: {
-        accept: () => handleUpdateOrder,
+        accept: () => handleUpdateOrder(),
         reject: () => {},
       },
       t: t,
