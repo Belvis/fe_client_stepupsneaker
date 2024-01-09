@@ -72,6 +72,7 @@ const TrackingPage = () => {
                     rules={[
                       {
                         required: true,
+                        whitespace: true,
                         message: "Mã hoá đơn không được để trống!",
                       },
                     ]}

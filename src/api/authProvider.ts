@@ -178,8 +178,6 @@ export const authProvider = (url: string): AuthBindings => ({
     };
   },
   onError: async (error) => {
-    console.error(error);
-
     return { error };
   },
   check: async () => {

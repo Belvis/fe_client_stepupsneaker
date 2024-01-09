@@ -857,7 +857,7 @@ const Cart = () => {
                         currency={currency}
                       />
                     </h4>
-                    <Link to={"/checkout"}>
+                    <Link to={"/pages/checkout"}>
                       {t(`cart.buttons.proceed_to_checkout`)}
                     </Link>
                   </div>

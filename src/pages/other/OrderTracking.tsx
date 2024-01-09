@@ -21,7 +21,6 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { CurrencyFormatter } from "../../helpers/currency";
 import { useModal } from "@refinedev/antd";
 import MyOrderModal from "../../components/order/MyOrderModal";
-import { showWarningConfirmDialog } from "../../helpers/confirm";
 import CancelReasonModal from "../../components/order/CancelReasonModal";
 
 const { useBreakpoint } = Grid;

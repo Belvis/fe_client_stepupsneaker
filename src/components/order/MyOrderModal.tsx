@@ -510,7 +510,6 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                                 if (updatedQuantityCount[single.id]) {
                                   updatedQuantityCount[single.id] += 1;
                                 }
-                                console.log(updatedQuantityCount);
 
                                 return updatedQuantityCount;
                               });
@@ -566,8 +565,10 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <div className="col-9">
                         <Badge
                           count={
-                            cartTotalPrice !== order.shippingMoney ? (
-                              cartTotalPrice > order.shippingMoney ? (
+                            cartTotalPrice !=
+                            order.totalMoney - order.shippingMoney ? (
+                              cartTotalPrice >
+                              order.totalMoney - order.totalMoney ? (
                                 <CaretUpOutlined style={{ color: "red" }} />
                               ) : (
                                 <CaretDownOutlined style={{ color: "green" }} />
@@ -637,8 +638,10 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <div className="col-9">
                         <Badge
                           count={
-                            viewOrder.totalMoney !== order.totalMoney ? (
-                              viewOrder.totalMoney > order.totalMoney ? (
+                            cartTotalPrice + viewOrder.shippingMoney !==
+                            order.totalMoney ? (
+                              cartTotalPrice + viewOrder.shippingMoney >
+                              order.totalMoney ? (
                                 <CaretUpOutlined style={{ color: "red" }} />
                               ) : (
                                 <CaretDownOutlined style={{ color: "green" }} />
@@ -656,7 +659,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <div className="col-3">
                         <CurrencyFormatter
                           className="amount"
-                          value={viewOrder.totalMoney}
+                          value={cartTotalPrice + viewOrder.shippingMoney}
                           currency={currency}
                         />
                       </div>

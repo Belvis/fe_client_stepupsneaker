@@ -168,22 +168,28 @@ const CheckOut = () => {
 
   useEffect(() => {
     if (user) {
+      const defaultAddress = user.addressList.find(
+        (add) => add.isDefault === true
+      );
+
+      if (defaultAddress) {
+        form.setFieldsValue({
+          phone_number: defaultAddress.phoneNumber,
+          provinceId: Number(defaultAddress.provinceId),
+          districtId: Number(defaultAddress.districtId),
+          wardCode: defaultAddress.wardCode,
+          line: defaultAddress.more,
+        });
+        setDistrictName(defaultAddress.districtName);
+        setProvinceName(defaultAddress.provinceName);
+        setWardName(defaultAddress.wardName);
+      }
       const dob = dayjs(new Date(user.dateOfBirth)).format("YYYY-MM-DD");
       form.setFieldsValue({
         full_name: user.fullName,
         email: user.email,
         gender: user.gender,
         date_of_birth: dob,
-      });
-    }
-
-    if (order.address) {
-      form.setFieldsValue({
-        phone_number: order.address.phoneNumber,
-        provinceId: Number(order.address.provinceId),
-        districtId: Number(order.address.districtId),
-        wardCode: order.address.wardCode,
-        line: order.address.more,
       });
     }
   }, [user, order]);
@@ -330,6 +336,7 @@ const CheckOut = () => {
       voucher: order.voucher ? order.voucher.id : "",
       phoneNumber: values.phone_number,
       fullName: values.full_name,
+      email: values.email,
       shippingMoney,
       note: values.order_note,
       paymentMethod: selectedPaymentMethod,
@@ -487,45 +494,6 @@ const CheckOut = () => {
                             ]}
                           >
                             <input type="text" />
-                          </Form.Item>
-                        </div>
-                      </div>
-                      <div className="col-lg-6 col-md-6">
-                        <div className="billing-select mb-20">
-                          <label>{t("checkout.billing_details.gender")}</label>
-                          <Form.Item
-                            name="gender"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Giới tính không được để trống!",
-                              },
-                            ]}
-                          >
-                            <select>
-                              <option value="">--Chọn giới tính--</option>
-                              <option value="Male">Nam</option>
-                              <option value="Female">Nữ</option>
-                              <option value="Other">Khác</option>
-                            </select>
-                          </Form.Item>
-                        </div>
-                      </div>
-                      <div className="col-lg-6 col-md-6">
-                        <div className="billing-info mb-20">
-                          <label>
-                            {t("checkout.billing_details.date_of_birth")}
-                          </label>
-                          <Form.Item
-                            name="date_of_birth"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Ngày sinh không được để trống!",
-                              },
-                            ]}
-                          >
-                            <input type="date" />
                           </Form.Item>
                         </div>
                       </div>
