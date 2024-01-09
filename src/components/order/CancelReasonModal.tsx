@@ -82,11 +82,11 @@ const CancelReasonModal: React.FC<CancelReasonModalProps> = ({
         accept: () => {
           update(
             {
-              resource: `orders`,
+              resource: `orders/cancel`,
               values: {
                 orderHistoryNote: selectedReason,
               },
-              id: order.id,
+              id: order.code,
             },
             {
               onError: (error, variables, context) => {},
