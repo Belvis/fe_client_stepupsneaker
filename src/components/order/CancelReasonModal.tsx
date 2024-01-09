@@ -131,7 +131,13 @@ const CancelReasonModal: React.FC<CancelReasonModalProps> = ({
           <Radio value={6}>
             Khác
             {value === 6 ? (
-              <Input style={{ width: 200, marginLeft: 10 }} />
+              <Input
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const { value: inputValue } = e.target;
+                  setSelectedReason(inputValue);
+                }}
+                style={{ width: 200, marginLeft: 10 }}
+              />
             ) : null}
           </Radio>
         </Space>
