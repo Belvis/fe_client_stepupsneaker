@@ -1,7 +1,7 @@
 import {
-  InfoCircleOutlined,
-  CaretUpOutlined,
   CaretDownOutlined,
+  CaretUpOutlined,
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import {
   HttpError,
@@ -45,6 +45,7 @@ interface MyOrderModalProps {
   code: string | undefined;
   callBack: any;
   close: () => void;
+  showCancel: () => void;
 }
 
 const { Title } = Typography;
@@ -53,6 +54,8 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
   restModalProps,
   code,
   callBack,
+  close,
+  showCancel,
 }) => {
   const { t } = useTranslation();
   const currency = useSelector((state: RootState) => state.currency);
@@ -107,7 +110,25 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
 
       setQuantityCount(updatedQuantityCount);
     }
-  }, [order]);
+  }, [order, restModalProps.open]);
+
+  useEffect(() => {
+    if (restModalProps.open && viewOrder) {
+      form.setFieldsValue({
+        districtId: Number(viewOrder.address?.districtId),
+        districtName: viewOrder.address?.districtName,
+        wardCode: viewOrder.address?.wardCode,
+        wardName: viewOrder.address?.wardName,
+        provinceId: Number(viewOrder.address?.provinceId),
+        provinceName: viewOrder.address?.provinceName,
+        line: viewOrder.address?.more,
+        fullName: viewOrder.fullName,
+        phoneNumber: viewOrder.phoneNumber,
+        email: viewOrder.customer?.email,
+        orderNote: viewOrder.note,
+      });
+    }
+  }, [restModalProps.open, viewOrder]);
 
   const { mutate: calculateFeeMutate, isLoading: isLoadingFee } =
     useCustomMutation<any>();
@@ -418,17 +439,18 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                                 if (updatedQuantityCount[single.id] > 1) {
                                   updatedQuantityCount[single.id] -= 1;
                                 } else {
-                                  if ((quantityCount.length = 1)) {
+                                  const cartCount =
+                                    viewOrder.orderDetails.length;
+                                  if (cartCount == 1) {
                                     showWarningConfirmDialog({
                                       options: {
                                         message:
                                           "Giảm số lượng về 0 khi giỏ hàng còn 1 sản phẩm tương đương với việc huỷ đơn hàng",
                                         accept: () => {
-                                          console.log("Đồng ý");
+                                          close();
+                                          showCancel();
                                         },
-                                        reject: () => {
-                                          console.log("Huỷ");
-                                        },
+                                        reject: () => {},
                                       },
                                       t: t,
                                     });
@@ -438,7 +460,14 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                                         message:
                                           "Giảm số lượng về 0 tương đương với việc loại bỏ sản phẩm khỏi giỏ",
                                         accept: () => {
-                                          console.log("Đồng ý");
+                                          setViewOrder((prev) => ({
+                                            ...prev,
+                                            orderDetails:
+                                              prev.orderDetails.filter(
+                                                (detail) =>
+                                                  detail.id !== single.id
+                                              ),
+                                          }));
                                         },
                                         reject: () => {
                                           console.log("Huỷ");
@@ -534,17 +563,32 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <td className="product-remove">
                         <button
                           onClick={() => {
-                            if ((quantityCount.length = 1)) {
+                            const cartCount = viewOrder.orderDetails.length;
+                            if (cartCount == 1) {
                               showWarningConfirmDialog({
                                 options: {
                                   message:
                                     "Loại bỏ sản phẩm duy nhất tương đương với việc huỷ đơn hàng",
                                   accept: () => {
-                                    console.log("Đồng ý");
+                                    close();
+                                    showCancel();
                                   },
-                                  reject: () => {
-                                    console.log("Huỷ");
+                                  reject: () => {},
+                                },
+                                t: t,
+                              });
+                            } else {
+                              showWarningConfirmDialog({
+                                options: {
+                                  accept: () => {
+                                    setViewOrder((prev) => ({
+                                      ...prev,
+                                      orderDetails: prev.orderDetails.filter(
+                                        (detail) => detail.id !== single.id
+                                      ),
+                                    }));
                                   },
+                                  reject: () => {},
                                 },
                                 t: t,
                               });
@@ -568,7 +612,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                             cartTotalPrice !=
                             order.totalMoney - order.shippingMoney ? (
                               cartTotalPrice >
-                              order.totalMoney - order.totalMoney ? (
+                              order.totalMoney - order.shippingMoney ? (
                                 <CaretUpOutlined style={{ color: "red" }} />
                               ) : (
                                 <CaretDownOutlined style={{ color: "green" }} />
