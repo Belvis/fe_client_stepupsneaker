@@ -131,8 +131,6 @@ const OrderTracking = () => {
                   orderHistory.actionStatus
                 )
             );
-            console.log(canceledReturnedOrExchangedOrder);
-            console.log(order.orderHistories);
             if (canceledReturnedOrExchangedOrder) {
               return {
                 ...event,
@@ -440,6 +438,7 @@ const OrderTracking = () => {
       <MyOrderModal
         restModalProps={restModalProps}
         close={close}
+        showCancel={showCancel}
         code={code}
         callBack={refetch}
       />

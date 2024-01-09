@@ -41,6 +41,7 @@ import { AppDispatch, RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { debounce } from "lodash";
 import { showErrorToast } from "../../helpers/toast";
+import { showWarningConfirmDialog } from "../../helpers/confirm";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -428,7 +429,25 @@ const Cart = () => {
                                       <button
                                         className="dec qtybutton"
                                         onClick={() => {
-                                          dispatch(decreaseQuantity(cartItem));
+                                          if (cartItem.quantity <= 1) {
+                                            showWarningConfirmDialog({
+                                              options: {
+                                                message:
+                                                  "Giảm số lượng về 0 tương đương với việc loại bỏ sản phẩm khỏi giỏ",
+                                                accept: () => {
+                                                  dispatch(
+                                                    decreaseQuantity(cartItem)
+                                                  );
+                                                },
+                                                reject: () => {},
+                                              },
+                                              t: t,
+                                            });
+                                          } else {
+                                            dispatch(
+                                              decreaseQuantity(cartItem)
+                                            );
+                                          }
                                         }}
                                       >
                                         -
@@ -437,9 +456,25 @@ const Cart = () => {
                                   >
                                     <button
                                       className="dec qtybutton"
-                                      onClick={() =>
-                                        dispatch(decreaseFromDB(cartItem))
-                                      }
+                                      onClick={() => {
+                                        if (cartItem.quantity <= 1) {
+                                          showWarningConfirmDialog({
+                                            options: {
+                                              message:
+                                                "Giảm số lượng về 0 tương đương với việc loại bỏ sản phẩm khỏi giỏ",
+                                              accept: () => {
+                                                dispatch(
+                                                  decreaseFromDB(cartItem)
+                                                );
+                                              },
+                                              reject: () => {},
+                                            },
+                                            t: t,
+                                          });
+                                        } else {
+                                          dispatch(decreaseFromDB(cartItem));
+                                        }
+                                      }}
                                     >
                                       -
                                     </button>
