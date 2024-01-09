@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "image": "",
+    "title": "Watches",
+    "subtitle": "Starting at",
+    "price": "$99.00",
+    "link": "/shop-grid-standard"
+  },
+  {
+    "id": 2,
+    "image": "",
+    "title": "Plo Bag",
+    "subtitle": "Starting at",
+    "price": "$79.00",
+    "link": "/shop-grid-standard"
+  },
+  {
+    "id": 3,
+    "image": "",
+    "title": "Sunglass",
+    "subtitle": "Starting at",
+    "price": "$29.00",
+    "link": "/shop-grid-standard"
+  }
+]

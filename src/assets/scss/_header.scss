@@ -371,6 +371,14 @@
           @media #{$xl-layout}{
             font-size: 13px;
           }
+          &.active {
+            color: $theme-color;
+            text-decoration: underline;
+            &::before {
+              opacity: 1;
+            }
+        }
+
         }
         &:hover a {
           color: $theme-color;
@@ -1064,6 +1072,9 @@
         top: 2px;
 
         color: #555252;
+      }
+      &.phone-number {
+        color: $theme-color;
       }
     }
     .lang-car-dropdown {

@@ -7,6 +7,8 @@ import {
   MobileMenu,
   NavMenu,
 } from "../../components";
+import { useGetLocale } from "@refinedev/core";
+import dayjs from "dayjs";
 
 type HeaderProps = {
   layout?: string;
@@ -27,6 +29,10 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [scroll, setScroll] = useState(0);
   const [headerTop, setHeaderTop] = useState(0);
+
+  const locale = useGetLocale();
+  const currentLocale = locale();
+  dayjs.locale(currentLocale);
 
   useEffect(() => {
     const header = document.querySelector(".sticky-bar") as HTMLElement | null;

@@ -9,6 +9,25 @@
 
     color: #000;
   }
+  a,
+  button {
+    background: none;
+    border: none;
+    background-color: #df5c39;
+    color: #fff;
+    display: inline-block;
+    line-height: 1;
+    margin: 0 2px;
+    padding: 12px 15px;
+    text-transform: uppercase;
+    font-weight: 500;
+    &:hover {
+      background-color: $theme-color;
+    }
+    &:disabled {
+      opacity: 0.6;
+    }
+  }
   .billing-info,
   .billing-select {
     label {
@@ -45,6 +64,59 @@
       -webkit-appearance: none;
          -moz-appearance: none;
               appearance: none;
+    }
+  }
+  .billing-back-btn {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    .billing-back {
+      a {
+        color: #000;
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        &:hover {
+          color: $theme-color;
+        }
+        i {
+          font-size: 16px;
+          color: $theme-color;
+        }
+      }
+    }
+    .billing-btn {
+      button {
+        background-color: #f2f2f2;
+        border: medium none;
+        color: #000;
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1;
+        padding: 16px 35px 17px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 400ms ease;
+        &:hover {
+          background: $theme-color;
+          color: #fff;
+        }
+        span.loading {
+          opacity: 0;
+          display: none;
+        }
+        &.loading {
+          pointer-events: none; 
+          opacity: 0.7;
+    
+          span.loading {
+            opacity: 1;
+            display: inline;
+          }
+        }
+      }
     }
   }
   .checkout-account {
@@ -292,6 +364,105 @@
   @media #{$xs-layout} {
     &.pb-100 {
       padding-bottom: 60px;
+    }
+  }
+}
+
+.checkout-discount-code-wrapper {
+  padding: 45px 30px 50px;
+
+  @media #{$lg-layout} {
+    padding: 45px 18px 50px;
+  }
+  @media #{$xs-layout} {
+    padding: 45px 18px 50px;
+  }
+  .title-wrap {
+    position: relative;
+    &::before {
+      position: absolute;
+      z-index: 1;
+      top: 10px;
+      left: 0;
+
+      width: 100%;
+      height: 1px;
+
+      content: "";
+      transition: all 0.4s ease 0s;
+
+      background-color: #e3e1e1;
+    }
+    h4.cart-bottom-title {
+      font-size: 18px;
+      font-weight: 500;
+
+      display: inline-block;
+
+      margin: 0;
+      padding-right: 18px;
+      @media #{$lg-layout} {
+        font-size: 16px;
+      }
+    }
+    .section-bg-gray {
+      position: relative;
+      z-index: 99;
+
+      background-color: #f8f9f9;
+    }
+  }
+  .discount-code {
+    margin: 21px 0 0;
+    p {
+      margin: 0 0 15px;
+    }
+    .discount-form {
+      input {
+        height: 40px;
+        margin-bottom: 30px;
+        padding-left: 10px;
+
+        border: 1px solid #ebebeb;
+        background: #fff;
+      }
+      button.cart-btn-2 {
+        font-size: 14px;
+        font-weight: 500;
+
+        padding: 13px 42px 12px;
+
+        cursor: pointer;
+        transition: all 0.3s ease 0s;
+        text-transform: uppercase;
+
+        color: #fff;
+        border: medium none;
+        border-radius: 50px;
+        background-color: $theme-color;
+        &:hover {
+          background-color: #333;
+        }
+      }
+      button.cart-btn-3 {
+        font-size: 14px;
+        font-weight: 500;
+
+        height: 47px;
+        width: 47px;
+
+        cursor: pointer;
+        transition: all 0.3s ease 0s;
+        text-transform: uppercase;
+
+        color: #fff;
+        border: medium none;
+        border-radius: 50%;
+        background-color: $theme-color;
+        &:hover {
+          background-color: #333;
+        }
+      }
     }
   }
 }

@@ -11,8 +11,20 @@
         "wishlist": "Danh sách mong muốn",
         "compare": "So sánh",
         "my_account": "Tài khoản của tôi",
-        "login_register": "Đăng nhập / Đăng ký",
-        "404_page": "404"
+        "login_register": "Đăng nhập - Đăng ký",
+        "/login": "Đăng nhập",
+        "/register": "Đăng ký",
+        "orders": "Đơn hàng của tôi",
+        "orders_tracking": "Theo dõi đơn hàng",
+        "404_page": "404",
+        "success": "Thành công",
+        "submission_failed": "Giao dịch không thành công",
+        "failed": "Thất bại",
+        "order": "Đơn hàng",
+        "tracking_page": "Tra cứu đơn hàng",
+        "my_orders": "Đơn hàng của tôi",
+        "reset_password": "Đặt lại mật khẩu",
+        "forgot_password": "Quên mật khẩu"
       },
       "contact_us": "Liên hệ",
       "about_us": "Về chúng tôi"
@@ -54,9 +66,60 @@
         "total_money": "Tổng cộng"
       },
       "no_items_found": "Không tìm thấy sản phẩm nào trong giỏ hàng.",
+      "payment_methods": {
+        "title": "Phương thức thanh toán",
+        "options": {
+          "cod": {
+            "title": "Thanh toán khi nhận hàng (Ship COD)",
+            "description": "Hình thức giao hàng thu hộ tiền hoặc giao hàng thu tiền. Người mua thanh toán khi nhận hàng"
+          },
+          "bank_transfer" :{
+            "title": "Thanh toán bằng chuyển khoản (VNPAY)",
+            "description": "Chuyển khoản vào tài khoản của chúng tôi. Đơn hàng sẽ được xác nhận ngay sau khi chuyển khoản"
+          }
+        }
+      },
       "buttons": {
         "place_order": "Đặt hàng",
         "shop_now": "Mua ngay"
+      }
+    },
+    "success": {
+
+      "payment": {
+
+        "methods": {
+          "options": {
+            "Cash": "Tiền mặt",
+            "Transfer": "Chuyển khoản",
+            "Card": "Thẻ ngân hàng"
+          }
+        },
+        "transaction_code": "Mã giao dịch"
+      }
+    },
+    "order_tracking": {
+      "steps": {
+        "PLACE_ORDER": {
+          "title": "Đặt hàng",
+          "description": "Khách đặt hàng online."
+        },
+        "WAIT_FOR_CONFIRMATION": {
+          "title": "Chờ xác nhận",
+          "description": "Khách hàng xác nhận đơn hàng."
+        },
+        "WAIT_FOR_DELIVERY": {
+          "title": "Sẵn sàng",
+          "description": "Đơn hàng đã sẵn sàng, đợi được giao."
+        },
+        "DELIVERING": {
+          "title": "Đang giao",
+          "description": "Đơn hàng đang được giao."
+        },
+        "COMPLETED": {
+          "title": "Hoàn tất",
+          "description": "Đơn hàng đã được hoàn thành."
+        }
       }
     },
     "wish_list": {
@@ -227,6 +290,19 @@
         }
       }
     },
+    "header": {
+      "menu_cart": {
+        "qty": "Số lượng",
+        "total": "Tổng",
+        "color": "Màu sắc",
+        "size": "Kích cỡ",
+        "buttons": {
+          "view_cart": "Xem giỏ hàng",
+          "checkout": "Thanh toán"
+        },
+        "no_items": "Không có sản phẩm nào trong giỏ hàng"
+      }
+    },
     "products": {
       "sale": "Giảm tới",
       "new": "Mới",
@@ -257,6 +333,20 @@
       "related_products": "Sản phẩm liên quan",
       "buttons": {
         "add_to_cart":"Thêm vào giỏ hàng"
+      }
+    },
+    "confirmDialog": {
+      "delete": {
+        "message": "Bạn có chắc không?",
+        "header": "Xác nhận xóa!",
+        "acceptLabel": "Đồng ý",
+        "rejectLabel": "Huỷ"
+      },
+      "edit": {
+        "message": "Bạn có chắc muốn tiếp tục?",
+        "header": "Xác nhận!",
+        "acceptLabel": "Đồng ý",
+        "rejectLabel": "Huỷ"
       }
     }
   }

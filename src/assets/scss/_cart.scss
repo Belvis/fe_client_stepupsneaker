@@ -45,6 +45,9 @@ h3.cart-page-title {
       border-bottom: 1px solid #ebebeb;
       td.product-thumbnail {
         width: 150px;
+        padding-left: 10px;
+        padding-right: 10px;
+
       }
       td.product-name {
         width: 435px;
@@ -108,7 +111,7 @@ h3.cart-page-title {
 
             float: inherit;
 
-            width: 20px;
+            width: 25px;
             margin: 0;
 
             cursor: pointer;
@@ -198,7 +201,7 @@ h3.cart-page-title {
       td {
         font-size: 15px;
 
-        padding: 30px 0 30px 30px;
+        padding: 30px 0 30px 0;
 
         text-align: center;
 
@@ -362,12 +365,20 @@ h3.cart-page-title {
         transition: all 0.3s ease 0s;
         text-transform: uppercase;
 
+        span.loading {
+          margin-right: 10px;
+        }
+
         color: #fff;
         border: medium none;
         border-radius: 50px;
         background-color: $theme-color;
         &:hover {
           background-color: #333;
+        }
+        &:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
         }
       }
     }
