@@ -5,12 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { getDiscountPrice } from "../../helpers/product";
-import {
-  ICustomerResponse,
-  IDistrict,
-  IProvince,
-  IWard,
-} from "../../interfaces";
+import { ICustomerResponse, IDistrict, IProvince, IWard } from "../../interfaces";
 import { AppDispatch, RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 
@@ -26,11 +21,7 @@ import { useNavigate } from "react-router-dom";
 import PaymentMethodAccordion from "../../components/payment-methods/PaymentMethodAccordion";
 import DiscountCodeAccordion from "../../components/voucher/DiscountCodeAccordion";
 import { CurrencyFormatter } from "../../helpers/currency";
-import {
-  deleteAllFromCart,
-  deleteAllFromDB,
-  fetchCart,
-} from "../../redux/slices/cart-slice";
+import { deleteAllFromCart, deleteAllFromDB, fetchCart } from "../../redux/slices/cart-slice";
 import { clearOrder, setOrder } from "../../redux/slices/order-slice";
 import { useModal } from "@refinedev/antd";
 import { ListAddressModal } from "../../components/address/ListAddressModal";
@@ -79,9 +70,7 @@ const CheckOut = () => {
     order_note: string;
   }>();
 
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
-    "Cash" | "Card"
-  >("Cash");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"Cash" | "Card">("Cash");
 
   const handlePaymentMethodChange = (e: RadioChangeEvent) => {
     setSelectedPaymentMethod(e.target.value);
@@ -93,22 +82,13 @@ const CheckOut = () => {
   const provinceId = Form.useWatch("provinceId", form);
   const districtId = Form.useWatch("districtId", form);
   const wardCode = Form.useWatch("wardCode", form);
-  const [provinceName, setProvinceName] = useState(
-    order.address ? order.address.provinceName || "" : ""
-  );
-  const [districtName, setDistrictName] = useState(
-    order.address ? order.address.districtName || "" : ""
-  );
-  const [wardName, setWardName] = useState(
-    order.address ? order.address.wardName || "" : ""
-  );
+  const [provinceName, setProvinceName] = useState(order.address ? order.address.provinceName || "" : "");
+  const [districtName, setDistrictName] = useState(order.address ? order.address.districtName || "" : "");
+  const [wardName, setWardName] = useState(order.address ? order.address.wardName || "" : "");
 
-  const { mutate: calculateFeeMutate, isLoading: isLoadingFee } =
-    useCustomMutation<any>();
+  const { mutate: calculateFeeMutate, isLoading: isLoadingFee } = useCustomMutation<any>();
 
-  const { isLoading: isLoadingProvince, refetch: refetchProvince } = useCustom<
-    IProvince[]
-  >({
+  const { isLoading: isLoadingProvince, refetch: refetchProvince } = useCustom<IProvince[]>({
     url: `${GHN_API_BASE_URL}/master-data/province`,
     method: "get",
     config: {
@@ -124,9 +104,7 @@ const CheckOut = () => {
     },
   });
 
-  const { isLoading: isLoadingDistrict, refetch: refetchDistrict } = useCustom<
-    IDistrict[]
-  >({
+  const { isLoading: isLoadingDistrict, refetch: refetchDistrict } = useCustom<IDistrict[]>({
     url: `${GHN_API_BASE_URL}/master-data/district`,
     method: "get",
     config: {
@@ -145,32 +123,28 @@ const CheckOut = () => {
     },
   });
 
-  const { isLoading: isLoadingWard, refetch: refetchWard } = useCustom<IWard[]>(
-    {
-      url: `${GHN_API_BASE_URL}/master-data/ward`,
-      method: "get",
-      config: {
-        headers: {
-          token: GHN_TOKEN,
-        },
-        query: {
-          district_id: districtId,
-        },
+  const { isLoading: isLoadingWard, refetch: refetchWard } = useCustom<IWard[]>({
+    url: `${GHN_API_BASE_URL}/master-data/ward`,
+    method: "get",
+    config: {
+      headers: {
+        token: GHN_TOKEN,
       },
-      queryOptions: {
-        enabled: false,
-        onSuccess: (data: any) => {
-          setWards(data.response.data);
-        },
+      query: {
+        district_id: districtId,
       },
-    }
-  );
+    },
+    queryOptions: {
+      enabled: false,
+      onSuccess: (data: any) => {
+        setWards(data.response.data);
+      },
+    },
+  });
 
   useEffect(() => {
     if (user) {
-      const defaultAddress = user.addressList.find(
-        (add) => add.isDefault === true
-      );
+      const defaultAddress = user.addressList.find((add) => add.isDefault === true);
 
       if (defaultAddress) {
         form.setFieldsValue({
@@ -272,13 +246,9 @@ const CheckOut = () => {
     }
   }, [provinceId, districtId, wardCode]);
 
-  const handleProvinceChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleProvinceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedProvinceID = Number(event.target.value);
-    const selectedProvince = provinces.find(
-      (p) => p.ProvinceID === selectedProvinceID
-    );
+    const selectedProvince = provinces.find((p) => p.ProvinceID === selectedProvinceID);
 
     if (selectedProvince) {
       const provinceName = selectedProvince.ProvinceName;
@@ -286,13 +256,9 @@ const CheckOut = () => {
     }
   };
 
-  const handleDistrictChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleDistrictChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedDistrictID = Number(event.target.value);
-    const selectedDistrict = districts.find(
-      (d) => d.DistrictID === selectedDistrictID
-    );
+    const selectedDistrict = districts.find((d) => d.DistrictID === selectedDistrictID);
 
     if (selectedDistrict) {
       const districtName = selectedDistrict.DistrictName;
@@ -322,14 +288,13 @@ const CheckOut = () => {
     order_note: string;
   }): void {
     4;
-    const simplifiedCartItems: { id: string; quantity: number }[] =
-      cartItems.map((item) => {
-        const {
-          selectedProductSize: { productDetailId },
-          quantity,
-        } = item;
-        return { id: productDetailId, quantity };
-      });
+    const simplifiedCartItems: { id: string; quantity: number }[] = cartItems.map((item) => {
+      const {
+        selectedProductSize: { productDetailId },
+        quantity,
+      } = item;
+      return { id: productDetailId, quantity };
+    });
     const submitData = {
       customer: user?.id ?? "",
       employee: "",
@@ -447,9 +412,7 @@ const CheckOut = () => {
                     <div className="row">
                       <div className="col-lg-12">
                         <div className="billing-info mb-20">
-                          <label>
-                            {t("checkout.billing_details.full_name")}
-                          </label>
+                          <label>{t("checkout.billing_details.full_name")}</label>
                           <Form.Item
                             name="full_name"
                             rules={[
@@ -465,9 +428,7 @@ const CheckOut = () => {
                       </div>
                       <div className="col-lg-6 col-md-6">
                         <div className="billing-info mb-20">
-                          <label>
-                            {t("checkout.billing_details.phone_number")}
-                          </label>
+                          <label>{t("checkout.billing_details.phone_number")}</label>
                           <Form.Item
                             name="phone_number"
                             rules={[
@@ -499,9 +460,7 @@ const CheckOut = () => {
                       </div>
                       <div className="col-lg-12">
                         <div className="billing-select mb-20">
-                          <label>
-                            {t("checkout.billing_details.province.title")}
-                          </label>
+                          <label>{t("checkout.billing_details.province.title")}</label>
                           <Form.Item
                             name="provinceId"
                             rules={[
@@ -513,23 +472,16 @@ const CheckOut = () => {
                           >
                             {provinces.length > 0 ? (
                               <select onChange={handleProvinceChange}>
-                                <option value="">
-                                  --Chọn tỉnh/thành phố--
-                                </option>
+                                <option value="">--Chọn tỉnh/thành phố--</option>
                                 {provinces.map((province, index) => (
-                                  <option
-                                    key={index}
-                                    value={province.ProvinceID}
-                                  >
+                                  <option key={index} value={province.ProvinceID}>
                                     {province.ProvinceName}
                                   </option>
                                 ))}
                               </select>
                             ) : (
                               <select>
-                                <option value="">
-                                  Đang tải tỉnh/thành phố...
-                                </option>
+                                <option value="">Đang tải tỉnh/thành phố...</option>
                               </select>
                             )}
                           </Form.Item>
@@ -537,9 +489,7 @@ const CheckOut = () => {
                       </div>
                       <div className="col-lg-12">
                         <div className="billing-select mb-20">
-                          <label>
-                            {t("checkout.billing_details.district.title")}
-                          </label>
+                          <label>{t("checkout.billing_details.district.title")}</label>
                           <Form.Item
                             name="districtId"
                             rules={[
@@ -553,10 +503,7 @@ const CheckOut = () => {
                               <select onChange={handleDistrictChange}>
                                 <option value="">--Chọn quận/huyện--</option>
                                 {districts.map((district, index) => (
-                                  <option
-                                    key={index}
-                                    value={district.DistrictID}
-                                  >
+                                  <option key={index} value={district.DistrictID}>
                                     {district.DistrictName}
                                   </option>
                                 ))}
@@ -571,9 +518,7 @@ const CheckOut = () => {
                       </div>
                       <div className="col-lg-12">
                         <div className="billing-select mb-20">
-                          <label>
-                            {t("checkout.billing_details.ward.title")}
-                          </label>
+                          <label>{t("checkout.billing_details.ward.title")}</label>
                           <Form.Item
                             name="wardCode"
                             rules={[
@@ -608,8 +553,7 @@ const CheckOut = () => {
                             rules={[
                               {
                                 required: true,
-                                message:
-                                  "Chi tiết địa chỉ không được để trống!",
+                                message: "Chi tiết địa chỉ không được để trống!",
                               },
                             ]}
                           >
@@ -620,23 +564,13 @@ const CheckOut = () => {
                     </div>
 
                     <div className="additional-info-wrap">
-                      <h4>
-                        {t(
-                          "checkout.billing_details.additional_information.title"
-                        )}
-                      </h4>
+                      <h4>{t("checkout.billing_details.additional_information.title")}</h4>
                       <div className="additional-info">
-                        <label>
-                          {t(
-                            "checkout.billing_details.additional_information.order_note.title"
-                          )}
-                        </label>
+                        <label>{t("checkout.billing_details.additional_information.order_note.title")}</label>
                         <Form.Item name="order_note">
                           <textarea
                             placeholder={
-                              t(
-                                "checkout.billing_details.additional_information.order_note.place_holder"
-                              ) ?? ""
+                              t("checkout.billing_details.additional_information.order_note.place_holder") ?? ""
                             }
                             name="message"
                           />
@@ -660,28 +594,19 @@ const CheckOut = () => {
                         <div className="your-order-middle">
                           <ul>
                             {cartItems.map((cartItem, key) => {
-                              const discountedPrice = getDiscountPrice(
-                                cartItem.selectedProductSize?.price ?? 0,
-                                0
-                              );
+                              const discountedPrice = getDiscountPrice(cartItem.selectedProductSize?.price ?? 0, 0);
                               const finalProductPrice =
-                                (cartItem.selectedProductSize?.price ?? 0) *
-                                currency.currencyRate;
+                                (cartItem.selectedProductSize?.price ?? 0) * currency.currencyRate;
                               const finalDiscountedPrice =
-                                discountedPrice !== null
-                                  ? discountedPrice * currency.currencyRate
-                                  : 0.0;
+                                discountedPrice !== null ? discountedPrice * currency.currencyRate : 0.0;
 
                               discountedPrice !== null
-                                ? (cartTotalPrice +=
-                                    finalDiscountedPrice * cartItem.quantity)
-                                : (cartTotalPrice +=
-                                    finalProductPrice * cartItem.quantity);
+                                ? (cartTotalPrice += finalDiscountedPrice * cartItem.quantity)
+                                : (cartTotalPrice += finalProductPrice * cartItem.quantity);
 
                               discount = order.voucher
                                 ? order.voucher.type == "PERCENTAGE"
-                                  ? (order.voucher.value / 100) *
-                                    Number(cartTotalPrice)
+                                  ? (order.voucher.value / 100) * Number(cartTotalPrice)
                                   : order.voucher.value
                                 : 0;
 
@@ -694,8 +619,7 @@ const CheckOut = () => {
                                     className="order-price"
                                     value={
                                       discountedPrice !== null
-                                        ? finalDiscountedPrice *
-                                          cartItem.quantity
+                                        ? finalDiscountedPrice * cartItem.quantity
                                         : finalProductPrice * cartItem.quantity
                                     }
                                     currency={currency}
@@ -707,36 +631,24 @@ const CheckOut = () => {
                         </div>
                         <div className="your-order-bottom">
                           <ul>
-                            <li className="your-order-shipping">
-                              {t("checkout.your_order.shipping")}
-                            </li>
+                            <li className="your-order-shipping">{t("checkout.your_order.shipping")}</li>
                             <li>
-                              <CurrencyFormatter
-                                value={shippingMoney}
-                                currency={currency}
-                              />
+                              <CurrencyFormatter value={shippingMoney} currency={currency} />
                             </li>
                           </ul>
                           <ul>
                             <li className="your-order-shipping">Giảm giá</li>
                             <li>
-                              <CurrencyFormatter
-                                value={discount}
-                                currency={currency}
-                              />
+                              <CurrencyFormatter value={discount} currency={currency} />
                             </li>
                           </ul>
                         </div>
                         <div className="your-order-total">
                           <ul>
-                            <li className="order-total">
-                              {t("checkout.your_order.total_money")}
-                            </li>
+                            <li className="order-total">{t("checkout.your_order.total_money")}</li>
                             <li>
                               <CurrencyFormatter
-                                value={
-                                  cartTotalPrice + shippingMoney - discount
-                                }
+                                value={cartTotalPrice + shippingMoney - discount}
                                 currency={currency}
                               />
                             </li>
@@ -748,7 +660,7 @@ const CheckOut = () => {
                   </div>
                   <div className="your-order-area mb-2 payment-methods-wrapper">
                     <Authenticated fallback={false}>
-                      <DiscountCodeAccordion />
+                      <DiscountCodeAccordion totalMoney={cartTotalPrice + shippingMoney - discount} />
                     </Authenticated>
                   </div>
                   <div className="your-order-area">
@@ -773,8 +685,7 @@ const CheckOut = () => {
                     <i className="pe-7s-cash"></i>
                   </div>
                   <div className="item-empty-area__text">
-                    {t("checkout.no_items_found")} <br />{" "}
-                    <Link to={"/shop"}>{t("checkout.buttons.shop_now")}</Link>
+                    {t("checkout.no_items_found")} <br /> <Link to={"/shop"}>{t("checkout.buttons.shop_now")}</Link>
                   </div>
                 </div>
               </div>
@@ -783,11 +694,7 @@ const CheckOut = () => {
         </div>
       </div>
       <Authenticated fallback={false}>
-        <ListAddressModal
-          customer={user}
-          modalProps={restModalProps}
-          close={close}
-        />
+        <ListAddressModal customer={user} modalProps={restModalProps} close={close} />
       </Authenticated>
     </Fragment>
   );
