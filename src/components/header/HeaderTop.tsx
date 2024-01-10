@@ -21,7 +21,7 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({ borderStyle }) => {
       <div className="header-offer">
         <p>
           Miễn phí vận chuyển cho đơn hàng trên{" "}
-          <CurrencyFormatter value={20000000} currency={currency} />
+          <CurrencyFormatter value={5000000} currency={currency} />
         </p>
       </div>
     </div>
