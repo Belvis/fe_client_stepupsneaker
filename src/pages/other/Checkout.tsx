@@ -1,5 +1,5 @@
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { Button, Form, RadioChangeEvent, Spin } from "antd";
+import { Button, Form, RadioChangeEvent, Spin, notification } from "antd";
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,6 +27,7 @@ import { useModal } from "@refinedev/antd";
 import { ListAddressModal } from "../../components/address/ListAddressModal";
 import dayjs from "dayjs";
 import { TOKEN_KEY } from "../../utils";
+import { showErrorToast } from "../../helpers/toast";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -327,6 +328,10 @@ const CheckOut = () => {
       },
       {
         onError: (error, variables, context) => {
+          notification.error({
+            message: "Đặt hàng không thành công",
+            description: error.message,
+          });
           console.log("An error occurred! " + error.message);
         },
         onSuccess: (data, variables, context) => {
