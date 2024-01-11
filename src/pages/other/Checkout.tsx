@@ -748,7 +748,9 @@ const CheckOut = () => {
                   </div>
                   <div className="your-order-area mb-2 payment-methods-wrapper">
                     <Authenticated fallback={false}>
-                      <DiscountCodeAccordion />
+                      <DiscountCodeAccordion
+                        totalMoney={cartTotalPrice + shippingMoney - discount}
+                      />
                     </Authenticated>
                   </div>
                   <div className="your-order-area">
