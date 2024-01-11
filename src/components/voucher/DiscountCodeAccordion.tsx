@@ -3,12 +3,7 @@ import { Space, Tooltip } from "antd";
 import { ContainerOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { Accordion } from "react-bootstrap";
-import {
-  HttpError,
-  useApiUrl,
-  useList,
-  useNotification,
-} from "@refinedev/core";
+import { HttpError, useApiUrl, useList, useNotification, useOne } from "@refinedev/core";
 import { IVoucherResponse } from "../../interfaces";
 import { dataProvider } from "../../api/dataProvider";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,7 +12,11 @@ import { RootState } from "../../redux/store";
 import { useModal } from "@refinedev/antd";
 import VoucherModal from "./VoucherModal";
 
-const DiscountCodeAccordion = () => {
+interface DiscountCodeAccordionProps {
+  totalMoney: number;
+}
+
+const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({ totalMoney }) => {
   const { t } = useTranslation();
   const API_URL = useApiUrl();
   const dispatch = useDispatch();
@@ -28,6 +27,32 @@ const DiscountCodeAccordion = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVoucherCode(e.target.value);
+  };
+
+  const { data, isLoading, isError } = useList<IVoucherResponse, HttpError>({
+    resource: "vouchers/get-legit-voucher",
+    filters: [
+      {
+        field: "totalMoney",
+        operator: "eq",
+        value: totalMoney,
+      },
+    ],
+  });
+  const legitVouchers = data?.data ? data?.data : [];
+
+  const getTopVoucher = () => {
+    const convertedLegitVoucher = legitVouchers.map((voucher) => {
+      const updatedVoucher = { ...voucher };
+      if (voucher.type === "PERCENTAGE") {
+        updatedVoucher.value = (voucher.value * totalMoney) / 100;
+      }
+      return updatedVoucher;
+    });
+
+    convertedLegitVoucher.sort((a, b) => b.value - a.value);
+
+    return convertedLegitVoucher.length > 0 ? convertedLegitVoucher[0].code : "";
   };
 
   const applyVoucher = async (event: React.FormEvent) => {
@@ -85,35 +110,23 @@ const DiscountCodeAccordion = () => {
     <Fragment>
       <Accordion>
         <Accordion.Item eventKey="0" className="single-my-account mb-20">
-          <Accordion.Header className="panel-heading">
-            Bạn có mã giảm giá? Sử dụng tại đây.
-          </Accordion.Header>
+          <Accordion.Header className="panel-heading">Bạn có mã giảm giá? Sử dụng tại đây.</Accordion.Header>
           <Accordion.Body style={{ padding: 0 }}>
             <div className="checkout-discount-code-wrapper">
               <div className="title-wrap">
-                <h4 className="cart-bottom-title section-bg-gray">
-                  {t("cart.voucher.title")}
-                </h4>
+                <h4 className="cart-bottom-title section-bg-gray">{t("cart.voucher.title")}</h4>
               </div>
 
               <div className="discount-code">
                 <p>{t("cart.voucher.subtitle")}</p>
                 <div className="discount-form">
-                  <input
-                    type="text"
-                    value={voucherCode}
-                    onChange={handleChange}
-                  />
+                  <input type="text" value={voucherCode} onChange={handleChange} placeholder={getTopVoucher()} />
                   <Space>
                     <button className="cart-btn-2" onClick={applyVoucher}>
                       {t("cart.buttons.apply_voucher")}
                     </button>
                     <Tooltip title="Xem voucher">
-                      <button
-                        className="cart-btn-3"
-                        type="button"
-                        onClick={show}
-                      >
+                      <button className="cart-btn-3" type="button" onClick={show}>
                         <ContainerOutlined />
                       </button>
                     </Tooltip>
