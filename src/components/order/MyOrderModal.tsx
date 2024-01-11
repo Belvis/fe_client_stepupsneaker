@@ -355,6 +355,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
         more: form.getFieldValue("line"),
       },
       cartItems: simplifiedCartItems,
+      voucher: viewOrder.voucher,
     };
 
     update(
@@ -729,8 +730,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                           value={
                             viewOrder.voucher
                               ? viewOrder.voucher.type == "PERCENTAGE"
-                                ? (viewOrder.voucher.value *
-                                    viewOrder.originMoney) /
+                                ? (viewOrder.voucher.value * cartTotalPrice) /
                                   100
                                 : viewOrder.voucher.value
                               : 0
@@ -768,7 +768,9 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <div className="col-3">
                         <CurrencyFormatter
                           className="amount"
-                          value={viewOrder.totalMoney}
+                          value={
+                            cartTotalPrice + viewOrder.shippingMoney - discount
+                          }
                           currency={currency}
                         />
                       </div>
