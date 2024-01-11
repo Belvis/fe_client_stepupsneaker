@@ -7,17 +7,17 @@ import {
 } from "@ant-design/icons";
 import { HttpError, useOne } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { Result } from "antd";
+import { Result, Typography } from "antd";
 import dayjs from "dayjs";
 import { Fragment, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { CurrencyFormatter } from "../../helpers/currency";
-import { getDiscountPrice } from "../../helpers/product";
 import { IOrderResponse } from "../../interfaces";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
+import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 
 const Success = () => {
   const { t } = useTranslation();
@@ -40,8 +40,6 @@ const Success = () => {
   const order = data?.data ? data?.data : ({} as IOrderResponse);
 
   const currency = useSelector((state: RootState) => state.currency);
-
-  let cartTotalPrice = 0;
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -242,22 +240,6 @@ const Success = () => {
                 {order.orderDetails &&
                   order.orderDetails.length > 0 &&
                   order.orderDetails.map((detail, key) => {
-                    const discountedPrice = getDiscountPrice(
-                      detail?.totalPrice ?? 0,
-                      0
-                    );
-                    const finalProductPrice =
-                      (detail?.totalPrice ?? 0) * currency.currencyRate;
-                    const finalDiscountedPrice =
-                      discountedPrice !== null
-                        ? discountedPrice * currency.currencyRate
-                        : 0.0;
-
-                    discountedPrice !== null
-                      ? (cartTotalPrice +=
-                          finalDiscountedPrice * detail.quantity)
-                      : (cartTotalPrice += finalProductPrice * detail.quantity);
-
                     return (
                       <tr key={key}>
                         <td className="product">
@@ -278,7 +260,10 @@ const Success = () => {
                             <div className="cart-item-variation col-9">
                               <span>
                                 {t(`cart.table.head.product_name`)}:{" "}
-                                <Link to={"/product/" + detail.id}>
+                                <Link
+                                  to={"/product/" + detail.id}
+                                  className="fw-bold"
+                                >
                                   {detail.productDetail.product.name}
                                 </Link>
                               </span>
@@ -297,19 +282,11 @@ const Success = () => {
                           </div>
                         </td>
                         <td className="value">
-                          {discountedPrice !== null ? (
-                            <CurrencyFormatter
-                              className="amount"
-                              value={finalDiscountedPrice * detail.quantity}
-                              currency={currency}
-                            />
-                          ) : (
-                            <CurrencyFormatter
-                              className="amount"
-                              value={finalProductPrice * detail.quantity}
-                              currency={currency}
-                            />
-                          )}
+                          <CurrencyFormatter
+                            className="amount"
+                            value={detail.totalPrice}
+                            currency={currency}
+                          />
                         </td>
                       </tr>
                     );
@@ -324,7 +301,7 @@ const Success = () => {
                       </div>
                       <div className="col-3">
                         <CurrencyFormatter
-                          value={cartTotalPrice}
+                          value={order.originMoney}
                           currency={currency}
                         />
                       </div>
@@ -334,11 +311,16 @@ const Success = () => {
                         <h5>{t(`cart.cart_total.shipping`)} </h5>
                       </div>
                       <div className="col-3">
-                        <CurrencyFormatter
-                          className="amount"
-                          value={order.shippingMoney}
-                          currency={currency}
-                        />
+                        {order.originMoney >= FREE_SHIPPING_THRESHOLD ? (
+                          <span className="free-shipping">
+                            Miễn phí vận chuyển
+                          </span>
+                        ) : (
+                          <CurrencyFormatter
+                            value={order.shippingMoney}
+                            currency={currency}
+                          />
+                        )}
                       </div>
                     </div>
                     <div className="row">
@@ -350,7 +332,8 @@ const Success = () => {
                           value={
                             order.voucher
                               ? order.voucher.type == "PERCENTAGE"
-                                ? (order.voucher.value / 100) * order.totalMoney
+                                ? (order.voucher.value / 100) *
+                                  order.originMoney
                                 : order.voucher.value
                               : 0
                           }

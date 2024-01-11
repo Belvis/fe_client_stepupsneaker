@@ -407,7 +407,7 @@ const OrderTracking = () => {
                         value={
                           order.voucher
                             ? order.voucher.type == "PERCENTAGE"
-                              ? (order.voucher.value / 100) * order.totalMoney
+                              ? (order.voucher.value / 100) * order.originMoney
                               : order.voucher.value
                             : 0
                         }

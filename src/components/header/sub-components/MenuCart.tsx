@@ -1,17 +1,25 @@
-import { Fragment, useEffect } from "react";
+import { GiftOutlined } from "@ant-design/icons";
+import {
+  Authenticated,
+  HttpError,
+  useGetIdentity,
+  useList,
+} from "@refinedev/core";
+import { Typography } from "antd";
+import clsx from "clsx";
+import { Fragment, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { AppDispatch, RootState } from "../../../redux/store";
+import { FREE_SHIPPING_THRESHOLD } from "../../../constants";
+import { CurrencyFormatter, formatCurrency } from "../../../helpers/currency";
 import { getDiscountPrice } from "../../../helpers/product";
-import {
-  deleteFromCart,
-  deleteFromDB,
-  fetchCart,
-} from "../../../redux/slices/cart-slice";
-import { useTranslation } from "react-i18next";
-import { CurrencyFormatter } from "../../../helpers/currency";
-import clsx from "clsx";
-import { Authenticated, useIsAuthenticated } from "@refinedev/core";
+import { ICustomerResponse, IVoucherResponse } from "../../../interfaces";
+import { deleteFromCart, deleteFromDB } from "../../../redux/slices/cart-slice";
+import { AppDispatch, RootState } from "../../../redux/store";
+import { DiscountMessage, DiscountMoney } from "../../../styled/CartStyled";
+
+const { Title } = Typography;
 
 type MenuCartProps = {
   activeIndex: number | null;
@@ -25,6 +33,47 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
   const { cartItems } = useSelector((state: RootState) => state.cart);
 
   let cartTotalPrice = 0;
+
+  const { data: user } = useGetIdentity<ICustomerResponse>();
+
+  const {
+    data,
+    isLoading: isLoadingVoucher,
+    isError,
+  } = useList<IVoucherResponse, HttpError>({
+    resource: "vouchers",
+    pagination: {
+      pageSize: 1000,
+    },
+    filters: [
+      {
+        field: "customer",
+        operator: "eq",
+        value: user?.id,
+      },
+    ],
+  });
+
+  // Todo: lưu identity vào local để đỡ phải call
+
+  const vouchers = data?.data ? data?.data : [];
+
+  const [legitVouchers, setLegitVouchers] = useState<IVoucherResponse[]>([]);
+
+  useEffect(() => {
+    if (vouchers) {
+      const convertedLegitVoucher = vouchers.map((voucher) => {
+        const updatedVoucher = { ...voucher };
+        if (voucher.type === "PERCENTAGE") {
+          updatedVoucher.value = (voucher.value * cartTotalPrice) / 100;
+        }
+        return updatedVoucher;
+      });
+
+      convertedLegitVoucher.sort((a, b) => b.value - a.value);
+      setLegitVouchers(convertedLegitVoucher);
+    }
+  }, [vouchers]);
 
   return (
     <div
@@ -110,14 +159,43 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
             })}
           </ul>
           <div className="shopping-cart-total">
-            <h4>
+            {cartTotalPrice < FREE_SHIPPING_THRESHOLD ? (
+              <DiscountMessage>
+                <GiftOutlined /> Mua thêm{" "}
+                <DiscountMoney>
+                  {formatCurrency(
+                    FREE_SHIPPING_THRESHOLD - cartTotalPrice,
+                    currency
+                  )}
+                </DiscountMoney>{" "}
+                để được miễn phí vận chuyển
+              </DiscountMessage>
+            ) : (
+              ""
+            )}
+            {legitVouchers.length > 0 && (
+              <DiscountMessage>
+                <GiftOutlined /> Mua thêm{" "}
+                <DiscountMoney>
+                  {formatCurrency(
+                    legitVouchers[0].constraint - cartTotalPrice,
+                    currency
+                  )}
+                </DiscountMoney>{" "}
+                để được giảm tới{" "}
+                <DiscountMoney>
+                  {formatCurrency(legitVouchers[0].value, currency)}
+                </DiscountMoney>
+              </DiscountMessage>
+            )}
+            <Title level={4}>
               {t("header.menu_cart.total")} :{" "}
               <CurrencyFormatter
                 className="shop-total"
                 value={cartTotalPrice}
                 currency={currency}
               />
-            </h4>
+            </Title>
           </div>
           <div className="shopping-cart-btn btn-hover text-center">
             <Link className="default-btn" to={"/pages/cart"}>

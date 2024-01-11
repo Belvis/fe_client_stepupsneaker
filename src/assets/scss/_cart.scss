@@ -482,7 +482,7 @@ h3.cart-page-title {
       background-color: #f9f9f9;
     }
   }
-  h5 {
+  h5:not(.message) {
     font-size: 14px;
 
     margin: 36px 0 27px;
@@ -491,6 +491,9 @@ h3.cart-page-title {
       font-weight: 500;
 
       float: right;
+      &.free-shipping {
+        color: $theme-color;
+      }
     }
   }
   .total-shipping {
@@ -543,7 +546,6 @@ h3.cart-page-title {
 
     margin: 0 0 25px;
 
-    color: $theme-color;
     span {
       float: right;
     }

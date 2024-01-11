@@ -1,3 +1,4 @@
+import { GiftOutlined } from "@ant-design/icons";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Button, Form, RadioChangeEvent, Spin } from "antd";
 import { Fragment, useEffect, useState } from "react";
@@ -9,6 +10,7 @@ import {
   ICustomerResponse,
   IDistrict,
   IProvince,
+  IVoucherResponse,
   IWard,
 } from "../../interfaces";
 import { AppDispatch, RootState } from "../../redux/store";
@@ -16,16 +18,18 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 
 import {
   Authenticated,
+  HttpError,
   useCreate,
   useCustom,
   useCustomMutation,
   useGetIdentity,
   useIsAuthenticated,
+  useList,
 } from "@refinedev/core";
 import { useNavigate } from "react-router-dom";
 import PaymentMethodAccordion from "../../components/payment-methods/PaymentMethodAccordion";
 import DiscountCodeAccordion from "../../components/voucher/DiscountCodeAccordion";
-import { CurrencyFormatter } from "../../helpers/currency";
+import { CurrencyFormatter, formatCurrency } from "../../helpers/currency";
 import {
   deleteAllFromCart,
   deleteAllFromDB,
@@ -36,6 +40,8 @@ import { useModal } from "@refinedev/antd";
 import { ListAddressModal } from "../../components/address/ListAddressModal";
 import dayjs from "dayjs";
 import { TOKEN_KEY } from "../../utils";
+import { FREE_SHIPPING_THRESHOLD } from "../../constants";
+import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -64,7 +70,49 @@ const CheckOut = () => {
 
   let cartTotalPrice = 0;
   let discount = 0;
-  const shippingMoney = order.shippingMoney ?? 0;
+
+  const [shippingMoney, setShippingMoney] = useState(order.shippingMoney ?? 0);
+
+  useEffect(() => {
+    if (cartTotalPrice >= FREE_SHIPPING_THRESHOLD) setShippingMoney(0);
+  }, [cartTotalPrice]);
+
+  const {
+    data,
+    isLoading: isLoadingVoucher,
+    isError,
+  } = useList<IVoucherResponse, HttpError>({
+    resource: "vouchers",
+    pagination: {
+      pageSize: 1000,
+    },
+    filters: [
+      {
+        field: "customer",
+        operator: "eq",
+        value: user?.id,
+      },
+    ],
+  });
+
+  const vouchers = data?.data ? data?.data : [];
+
+  const [legitVouchers, setLegitVouchers] = useState<IVoucherResponse[]>([]);
+
+  useEffect(() => {
+    if (vouchers) {
+      const convertedLegitVoucher = vouchers.map((voucher) => {
+        const updatedVoucher = { ...voucher };
+        if (voucher.type === "PERCENTAGE") {
+          updatedVoucher.value = (voucher.value * cartTotalPrice) / 100;
+        }
+        return updatedVoucher;
+      });
+
+      convertedLegitVoucher.sort((a, b) => b.value - a.value);
+      setLegitVouchers(convertedLegitVoucher);
+    }
+  }, [vouchers]);
 
   const [form] = Form.useForm<{
     provinceId: number;
@@ -680,8 +728,7 @@ const CheckOut = () => {
 
                               discount = order.voucher
                                 ? order.voucher.type == "PERCENTAGE"
-                                  ? (order.voucher.value / 100) *
-                                    Number(cartTotalPrice)
+                                  ? (order.voucher.value * cartTotalPrice) / 100
                                   : order.voucher.value
                                 : 0;
 
@@ -711,10 +758,16 @@ const CheckOut = () => {
                               {t("checkout.your_order.shipping")}
                             </li>
                             <li>
-                              <CurrencyFormatter
-                                value={shippingMoney}
-                                currency={currency}
-                              />
+                              {cartTotalPrice >= FREE_SHIPPING_THRESHOLD ? (
+                                <span className="free-shipping">
+                                  Miễn phí vận chuyển
+                                </span>
+                              ) : (
+                                <CurrencyFormatter
+                                  value={shippingMoney}
+                                  currency={currency}
+                                />
+                              )}
                             </li>
                           </ul>
                           <ul>
@@ -726,6 +779,40 @@ const CheckOut = () => {
                               />
                             </li>
                           </ul>
+                        </div>
+                        <div className="discount-message">
+                          {cartTotalPrice < FREE_SHIPPING_THRESHOLD ? (
+                            <DiscountMessage>
+                              <GiftOutlined /> Mua thêm{" "}
+                              <DiscountMoney>
+                                {formatCurrency(
+                                  FREE_SHIPPING_THRESHOLD - cartTotalPrice,
+                                  currency
+                                )}
+                              </DiscountMoney>{" "}
+                              để được miễn phí vận chuyển
+                            </DiscountMessage>
+                          ) : (
+                            ""
+                          )}
+                          {legitVouchers.length > 0 && (
+                            <DiscountMessage>
+                              <GiftOutlined /> Mua thêm{" "}
+                              <DiscountMoney>
+                                {formatCurrency(
+                                  legitVouchers[0].constraint - cartTotalPrice,
+                                  currency
+                                )}
+                              </DiscountMoney>{" "}
+                              để được giảm tới{" "}
+                              <DiscountMoney>
+                                {formatCurrency(
+                                  legitVouchers[0].value,
+                                  currency
+                                )}
+                              </DiscountMoney>
+                            </DiscountMessage>
+                          )}
                         </div>
                         <div className="your-order-total">
                           <ul>
@@ -750,6 +837,8 @@ const CheckOut = () => {
                     <Authenticated fallback={false}>
                       <DiscountCodeAccordion
                         totalMoney={cartTotalPrice + shippingMoney - discount}
+                        vouchers={vouchers}
+                        isLoading={isLoading}
                       />
                     </Authenticated>
                   </div>

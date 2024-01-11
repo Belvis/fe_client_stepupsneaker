@@ -263,6 +263,10 @@
             font-weight: 400;
 
             list-style: none;
+            span.free-shipping {
+              color: $theme-color;
+              font-weight: 500;
+            }
           }
           li.your-order-shipping {
             font-size: 16px;
@@ -271,6 +275,12 @@
             color: #212121;
           }
         }
+      }
+      .discount-message {
+        margin: 18px 0 0;
+        padding: 17px 0 0;
+
+        border-top: 1px solid #dee0e4;
       }
       .your-order-total {
         margin: 18px 0 33px;
@@ -294,7 +304,6 @@
 
             list-style: outside none none;
 
-            color: $theme-color;
           }
         }
       }

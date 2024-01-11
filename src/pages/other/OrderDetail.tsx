@@ -391,8 +391,7 @@ const OrderDetail = () => {
                         }).format(
                           order.voucher
                             ? order.voucher.type == "PERCENTAGE"
-                              ? (order.voucher.value / 100) *
-                                Number(order.totalMoney.toFixed(2))
+                              ? (order.voucher.value / 100) * order.originMoney
                               : order.voucher.value
                             : 0
                         )}

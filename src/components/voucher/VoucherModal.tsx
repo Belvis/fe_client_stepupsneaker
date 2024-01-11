@@ -14,20 +14,17 @@ interface VoucherModalProps {
     title?: ReactNode;
     closable?: boolean | undefined;
   };
+  vouchers: IVoucherResponse[] | undefined;
+  isLoading: boolean;
 }
 
-const VoucherModal: React.FC<VoucherModalProps> = ({ restModalProps }) => {
+const VoucherModal: React.FC<VoucherModalProps> = ({
+  restModalProps,
+  vouchers,
+  isLoading,
+}) => {
   const currency = useSelector((state: RootState) => state.currency);
   const [copied, setCopied] = useState(false);
-
-  const { data, isLoading, isError } = useList<IVoucherResponse, HttpError>({
-    resource: "vouchers",
-    pagination: {
-      pageSize: 1000,
-    },
-  });
-
-  const vouchers = data?.data ? data?.data : [];
 
   function renderItem(item: IVoucherResponse) {
     const { id, code, value, constraint, image, endDate, quantity, type } =

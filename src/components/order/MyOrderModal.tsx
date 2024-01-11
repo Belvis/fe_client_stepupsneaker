@@ -2,11 +2,14 @@ import {
   CaretDownOutlined,
   CaretUpOutlined,
   InfoCircleOutlined,
+  GiftOutlined,
 } from "@ant-design/icons";
 import {
   HttpError,
   useCustom,
   useCustomMutation,
+  useGetIdentity,
+  useList,
   useOne,
   useUpdate,
 } from "@refinedev/core";
@@ -25,11 +28,20 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { showWarningConfirmDialog } from "../../helpers/confirm";
-import { CurrencyFormatter } from "../../helpers/currency";
+import { CurrencyFormatter, formatCurrency } from "../../helpers/currency";
 import { getDiscountPrice } from "../../helpers/product";
 import { showErrorToast } from "../../helpers/toast";
-import { IDistrict, IOrderResponse, IProvince, IWard } from "../../interfaces";
+import {
+  ICustomerResponse,
+  IDistrict,
+  IOrderResponse,
+  IProvince,
+  IVoucherResponse,
+  IWard,
+} from "../../interfaces";
 import { RootState } from "../../redux/store";
+import { FREE_SHIPPING_THRESHOLD } from "../../constants";
+import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -95,6 +107,56 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
   const [wardName, setWardName] = useState("");
 
   const [viewOrder, setViewOrder] = useState<IOrderResponse>(order);
+
+  const [discount, setDiscount] = useState<number>(0);
+
+  useEffect(() => {
+    setDiscount((prevDiscount) =>
+      order.voucher
+        ? order.voucher.type === "PERCENTAGE"
+          ? (order.voucher.value / 100) * order.originMoney
+          : order.voucher.value
+        : 0
+    );
+  }, [order]);
+
+  const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
+
+  const { data: dataV, isLoading: isLoadingVoucher } = useList<
+    IVoucherResponse,
+    HttpError
+  >({
+    resource: "vouchers",
+    pagination: {
+      pageSize: 1000,
+    },
+    filters: [
+      {
+        field: "customer",
+        operator: "eq",
+        value: user?.id,
+      },
+    ],
+  });
+
+  const vouchers = dataV?.data ? dataV?.data : [];
+
+  const [legitVouchers, setLegitVouchers] = useState<IVoucherResponse[]>([]);
+
+  useEffect(() => {
+    if (vouchers) {
+      const convertedLegitVoucher = vouchers.map((voucher) => {
+        const updatedVoucher = { ...voucher };
+        if (voucher.type === "PERCENTAGE") {
+          updatedVoucher.value = (voucher.value * cartTotalPrice) / 100;
+        }
+        return updatedVoucher;
+      });
+
+      convertedLegitVoucher.sort((a, b) => b.value - a.value);
+      setLegitVouchers(convertedLegitVoucher);
+    }
+  }, [vouchers]);
 
   const [quantityCount, setQuantityCount] = useState<{
     [productId: string]: number;
@@ -609,10 +671,8 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <div className="col-9">
                         <Badge
                           count={
-                            cartTotalPrice !=
-                            order.totalMoney - order.shippingMoney ? (
-                              cartTotalPrice >
-                              order.totalMoney - order.shippingMoney ? (
+                            cartTotalPrice != order.originMoney ? (
+                              cartTotalPrice > order.originMoney ? (
                                 <CaretUpOutlined style={{ color: "red" }} />
                               ) : (
                                 <CaretDownOutlined style={{ color: "green" }} />
@@ -669,8 +729,9 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                           value={
                             viewOrder.voucher
                               ? viewOrder.voucher.type == "PERCENTAGE"
-                                ? (viewOrder.voucher.value / 100) *
-                                  viewOrder.totalMoney
+                                ? (viewOrder.voucher.value *
+                                    viewOrder.originMoney) /
+                                  100
                                 : viewOrder.voucher.value
                               : 0
                           }
@@ -682,9 +743,13 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <div className="col-9">
                         <Badge
                           count={
-                            cartTotalPrice + viewOrder.shippingMoney !==
+                            cartTotalPrice +
+                              viewOrder.shippingMoney -
+                              discount !==
                             order.totalMoney ? (
-                              cartTotalPrice + viewOrder.shippingMoney >
+                              cartTotalPrice +
+                                viewOrder.shippingMoney -
+                                discount >
                               order.totalMoney ? (
                                 <CaretUpOutlined style={{ color: "red" }} />
                               ) : (
@@ -703,10 +768,41 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <div className="col-3">
                         <CurrencyFormatter
                           className="amount"
-                          value={cartTotalPrice + viewOrder.shippingMoney}
+                          value={viewOrder.totalMoney}
                           currency={currency}
                         />
                       </div>
+                    </div>
+                    <div className="row">
+                      {cartTotalPrice < FREE_SHIPPING_THRESHOLD ? (
+                        <DiscountMessage>
+                          <GiftOutlined /> Mua thêm{" "}
+                          <DiscountMoney>
+                            {formatCurrency(
+                              FREE_SHIPPING_THRESHOLD - cartTotalPrice,
+                              currency
+                            )}
+                          </DiscountMoney>{" "}
+                          để được miễn phí vận chuyển
+                        </DiscountMessage>
+                      ) : (
+                        ""
+                      )}
+                      {legitVouchers.length > 0 && !viewOrder.voucher && (
+                        <DiscountMessage>
+                          <GiftOutlined /> Mua thêm{" "}
+                          <DiscountMoney>
+                            {formatCurrency(
+                              legitVouchers[0].constraint - cartTotalPrice,
+                              currency
+                            )}
+                          </DiscountMoney>{" "}
+                          để được giảm tới{" "}
+                          <DiscountMoney>
+                            {formatCurrency(legitVouchers[0].value, currency)}
+                          </DiscountMoney>
+                        </DiscountMessage>
+                      )}
                     </div>
                   </th>
                 </tr>

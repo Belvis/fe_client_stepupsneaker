@@ -118,6 +118,7 @@ export interface IOrderResponse {
   fullName: string;
   shippingMoney: number;
   totalMoney: number;
+  originMoney: number;
   expectedDeliveryDate: number;
   confirmationDate: number;
   deliveryStartDate: number;

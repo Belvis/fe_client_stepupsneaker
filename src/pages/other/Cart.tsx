@@ -1,10 +1,17 @@
-import { ContainerOutlined, LoadingOutlined } from "@ant-design/icons";
+import {
+  ContainerOutlined,
+  LoadingOutlined,
+  GiftOutlined,
+} from "@ant-design/icons";
 import { useModal } from "@refinedev/antd";
 import {
   Authenticated,
+  HttpError,
   useApiUrl,
   useCustom,
   useCustomMutation,
+  useGetIdentity,
+  useList,
   useNotification,
 } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
@@ -19,6 +26,7 @@ import { CurrencyFormatter, formatCurrency } from "../../helpers/currency";
 import { cartItemStock, getDiscountPrice } from "../../helpers/product";
 import {
   ICartItem,
+  ICustomerResponse,
   IDistrict,
   IProvince,
   IVoucherResponse,
@@ -42,6 +50,8 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { debounce } from "lodash";
 import { showErrorToast } from "../../helpers/toast";
 import { showWarningConfirmDialog } from "../../helpers/confirm";
+import { FREE_SHIPPING_THRESHOLD } from "../../constants";
+import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -259,6 +269,45 @@ const Cart = () => {
   } = useModal();
 
   const [voucherCode, setVoucherCode] = useState("");
+
+  const { data: user } = useGetIdentity<ICustomerResponse>();
+
+  const {
+    data,
+    isLoading: isLoadingVoucher,
+    isError,
+  } = useList<IVoucherResponse, HttpError>({
+    resource: "vouchers",
+    pagination: {
+      pageSize: 1000,
+    },
+    filters: [
+      {
+        field: "customer",
+        operator: "eq",
+        value: user?.id,
+      },
+    ],
+  });
+
+  const vouchers = data?.data ? data?.data : [];
+
+  const [legitVouchers, setLegitVouchers] = useState<IVoucherResponse[]>([]);
+
+  useEffect(() => {
+    if (vouchers) {
+      const convertedLegitVoucher = vouchers.map((voucher) => {
+        const updatedVoucher = { ...voucher };
+        if (voucher.type === "PERCENTAGE") {
+          updatedVoucher.value = (voucher.value * cartTotalPrice) / 100;
+        }
+        return updatedVoucher;
+      });
+
+      convertedLegitVoucher.sort((a, b) => b.value - a.value);
+      setLegitVouchers(convertedLegitVoucher);
+    }
+  }, [vouchers]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     try {
@@ -866,10 +915,16 @@ const Cart = () => {
                     </h5>
                     <h5>
                       {t(`cart.cart_total.shipping`)}{" "}
-                      <CurrencyFormatter
-                        value={order.shippingMoney ?? 0}
-                        currency={currency}
-                      />
+                      {cartTotalPrice >= FREE_SHIPPING_THRESHOLD ? (
+                        <span className="free-shipping">
+                          Miễn phí vận chuyển
+                        </span>
+                      ) : (
+                        <CurrencyFormatter
+                          value={order.shippingMoney ?? 0}
+                          currency={currency}
+                        />
+                      )}
                     </h5>
                     <h5>
                       {"Giảm giá"}{" "}
@@ -884,7 +939,6 @@ const Cart = () => {
                         currency={currency}
                       />
                     </h5>
-
                     <h4 className="grand-totall-title">
                       {t(`cart.cart_total.grand_total`)}{" "}
                       <CurrencyFormatter
@@ -892,7 +946,41 @@ const Cart = () => {
                         currency={currency}
                       />
                     </h4>
-                    <Link to={"/pages/checkout"}>
+                    <hr />
+                    <div>
+                      {cartTotalPrice < FREE_SHIPPING_THRESHOLD ? (
+                        <DiscountMessage className="message">
+                          <GiftOutlined /> Mua thêm{" "}
+                          <DiscountMoney>
+                            {formatCurrency(
+                              FREE_SHIPPING_THRESHOLD - cartTotalPrice,
+                              currency
+                            )}
+                          </DiscountMoney>{" "}
+                          để được miễn phí vận chuyển
+                        </DiscountMessage>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                    <div>
+                      {legitVouchers.length > 0 && (
+                        <DiscountMessage className="message">
+                          <GiftOutlined /> Mua thêm{" "}
+                          <DiscountMoney>
+                            {formatCurrency(
+                              legitVouchers[0].constraint - cartTotalPrice,
+                              currency
+                            )}
+                          </DiscountMoney>{" "}
+                          để được giảm tới{" "}
+                          <DiscountMoney>
+                            {formatCurrency(legitVouchers[0].value, currency)}
+                          </DiscountMoney>
+                        </DiscountMessage>
+                      )}
+                    </div>
+                    <Link to={"/pages/checkout"} className="mt-3">
                       {t(`cart.buttons.proceed_to_checkout`)}
                     </Link>
                   </div>
@@ -918,7 +1006,11 @@ const Cart = () => {
         </div>
       </div>
       <Authenticated fallback={false}>
-        <VoucherModal restModalProps={restModalProps} />
+        <VoucherModal
+          restModalProps={restModalProps}
+          vouchers={vouchers}
+          isLoading={isLoadingVoucher}
+        />
       </Authenticated>
     </Fragment>
   );
