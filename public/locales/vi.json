@@ -119,6 +119,10 @@
         "COMPLETED": {
           "title": "Hoàn tất",
           "description": "Đơn hàng đã được hoàn thành."
+        },
+        "CANCELED": {
+          "title": "Đã huỷ",
+          "description": "Đơn hàng đã bị huỷ."
         }
       }
     },
