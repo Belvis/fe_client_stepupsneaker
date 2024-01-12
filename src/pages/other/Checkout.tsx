@@ -1,6 +1,6 @@
 import { GiftOutlined } from "@ant-design/icons";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { Button, Form, RadioChangeEvent, Spin } from "antd";
+import { Form, RadioChangeEvent, Spin } from "antd";
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,38 +11,34 @@ import {
   IDistrict,
   IProvince,
   IVoucherList,
-  IVoucherResponse,
   IWard,
 } from "../../interfaces";
 import { AppDispatch, RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 
+import { useModal } from "@refinedev/antd";
 import {
   Authenticated,
-  HttpError,
   useCreate,
   useCustom,
   useCustomMutation,
   useGetIdentity,
-  useIsAuthenticated,
-  useList,
 } from "@refinedev/core";
+import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
+import { ListAddressModal } from "../../components/address/ListAddressModal";
 import PaymentMethodAccordion from "../../components/payment-methods/PaymentMethodAccordion";
 import DiscountCodeAccordion from "../../components/voucher/DiscountCodeAccordion";
+import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 import { CurrencyFormatter, formatCurrency } from "../../helpers/currency";
 import {
   deleteAllFromCart,
   deleteAllFromDB,
-  fetchCart,
 } from "../../redux/slices/cart-slice";
 import { clearOrder, setOrder } from "../../redux/slices/order-slice";
-import { useModal } from "@refinedev/antd";
-import { ListAddressModal } from "../../components/address/ListAddressModal";
-import dayjs from "dayjs";
-import { TOKEN_KEY } from "../../utils";
-import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
+import { TOKEN_KEY } from "../../utils";
+import _ from "lodash";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -82,7 +78,8 @@ const CheckOut = () => {
 
   useEffect(() => {
     if (user && user.customerVoucherList) {
-      const convertedLegitVoucher = user.customerVoucherList.map((single) => {
+      const convertedLegitVoucher = _.cloneDeep(user.customerVoucherList);
+      convertedLegitVoucher.map((single) => {
         const updatedVoucher = { ...single };
         if (single.voucher.type === "PERCENTAGE") {
           updatedVoucher.voucher.value =

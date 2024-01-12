@@ -53,6 +53,7 @@ import { showErrorToast } from "../../helpers/toast";
 import { showWarningConfirmDialog } from "../../helpers/confirm";
 import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
+import _ from "lodash";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -277,7 +278,8 @@ const Cart = () => {
 
   useEffect(() => {
     if (user && user.customerVoucherList) {
-      const convertedLegitVoucher = user.customerVoucherList.map((single) => {
+      const convertedLegitVoucher = _.cloneDeep(user.customerVoucherList);
+      convertedLegitVoucher.map((single) => {
         const updatedVoucher = { ...single };
         if (single.voucher.type === "PERCENTAGE") {
           updatedVoucher.voucher.value =

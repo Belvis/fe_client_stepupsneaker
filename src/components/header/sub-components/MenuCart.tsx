@@ -13,6 +13,7 @@ import { ICustomerResponse, IVoucherList } from "../../../interfaces";
 import { deleteFromCart, deleteFromDB } from "../../../redux/slices/cart-slice";
 import { AppDispatch, RootState } from "../../../redux/store";
 import { DiscountMessage, DiscountMoney } from "../../../styled/CartStyled";
+import _ from "lodash";
 
 const { Title } = Typography;
 
@@ -37,7 +38,8 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
 
   useEffect(() => {
     if (user && user.customerVoucherList) {
-      const convertedLegitVoucher = user.customerVoucherList.map((single) => {
+      const convertedLegitVoucher = _.cloneDeep(user.customerVoucherList);
+      convertedLegitVoucher.map((single) => {
         const updatedVoucher = { ...single };
         if (single.voucher.type === "PERCENTAGE") {
           updatedVoucher.voucher.value =
