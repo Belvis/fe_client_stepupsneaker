@@ -66,10 +66,7 @@ const OrderTracking = () => {
     .filter((screen) => !!screen[1])
     .map((screen) => screen[0]);
 
-  const { data, isLoading, isError, refetch } = useOne<
-    IOrderResponse,
-    HttpError
-  >({
+  const { data, isLoading, isError, refetch } = useOne<IOrderResponse, HttpError>({
     resource: "orders/tracking",
     id: code,
   });
@@ -111,12 +108,7 @@ const OrderTracking = () => {
     }
   };
   useEffect(() => {
-    if (
-      order &&
-      order.orderHistories &&
-      order.orderHistories.length > 0 &&
-      !isError
-    ) {
+    if (order && order.orderHistories && order.orderHistories.length > 0 && !isError) {
       const updatedEvents = InitialEventData.map((event) => {
         switch (event.status) {
           case "PLACE_ORDER":
@@ -125,11 +117,8 @@ const OrderTracking = () => {
               date: order.createdAt,
             };
           case "COMPLETED":
-            const canceledReturnedOrExchangedOrder = order.orderHistories.find(
-              (orderHistory) =>
-                ["CANCELED", "RETURNED", "EXCHANGED"].includes(
-                  orderHistory.actionStatus
-                )
+            const canceledReturnedOrExchangedOrder = order.orderHistories.find((orderHistory) =>
+              ["CANCELED", "RETURNED", "EXCHANGED"].includes(orderHistory.actionStatus)
             );
             if (canceledReturnedOrExchangedOrder) {
               return {
@@ -182,9 +171,7 @@ const OrderTracking = () => {
 
     return (
       <Steps
-        direction={
-          currentBreakPoints.includes("lg") ? "horizontal" : "vertical"
-        }
+        direction={currentBreakPoints.includes("lg") ? "horizontal" : "vertical"}
         current={events.findIndex((el) => el.status === order?.status)}
         type={currentBreakPoints.includes("lg") ? "navigation" : "default"}
       >
@@ -195,19 +182,11 @@ const OrderTracking = () => {
             title={t(`order_tracking.steps.${event.status}.title`)}
             description={t(`order_tracking.steps.${event.status}.description`)}
             subTitle={
-              <Tooltip
-                title={event.date && dayjs(new Date(event.date)).format("LLL")}
-              >
+              <Tooltip title={event.date && dayjs(new Date(event.date)).format("LLL")}>
                 {event.date && dayjs(new Date(event.date)).format("DD/MM/YYYY")}
               </Tooltip>
             }
-            icon={
-              notFinishedCurrentStep(event, index) ? (
-                <LoadingOutlined />
-              ) : (
-                getIconByStatus(event.status)
-              )
-            }
+            icon={notFinishedCurrentStep(event, index) ? <LoadingOutlined /> : getIconByStatus(event.status)}
           />
         ))}
       </Steps>
@@ -227,16 +206,10 @@ const OrderTracking = () => {
         <Flex gap="middle" align="center" justify="space-between">
           <h3>Trạng thái đơn hàng: #{order && order.code}</h3>
           <Space>
-            <Button
-              disabled={order.status !== "WAIT_FOR_CONFIRMATION"}
-              onClick={showCancel}
-            >
+            <Button disabled={order.status !== "WAIT_FOR_CONFIRMATION"} onClick={showCancel}>
               Huỷ
             </Button>
-            <Button
-              disabled={order.status !== "WAIT_FOR_CONFIRMATION"}
-              onClick={show}
-            >
+            <Button disabled={order.status !== "WAIT_FOR_CONFIRMATION"} onClick={show}>
               Sửa đơn hàng
             </Button>
           </Space>
@@ -266,9 +239,7 @@ const OrderTracking = () => {
                   <p>Ngày dự kiến giao hàng</p>
                 </td>
                 <td className="value">
-                  <p>
-                    {dayjs(new Date(order.expectedDeliveryDate)).format("LLL")}
-                  </p>
+                  <p>{dayjs(new Date(order.expectedDeliveryDate)).format("LLL")}</p>
                 </td>
               </tr>
               <tr>
@@ -293,25 +264,16 @@ const OrderTracking = () => {
             <thead>
               <tr>
                 <th style={{ textAlign: "start" }}>Sản phẩm</th>
-                <th style={{ textAlign: "end" }}>
-                  {t(`cart.table.head.subtotal`)}
-                </th>
+                <th style={{ textAlign: "end" }}>{t(`cart.table.head.subtotal`)}</th>
               </tr>
             </thead>
             <tbody>
               {order.orderDetails &&
                 order.orderDetails.length > 0 &&
                 order.orderDetails.map((detail, key) => {
-                  const discountedPrice = getDiscountPrice(
-                    detail?.totalPrice ?? 0,
-                    0
-                  );
-                  const finalProductPrice =
-                    (detail?.totalPrice ?? 0) * currency.currencyRate;
-                  const finalDiscountedPrice =
-                    discountedPrice !== null
-                      ? discountedPrice * currency.currencyRate
-                      : 0.0;
+                  const discountedPrice = getDiscountPrice(detail?.totalPrice ?? 0, 0);
+                  const finalProductPrice = (detail?.totalPrice ?? 0) * currency.currencyRate;
+                  const finalDiscountedPrice = discountedPrice !== null ? discountedPrice * currency.currencyRate : 0.0;
 
                   discountedPrice !== null
                     ? (cartTotalPrice += finalDiscountedPrice * detail.quantity)
@@ -323,27 +285,19 @@ const OrderTracking = () => {
                         <div className="row">
                           <div className="product-thumbnail col-3">
                             <Link to={"/product/" + detail.id}>
-                              <img
-                                className="img-fluid"
-                                src={detail.productDetail.image}
-                                alt=""
-                              />
+                              <img className="img-fluid" src={detail.productDetail.image} alt="" />
                             </Link>
                           </div>
                           <div className="cart-item-variation col-9">
                             <span>
                               {t(`cart.table.head.product_name`)}:{" "}
-                              <Link to={"/product/" + detail.id}>
-                                {detail.productDetail.product.name}
-                              </Link>
+                              <Link to={"/product/" + detail.id}>{detail.productDetail.product.name}</Link>
                             </span>
                             <span>
-                              {t(`cart.table.head.color`)}:{" "}
-                              {detail.productDetail.color.name}
+                              {t(`cart.table.head.color`)}: {detail.productDetail.color.name}
                             </span>
                             <span>
-                              {t(`cart.table.head.size`)}:{" "}
-                              {detail.productDetail.size.name}
+                              {t(`cart.table.head.size`)}: {detail.productDetail.size.name}
                             </span>
                             <span>
                               {t(`cart.table.head.qty`)}: {detail.quantity}
@@ -353,17 +307,9 @@ const OrderTracking = () => {
                       </td>
                       <td className="product-subtotal value">
                         {discountedPrice !== null ? (
-                          <CurrencyFormatter
-                            className="amount"
-                            value={finalDiscountedPrice * detail.quantity}
-                            currency={currency}
-                          />
+                          <CurrencyFormatter className="amount" value={detail.totalPrice} currency={currency} />
                         ) : (
-                          <CurrencyFormatter
-                            className="amount"
-                            value={finalProductPrice * detail.quantity}
-                            currency={currency}
-                          />
+                          <CurrencyFormatter className="amount" value={detail.totalPrice} currency={currency} />
                         )}
                       </td>
                     </tr>
@@ -378,11 +324,7 @@ const OrderTracking = () => {
                       <h5>{t(`cart.cart_total.total`)} </h5>
                     </div>
                     <div className="col-3">
-                      <CurrencyFormatter
-                        className="amount"
-                        value={cartTotalPrice}
-                        currency={currency}
-                      />
+                      <CurrencyFormatter className="amount" value={order.originMoney} currency={currency} />
                     </div>
                   </div>
                   <div className="row">
@@ -390,11 +332,7 @@ const OrderTracking = () => {
                       <h5>{t(`cart.cart_total.shipping`)} </h5>
                     </div>
                     <div className="col-3">
-                      <CurrencyFormatter
-                        className="amount"
-                        value={order.shippingMoney}
-                        currency={currency}
-                      />
+                      <CurrencyFormatter className="amount" value={order.shippingMoney} currency={currency} />
                     </div>
                   </div>
                   <div className="row">
@@ -417,16 +355,10 @@ const OrderTracking = () => {
                   </div>
                   <div className="row">
                     <div className="col-9">
-                      <h4 className="grand-totall-title">
-                        {t(`cart.cart_total.grand_total`)}{" "}
-                      </h4>
+                      <h4 className="grand-totall-title">{t(`cart.cart_total.grand_total`)} </h4>
                     </div>
                     <div className="col-3">
-                      <CurrencyFormatter
-                        className="amount"
-                        value={order.totalMoney}
-                        currency={currency}
-                      />
+                      <CurrencyFormatter className="amount" value={order.totalMoney} currency={currency} />
                     </div>
                   </div>
                 </th>
@@ -442,12 +374,7 @@ const OrderTracking = () => {
         code={code}
         callBack={refetch}
       />
-      <CancelReasonModal
-        restModalProps={restProps}
-        close={closeCancle}
-        code={code}
-        callBack={refetch}
-      />
+      <CancelReasonModal restModalProps={restProps} close={closeCancle} code={code} callBack={refetch} />
     </Fragment>
   );
 };
