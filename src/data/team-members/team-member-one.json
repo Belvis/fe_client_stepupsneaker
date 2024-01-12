@@ -1,0 +1,38 @@
+[
+  {
+    "id": "1",
+    "image": "/images/team/team-1.jpg",
+    "fbLink": "//www.facebook.com",
+    "twitterLink": "//www.twitter.com",
+    "instagramLink": "//www.instagram.com",
+    "name": "Mr.Doãn Văn Đức",
+    "position": "Quản lý"
+  },
+  {
+    "id": "2",
+    "image": "/images/team/team-3.jpg",
+    "fbLink": "//www.facebook.com",
+    "twitterLink": "//www.twitter.com",
+    "instagramLink": "//www.instagram.com",
+    "name": "Mr.Nguyễn Anh Tuấn",
+    "position": "Lập trình viên"
+  },
+  {
+    "id": "3",
+    "image": "/images/team/team-2.jpg",
+    "fbLink": "//www.facebook.com",
+    "twitterLink": "//www.twitter.com",
+    "instagramLink": "//www.instagram.com",
+    "name": "Ms.Trần Hậu Nguyên",
+    "position": "Nhà thiết kế"
+  },
+  {
+    "id": "4",
+    "image": "/images/team/team-4.jpg",
+    "fbLink": "//www.facebook.com",
+    "twitterLink": "//www.twitter.com",
+    "instagramLink": "//www.instagram.com",
+    "name": "Mr.Lê Văn Duy",
+    "position": "Chủ tịch"
+  }
+]
