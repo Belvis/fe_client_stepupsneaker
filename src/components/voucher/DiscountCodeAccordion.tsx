@@ -17,6 +17,7 @@ import { setOrder } from "../../redux/slices/order-slice";
 import { RootState } from "../../redux/store";
 import { useModal } from "@refinedev/antd";
 import VoucherModal from "./VoucherModal";
+import _ from "lodash";
 
 interface DiscountCodeAccordionProps {
   totalMoney: number;
@@ -40,7 +41,8 @@ const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({
   };
 
   const getTopVoucher = () => {
-    const convertedLegitVoucher = vouchers.map((single) => {
+    const convertedLegitVoucher = _.cloneDeep(vouchers);
+    convertedLegitVoucher.map((single) => {
       const updatedVoucher = { ...single };
       if (single.voucher.type === "PERCENTAGE") {
         updatedVoucher.voucher.value =
