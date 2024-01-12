@@ -87,7 +87,7 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
                 </div>
                 <div className="pro-same-action pro-cart">
                   {product.variation && product.variation.length >= 1 ? (
-                    <Link to={`/product/${product.id}`}>Select Option</Link>
+                    <Link to={`/product/${product.id}`}>Mua ngay</Link>
                   ) : (
                     <button disabled className="active">
                       Out of Stock
@@ -226,7 +226,7 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
               <div className="shop-list-actions d-flex align-items-center">
                 <div className="shop-list-btn btn-hover">
                   {product.variation && product.variation.length >= 1 ? (
-                    <Link to={`/product/${product.id}`}>Select Option</Link>
+                    <Link to={`/product/${product.id}`}>Mua ngay</Link>
                   ) : (
                     <button disabled className="active">
                       Out of Stock

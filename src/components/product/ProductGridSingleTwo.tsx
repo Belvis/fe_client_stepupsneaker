@@ -114,7 +114,7 @@ const ProductGridSingleTwo: React.FC<ProductGridSingleTwoProps> = ({
             </div>
             <div className="pro-same-action pro-cart">
               {product.variation && product.variation.length >= 1 ? (
-                <Link to={`/product/${product.id}`} title="Select option">
+                <Link to={`/product/${product.id}`} title="Mua ngay">
                   <i className="pe-7s-cart"></i>
                 </Link>
               ) : (

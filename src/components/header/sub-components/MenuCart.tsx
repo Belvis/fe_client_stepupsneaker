@@ -1,5 +1,5 @@
 import { GiftOutlined } from "@ant-design/icons";
-import { Authenticated, HttpError, useGetIdentity, useList } from "@refinedev/core";
+import { Authenticated, useGetIdentity } from "@refinedev/core";
 import { Typography } from "antd";
 import clsx from "clsx";
 import { Fragment, useEffect, useState } from "react";
@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import { FREE_SHIPPING_THRESHOLD } from "../../../constants";
 import { CurrencyFormatter, formatCurrency } from "../../../helpers/currency";
 import { getDiscountPrice } from "../../../helpers/product";
-import { ICustomerResponse, IVoucherResponse } from "../../../interfaces";
+import { ICustomerResponse, IVoucherList } from "../../../interfaces";
 import { deleteFromCart, deleteFromDB } from "../../../redux/slices/cart-slice";
 import { AppDispatch, RootState } from "../../../redux/store";
 import { DiscountMessage, DiscountMoney } from "../../../styled/CartStyled";
@@ -31,55 +31,45 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
 
   const { data: user } = useGetIdentity<ICustomerResponse>();
 
-  const {
-    data,
-    isLoading: isLoadingVoucher,
-    isError,
-  } = useList<IVoucherResponse, HttpError>({
-    resource: "vouchers",
-    pagination: {
-      pageSize: 1000,
-    },
-    filters: [
-      {
-        field: "customer",
-        operator: "eq",
-        value: user?.id,
-      },
-    ],
-  });
-
   // Todo: lưu identity vào local để đỡ phải call
 
-  const vouchers = data?.data ? data?.data : [];
-
-  const [legitVouchers, setLegitVouchers] = useState<IVoucherResponse[]>([]);
+  const [legitVouchers, setLegitVouchers] = useState<IVoucherList[]>([]);
 
   useEffect(() => {
-    if (vouchers) {
-      const convertedLegitVoucher = vouchers.map((voucher) => {
-        const updatedVoucher = { ...voucher };
-        if (voucher.type === "PERCENTAGE") {
-          updatedVoucher.value = (voucher.value * cartTotalPrice) / 100;
+    if (user && user.customerVoucherList) {
+      const convertedLegitVoucher = user.customerVoucherList.map((single) => {
+        const updatedVoucher = { ...single };
+        if (single.voucher.type === "PERCENTAGE") {
+          updatedVoucher.voucher.value =
+            (single.voucher.value * cartTotalPrice) / 100;
         }
         return updatedVoucher;
       });
 
-      convertedLegitVoucher.sort((a, b) => b.value - a.value);
+      convertedLegitVoucher.sort((a, b) => b.voucher.value - a.voucher.value);
       setLegitVouchers(convertedLegitVoucher);
     }
-  }, [vouchers]);
+  }, [user]);
 
   return (
-    <div className={clsx("shopping-cart-content", { active: activeIndex === 2 })}>
+    <div
+      className={clsx("shopping-cart-content", { active: activeIndex === 2 })}
+    >
       {cartItems && cartItems.length > 0 ? (
         <Fragment>
           <ul>
             {cartItems.map((item) => {
-              const discountedPrice = getDiscountPrice(item.selectedProductSize?.price ?? 0, 0);
-              const finalProductPrice = (item.selectedProductSize?.price ?? 0) * currency.currencyRate;
+              const discountedPrice = getDiscountPrice(
+                item.selectedProductSize?.price ?? 0,
+                0
+              );
+              const finalProductPrice =
+                (item.selectedProductSize?.price ?? 0) * currency.currencyRate;
 
-              const finalDiscountedPrice = discountedPrice !== null ? discountedPrice * currency.currencyRate : 0.0;
+              const finalDiscountedPrice =
+                discountedPrice !== null
+                  ? discountedPrice * currency.currencyRate
+                  : 0.0;
 
               discountedPrice !== null
                 ? (cartTotalPrice += finalDiscountedPrice * item.quantity)
@@ -94,22 +84,31 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
                   </div>
                   <div className="shopping-cart-title">
                     <h4>
-                      <Link to={"/product/" + item.cartItemId}> {item.name} </Link>
+                      <Link to={"/product/" + item.cartItemId}>
+                        {" "}
+                        {item.name}{" "}
+                      </Link>
                     </h4>
                     <h6>
                       {t("header.menu_cart.qty")}: {item.quantity}
                     </h6>
                     <CurrencyFormatter
-                      value={discountedPrice !== null ? finalDiscountedPrice : finalProductPrice}
+                      value={
+                        discountedPrice !== null
+                          ? finalDiscountedPrice
+                          : finalProductPrice
+                      }
                       currency={currency}
                     />
                     {item.selectedProductColor && item.selectedProductSize ? (
                       <div className="cart-item-variation">
                         <span>
-                          {t("header.menu_cart.color")}: {item.selectedProductColor.name}
+                          {t("header.menu_cart.color")}:{" "}
+                          {item.selectedProductColor.name}
                         </span>
                         <span>
-                          {t("header.menu_cart.size")}: {item.selectedProductSize.name}
+                          {t("header.menu_cart.size")}:{" "}
+                          {item.selectedProductSize.name}
                         </span>
                       </div>
                     ) : (
@@ -119,7 +118,9 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
                   <div className="shopping-cart-delete">
                     <Authenticated
                       fallback={
-                        <button onClick={() => dispatch(deleteFromCart(item?.id))}>
+                        <button
+                          onClick={() => dispatch(deleteFromCart(item?.id))}
+                        >
                           <i className="fa fa-times-circle" />
                         </button>
                       }
@@ -137,22 +138,39 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
             {cartTotalPrice < FREE_SHIPPING_THRESHOLD ? (
               <DiscountMessage>
                 <GiftOutlined /> Mua thêm{" "}
-                <DiscountMoney>{formatCurrency(FREE_SHIPPING_THRESHOLD - cartTotalPrice, currency)}</DiscountMoney> để
-                được miễn phí vận chuyển
+                <DiscountMoney>
+                  {formatCurrency(
+                    FREE_SHIPPING_THRESHOLD - cartTotalPrice,
+                    currency
+                  )}
+                </DiscountMoney>{" "}
+                để được miễn phí vận chuyển
               </DiscountMessage>
             ) : (
               ""
             )}
-            {legitVouchers.length > 0 && cartTotalPrice < legitVouchers[0].constraint && (
+            {legitVouchers.length > 0 && (
               <DiscountMessage>
                 <GiftOutlined /> Mua thêm{" "}
-                <DiscountMoney>{formatCurrency(legitVouchers[0].constraint - cartTotalPrice, currency)}</DiscountMoney>{" "}
-                để được giảm tới <DiscountMoney>{formatCurrency(legitVouchers[0].value, currency)}</DiscountMoney>
+                <DiscountMoney>
+                  {formatCurrency(
+                    legitVouchers[0].voucher.constraint - cartTotalPrice,
+                    currency
+                  )}
+                </DiscountMoney>{" "}
+                để được giảm tới{" "}
+                <DiscountMoney>
+                  {formatCurrency(legitVouchers[0].voucher.value, currency)}
+                </DiscountMoney>
               </DiscountMessage>
             )}
             <Title level={4}>
               {t("header.menu_cart.total")} :{" "}
-              <CurrencyFormatter className="shop-total" value={cartTotalPrice} currency={currency} />
+              <CurrencyFormatter
+                className="shop-total"
+                value={cartTotalPrice}
+                currency={currency}
+              />
             </Title>
           </div>
           <div className="shopping-cart-btn btn-hover text-center">

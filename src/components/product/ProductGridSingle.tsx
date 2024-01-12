@@ -79,7 +79,7 @@ const ProductGridSingleNine: React.FC<ProductGridSingleNineProps> = ({
 
             <div className="product-action-2">
               {product.variation && product.variation.length >= 1 ? (
-                <Link to={`/product/${product.id}`} title="Select options">
+                <Link to={`/product/${product.id}`} title="Mua ngay">
                   <i className="fa fa-cog"></i>
                 </Link>
               ) : (
