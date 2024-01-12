@@ -1,16 +1,16 @@
-import { NumberField } from "@refinedev/antd";
+import { Badge } from "antd";
 import clsx from "clsx";
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { CurrencyFormatter } from "../../helpers/currency";
 import { getDiscountPrice } from "../../helpers/product";
 import { ICartItem, IProductClient } from "../../interfaces";
 import { addToCompare } from "../../redux/slices/compare-slice";
+import { CurrencyState } from "../../redux/slices/currency-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
 import ProductModal from "./ProductModal";
-import { Badge } from "antd";
-import { CurrencyState } from "../../redux/slices/currency-slice";
 
 type ProductGridSingleNineProps = {
   cartItem?: ICartItem;
@@ -35,12 +35,10 @@ const ProductGridSingleNine: React.FC<ProductGridSingleNineProps> = ({
 
   const [modalShow, setModalShow] = useState(false);
   const discountedPrice = getDiscountPrice(product.price.max, product.discount);
-  const finalProductPrice = +(
-    product.price.max * currency.currencyRate
-  ).toFixed(2);
+  const finalProductPrice = +(product.price.max * currency.currencyRate);
   const finalDiscountedPrice = +(
     (discountedPrice ?? product.discount) * currency.currencyRate
-  ).toFixed(2);
+  );
   const dispatch = useDispatch();
 
   return (
@@ -116,30 +114,20 @@ const ProductGridSingleNine: React.FC<ProductGridSingleNineProps> = ({
               <div className="price-2">
                 {discountedPrice !== null ? (
                   <Fragment>
-                    <span className="old">
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: currency.currencyName,
-                        currencyDisplay: "symbol",
-                      }).format(finalProductPrice)}
-                    </span>{" "}
-                    <NumberField
+                    <CurrencyFormatter
+                      value={finalProductPrice}
+                      currency={currency}
+                    />{" "}
+                    <CurrencyFormatter
+                      className="old"
                       value={finalDiscountedPrice}
-                      options={{
-                        currency: currency.currencyName,
-                        style: "currency",
-                        currencyDisplay: "symbol",
-                      }}
+                      currency={currency}
                     />
                   </Fragment>
                 ) : (
-                  <NumberField
+                  <CurrencyFormatter
                     value={finalProductPrice}
-                    options={{
-                      currency: currency.currencyName,
-                      style: "currency",
-                      currencyDisplay: "symbol",
-                    }}
+                    currency={currency}
                   />
                 )}
               </div>

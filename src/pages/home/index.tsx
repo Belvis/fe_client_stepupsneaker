@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import HeroSlider from "../../wrappers/hero-slider/HeroSlider";
 import FeatureIcon from "../../wrappers/feature-icon/FeatureIcon";
@@ -13,7 +13,11 @@ import { useDocumentTitle } from "@refinedev/react-router-v6";
 export const HomePage: React.FC = () => {
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.home") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.home") + " | SUNS");
+  }, [t]);
 
   return (
     <Fragment>

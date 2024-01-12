@@ -1,12 +1,13 @@
-import React, { FC } from "react";
-import { useSelector } from "react-redux";
+import React, { FC, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Swiper, { SwiperSlide } from "../../components/swiper";
 import ProductGridSingleTwo from "../../components/product/ProductGridSingleTwo";
-import { RootState } from "../../redux/store";
-import { HttpError, useList } from "@refinedev/core";
+import { AppDispatch, RootState } from "../../redux/store";
+import { HttpError, useIsAuthenticated, useList } from "@refinedev/core";
 import { IProductResponse } from "../../interfaces";
 import { mapProductsToClients } from "../../helpers/product";
 import { Spin } from "antd";
+import { fetchCart } from "../../redux/slices/cart-slice";
 
 type ProductGridTwoProps = {
   sliderClassName?: string;
@@ -62,6 +63,12 @@ const ProductGridTwo: FC<ProductGridTwoProps> = ({
     pagination: {
       pageSize: limit,
     },
+    sorters: [
+      {
+        field: "saleCount",
+        order: "desc",
+      },
+    ],
   });
   const prods = data?.data ? mapProductsToClients(data?.data) : [];
 

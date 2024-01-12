@@ -14,7 +14,6 @@ const ProductGridList: React.FC<ProductGridListProps> = ({
   spaceBottomClass,
 }) => {
   const currency = useSelector((state: RootState) => state.currency);
-  const { cartItems } = useSelector((state: RootState) => state.cart);
   const { wishlistItems } = useSelector((state: RootState) => state.wishlist);
   const { compareItems } = useSelector((state: RootState) => state.compare);
 
@@ -27,10 +26,6 @@ const ProductGridList: React.FC<ProductGridListProps> = ({
               spaceBottomClass={spaceBottomClass}
               product={product}
               currency={currency}
-              cartItem={
-                cartItems.find((cartItem) => cartItem.id === product.id) ??
-                ({} as ICartItem)
-              }
               wishlistItem={wishlistItems.find(
                 (wishlistItem) => wishlistItem.id === product.id
               )}

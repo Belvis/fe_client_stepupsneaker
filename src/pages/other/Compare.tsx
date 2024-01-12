@@ -1,5 +1,5 @@
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
@@ -8,11 +8,16 @@ import { getDiscountPrice } from "../../helpers/product";
 import { deleteFromCompare } from "../../redux/slices/compare-slice";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 const Compare = () => {
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.pages.compare") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.compare") + " | SUNS");
+  }, [t]);
 
   const dispatch = useDispatch();
   let { pathname } = useLocation();
@@ -58,7 +63,7 @@ const Compare = () => {
                                   className="image"
                                 >
                                   <img
-                                    style={{ maxHeight: "400px" }}
+                                    style={{ maxHeight: "250px" }}
                                     className="img-fluid"
                                     src={compareItem.image[0]}
                                     alt=""
@@ -94,45 +99,34 @@ const Compare = () => {
                               compareItem.price.min,
                               0
                             );
-                            const finalProductPrice = (
+                            const finalProductPrice =
                               (compareItem?.price.min ?? 0) *
-                              currency.currencyRate
-                            ).toFixed(2);
+                              currency.currencyRate;
                             const finalDiscountedPrice =
                               discountedPrice !== null
-                                ? parseFloat(
-                                    (
-                                      discountedPrice * currency.currencyRate
-                                    ).toFixed(2)
-                                  )
+                                ? discountedPrice * currency.currencyRate
                                 : 0.0;
                             return (
                               <td className="product-price" key={key}>
                                 {discountedPrice !== null ? (
                                   <Fragment>
-                                    <span className="amount old">
-                                      {new Intl.NumberFormat("en-US", {
-                                        style: "currency",
-                                        currency: currency.currencyName,
-                                        currencyDisplay: "symbol",
-                                      }).format(Number(finalProductPrice))}
-                                    </span>
-                                    <span className="amount">
-                                      {new Intl.NumberFormat("en-US", {
-                                        style: "currency",
-                                        currency: currency.currencyName,
-                                        currencyDisplay: "symbol",
-                                      }).format(finalDiscountedPrice)}
-                                    </span>
+                                    <CurrencyFormatter
+                                      className="amount old"
+                                      value={finalProductPrice}
+                                      currency={currency}
+                                    />
+                                    <CurrencyFormatter
+                                      className="amount"
+                                      value={finalDiscountedPrice}
+                                      currency={currency}
+                                    />
                                   </Fragment>
                                 ) : (
-                                  <span className="amount">
-                                    {new Intl.NumberFormat("en-US", {
-                                      style: "currency",
-                                      currency: currency.currencyName,
-                                      currencyDisplay: "symbol",
-                                    }).format(Number(finalProductPrice))}
-                                  </span>
+                                  <CurrencyFormatter
+                                    className="amount"
+                                    value={finalProductPrice}
+                                    currency={currency}
+                                  />
                                 )}
                               </td>
                             );

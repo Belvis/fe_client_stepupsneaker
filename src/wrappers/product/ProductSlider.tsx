@@ -15,7 +15,7 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ spaceBottomClass }) => {
       <div className="container">
         <SectionTitleSeven
           titleText={t(`product_slider.new_products.title`)}
-          subtitleText={t(`product_slider.new_products.subtitle`)}
+          subtitleText={t(`product_slider.new_products.subtitle`) || ""}
           spaceClass="mb-55"
           borderClass="no-border"
           positionClass="text-center"

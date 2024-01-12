@@ -1,14 +1,16 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
 import Swiper, { SwiperSlide } from "../../components/swiper";
 import SectionTitle from "../../components/section-title/SectionTitle";
 import ProductGridSingle from "../../components/product/ProductGridSingle";
-import { RootState } from "../../redux/store";
-import { HttpError, useList } from "@refinedev/core";
+import { AppDispatch, RootState } from "../../redux/store";
+import { HttpError, useIsAuthenticated, useList } from "@refinedev/core";
 import { IProductResponse } from "../../interfaces";
 import { mapProductsToClients } from "../../helpers/product";
 import { Spin } from "antd";
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
+import { fetchCart } from "../../redux/slices/cart-slice";
 
 interface RelatedProductSliderProps {
   spaceBottomClass: string;

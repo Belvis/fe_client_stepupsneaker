@@ -20,7 +20,7 @@ const persistConfig = {
   key: "suns",
   version: 1.1,
   storage,
-  blacklist: ["order"],
+  // blacklist: ["order"],
 };
 
 export const rootReducer = combineReducers({
@@ -52,3 +52,5 @@ export type RootState = {
   compare: CompareState;
   wishlist: WishlistState;
 };
+
+export type AppDispatch = typeof store.dispatch;

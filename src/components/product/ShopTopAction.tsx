@@ -2,8 +2,10 @@ import React from "react";
 import { setActiveLayout } from "../../helpers/product";
 
 interface ShopTopActionProps {
-  updateLayout: (layout: string) => void;
-  updateSortParams: (sortType: "asc" | "desc", sortValue: string) => void;
+  updateLayout: (
+    layout: "grid two-column" | "grid three-column" | "list"
+  ) => void;
+  updateSortParams: (orderBy: string) => void;
   productCount: number;
   sortedProductCount: number;
 }
@@ -25,20 +27,21 @@ const ShopTopAction: React.FC<ShopTopActionProps> = ({
   return (
     <div className="shop-top-bar mb-35">
       <div className="select-shoing-wrap">
+        <span>Sắp xếp theo</span>
         <div className="shop-select">
-          <select
-            onChange={(e) => {
-              const { order, field } = sortOptions[e.target.value];
-              updateSortParams(order as "asc" | "desc", field);
-            }}
-          >
-            <option value="default">Default</option>
-            <option value="priceHighToLow">Price - High to Low</option>
-            <option value="priceLowToHigh">Price - Low to High</option>
+          <select onChange={(e) => updateSortParams(e.target.value)}>
+            <option value="default">Mặc định</option>
+            <option value="popularity">Phổ biến</option>
+            <option value="best-seller">Bán chạy</option>
+            <option value="newest">Mới nhất</option>
+            <option value="latest">Cũ nhất</option>
+            <option value="price">Giá - Từ cao đến thấp</option>
+            <option value="price-desc">Giá - từ thấp đến cao</option>
           </select>
         </div>
         <p>
-          Showing {sortedProductCount} of {productCount} result
+          Hiển thị {sortedProductCount} kết quả trên tổng số {productCount} kết
+          quả
         </p>
       </div>
 

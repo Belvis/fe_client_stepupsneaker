@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
@@ -10,11 +10,16 @@ import {
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { CurrencyFormatter } from "../../helpers/currency";
 
 const Wishlist = () => {
   const { t } = useTranslation();
 
-  useDocumentTitle(t("nav.pages.wishlist") + " | SUNS");
+  const setTitle = useDocumentTitle();
+
+  useEffect(() => {
+    setTitle(t("nav.pages.wishlist") + " | SUNS");
+  }, [t]);
 
   const dispatch = useDispatch();
   let { pathname } = useLocation();
@@ -54,13 +59,12 @@ const Wishlist = () => {
                             wishlistItem.price.max,
                             wishlistItem.discount
                           );
-                          const finalProductPrice = (
-                            wishlistItem.price.max * currency.currencyRate
-                          ).toFixed(2);
+                          const finalProductPrice =
+                            wishlistItem.price.max * currency.currencyRate;
                           const finalDiscountedPrice = +(
                             (discountedPrice ?? wishlistItem.discount) *
                             currency.currencyRate
-                          ).toFixed(2);
+                          );
 
                           return (
                             <tr key={key}>
@@ -83,29 +87,23 @@ const Wishlist = () => {
                               <td className="product-price-cart">
                                 {discountedPrice !== null ? (
                                   <Fragment>
-                                    <span className="amount old">
-                                      {new Intl.NumberFormat("en-US", {
-                                        style: "currency",
-                                        currency: currency.currencyName,
-                                        currencyDisplay: "symbol",
-                                      }).format(Number(finalProductPrice))}
-                                    </span>
-                                    <span className="amount">
-                                      {new Intl.NumberFormat("en-US", {
-                                        style: "currency",
-                                        currency: currency.currencyName,
-                                        currencyDisplay: "symbol",
-                                      }).format(finalDiscountedPrice)}
-                                    </span>
+                                    <CurrencyFormatter
+                                      className="amount old"
+                                      value={finalProductPrice}
+                                      currency={currency}
+                                    />
+                                    <CurrencyFormatter
+                                      className="amount"
+                                      value={finalDiscountedPrice}
+                                      currency={currency}
+                                    />
                                   </Fragment>
                                 ) : (
-                                  <span className="amount">
-                                    {new Intl.NumberFormat("en-US", {
-                                      style: "currency",
-                                      currency: currency.currencyName,
-                                      currencyDisplay: "symbol",
-                                    }).format(Number(finalProductPrice))}
-                                  </span>
+                                  <CurrencyFormatter
+                                    className="amount"
+                                    value={finalProductPrice}
+                                    currency={currency}
+                                  />
                                 )}
                               </td>
 

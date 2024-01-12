@@ -14,11 +14,11 @@ const orderSlice = createSlice({
     setOrder(state, action: PayloadAction<IOrderRequest>) {
       state.order = action.payload;
     },
-    deleteAll(state) {
+    clearOrder(state) {
       state.order = {} as IOrderRequest;
     },
   },
 });
 
-export const { setOrder } = orderSlice.actions;
+export const { setOrder, clearOrder } = orderSlice.actions;
 export default orderSlice.reducer;
