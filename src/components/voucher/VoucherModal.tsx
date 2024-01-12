@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from "react";
 import { Modal, List as AntdList } from "antd";
-import { IVoucherResponse } from "../../interfaces";
+import { IVoucherList, IVoucherResponse } from "../../interfaces";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import dayjs from "dayjs";
@@ -14,21 +14,19 @@ interface VoucherModalProps {
     title?: ReactNode;
     closable?: boolean | undefined;
   };
-  vouchers: IVoucherResponse[] | undefined;
-  isLoading: boolean;
+  vouchers: IVoucherList[];
 }
 
 const VoucherModal: React.FC<VoucherModalProps> = ({
   restModalProps,
   vouchers,
-  isLoading,
 }) => {
   const currency = useSelector((state: RootState) => state.currency);
   const [copied, setCopied] = useState(false);
 
-  function renderItem(item: IVoucherResponse) {
+  function renderItem(item: IVoucherList) {
     const { id, code, value, constraint, image, endDate, quantity, type } =
-      item;
+      item.voucher;
 
     const constraintPrice = (
       <CurrencyFormatter value={constraint} currency={currency} />
@@ -95,7 +93,6 @@ const VoucherModal: React.FC<VoucherModalProps> = ({
         itemLayout="horizontal"
         dataSource={vouchers}
         renderItem={renderItem}
-        loading={isLoading}
       />
     </Modal>
   );

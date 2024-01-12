@@ -10,7 +10,7 @@ import {
   useNotification,
   useOne,
 } from "@refinedev/core";
-import { IVoucherResponse } from "../../interfaces";
+import { IVoucherList, IVoucherResponse } from "../../interfaces";
 import { dataProvider } from "../../api/dataProvider";
 import { useDispatch, useSelector } from "react-redux";
 import { setOrder } from "../../redux/slices/order-slice";
@@ -20,14 +20,12 @@ import VoucherModal from "./VoucherModal";
 
 interface DiscountCodeAccordionProps {
   totalMoney: number;
-  vouchers: IVoucherResponse[];
-  isLoading: boolean;
+  vouchers: IVoucherList[];
 }
 
 const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({
   totalMoney,
   vouchers,
-  isLoading,
 }) => {
   const { t } = useTranslation();
   const API_URL = useApiUrl();
@@ -42,18 +40,19 @@ const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({
   };
 
   const getTopVoucher = () => {
-    const convertedLegitVoucher = vouchers.map((voucher) => {
-      const updatedVoucher = { ...voucher };
-      if (voucher.type === "PERCENTAGE") {
-        updatedVoucher.value = (voucher.value * totalMoney) / 100;
+    const convertedLegitVoucher = vouchers.map((single) => {
+      const updatedVoucher = { ...single };
+      if (single.voucher.type === "PERCENTAGE") {
+        updatedVoucher.voucher.value =
+          (single.voucher.value * totalMoney) / 100;
       }
       return updatedVoucher;
     });
 
-    convertedLegitVoucher.sort((a, b) => b.value - a.value);
+    convertedLegitVoucher.sort((a, b) => b.voucher.value - a.voucher.value);
 
     return convertedLegitVoucher.length > 0
-      ? convertedLegitVoucher[0].code
+      ? convertedLegitVoucher[0].voucher.code
       : "";
   };
 
@@ -152,11 +151,7 @@ const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
-      <VoucherModal
-        restModalProps={restModalProps}
-        vouchers={vouchers}
-        isLoading={isLoading}
-      />
+      <VoucherModal restModalProps={restModalProps} vouchers={vouchers} />
     </Fragment>
   );
 };

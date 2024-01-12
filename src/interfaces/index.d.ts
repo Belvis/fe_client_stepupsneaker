@@ -163,7 +163,12 @@ export interface ICustomerResponse {
   gender: string;
   image: string;
   addressList: IAddressResponse[];
+  customerVoucherList: IVoucherList[];
   cart: ICartItem;
+}
+export interface IVoucherList {
+  id: string;
+  voucher: IVoucherResponse;
 }
 export interface IAddressResponse {
   id: string;
