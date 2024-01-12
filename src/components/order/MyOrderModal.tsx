@@ -1,28 +1,6 @@
-import {
-  CaretDownOutlined,
-  CaretUpOutlined,
-  InfoCircleOutlined,
-  GiftOutlined,
-} from "@ant-design/icons";
-import {
-  HttpError,
-  useCustom,
-  useCustomMutation,
-  useGetIdentity,
-  useList,
-  useOne,
-  useUpdate,
-} from "@refinedev/core";
-import {
-  Badge,
-  Form,
-  Input,
-  Modal,
-  Select,
-  Space,
-  Tooltip,
-  Typography,
-} from "antd";
+import { CaretDownOutlined, CaretUpOutlined, InfoCircleOutlined, GiftOutlined } from "@ant-design/icons";
+import { HttpError, useCustom, useCustomMutation, useGetIdentity, useList, useOne, useUpdate } from "@refinedev/core";
+import { Badge, Form, Input, Modal, Select, Space, Tooltip, Typography } from "antd";
 import React, { Fragment, ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -31,14 +9,7 @@ import { showWarningConfirmDialog } from "../../helpers/confirm";
 import { CurrencyFormatter, formatCurrency } from "../../helpers/currency";
 import { getDiscountPrice } from "../../helpers/product";
 import { showErrorToast } from "../../helpers/toast";
-import {
-  ICustomerResponse,
-  IDistrict,
-  IOrderResponse,
-  IProvince,
-  IVoucherResponse,
-  IWard,
-} from "../../interfaces";
+import { ICustomerResponse, IDistrict, IOrderResponse, IProvince, IVoucherResponse, IWard } from "../../interfaces";
 import { RootState } from "../../redux/store";
 import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
@@ -62,13 +33,7 @@ interface MyOrderModalProps {
 
 const { Title } = Typography;
 
-const MyOrderModal: React.FC<MyOrderModalProps> = ({
-  restModalProps,
-  code,
-  callBack,
-  close,
-  showCancel,
-}) => {
+const MyOrderModal: React.FC<MyOrderModalProps> = ({ restModalProps, code, callBack, close, showCancel }) => {
   const { t } = useTranslation();
   const currency = useSelector((state: RootState) => state.currency);
 
@@ -122,10 +87,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
 
   const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
 
-  const { data: dataV, isLoading: isLoadingVoucher } = useList<
-    IVoucherResponse,
-    HttpError
-  >({
+  const { data: dataV, isLoading: isLoadingVoucher } = useList<IVoucherResponse, HttpError>({
     resource: "vouchers",
     pagination: {
       pageSize: 1000,
@@ -192,12 +154,9 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
     }
   }, [restModalProps.open, viewOrder]);
 
-  const { mutate: calculateFeeMutate, isLoading: isLoadingFee } =
-    useCustomMutation<any>();
+  const { mutate: calculateFeeMutate, isLoading: isLoadingFee } = useCustomMutation<any>();
 
-  const { isLoading: isLoadingProvince, refetch: refetchProvince } = useCustom<
-    IProvince[]
-  >({
+  const { isLoading: isLoadingProvince, refetch: refetchProvince } = useCustom<IProvince[]>({
     url: `${GHN_API_BASE_URL}/master-data/province`,
     method: "get",
     config: {
@@ -213,9 +172,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
     },
   });
 
-  const { isLoading: isLoadingDistrict, refetch: refetchDistrict } = useCustom<
-    IDistrict[]
-  >({
+  const { isLoading: isLoadingDistrict, refetch: refetchDistrict } = useCustom<IDistrict[]>({
     url: `${GHN_API_BASE_URL}/master-data/district`,
     method: "get",
     config: {
@@ -234,26 +191,24 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
     },
   });
 
-  const { isLoading: isLoadingWard, refetch: refetchWard } = useCustom<IWard[]>(
-    {
-      url: `${GHN_API_BASE_URL}/master-data/ward`,
-      method: "get",
-      config: {
-        headers: {
-          token: GHN_TOKEN,
-        },
-        query: {
-          district_id: districtId,
-        },
+  const { isLoading: isLoadingWard, refetch: refetchWard } = useCustom<IWard[]>({
+    url: `${GHN_API_BASE_URL}/master-data/ward`,
+    method: "get",
+    config: {
+      headers: {
+        token: GHN_TOKEN,
       },
-      queryOptions: {
-        enabled: false,
-        onSuccess: (data: any) => {
-          setWards(data.response.data);
-        },
+      query: {
+        district_id: districtId,
       },
-    }
-  );
+    },
+    queryOptions: {
+      enabled: false,
+      onSuccess: (data: any) => {
+        setWards(data.response.data);
+      },
+    },
+  });
 
   useEffect(() => {
     setProvinces([]);
@@ -335,10 +290,9 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
   };
 
   const handleUpdateOrder = () => {
-    const simplifiedCartItems: { id: string; quantity: number }[] =
-      viewOrder.orderDetails.map((item) => {
-        return { id: item.productDetail.id, quantity: quantityCount[item.id] };
-      });
+    const simplifiedCartItems: { id: string; quantity: number }[] = viewOrder.orderDetails.map((item) => {
+      return { id: item.productDetail.id, quantity: quantityCount[item.id] };
+    });
     const submitData = {
       fullName: form.getFieldValue("fullName"),
       email: form.getFieldValue("email"),
@@ -355,7 +309,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
         more: form.getFieldValue("line"),
       },
       cartItems: simplifiedCartItems,
-      voucher: viewOrder.voucher,
+      voucher: viewOrder.voucher !== null ? viewOrder.voucher.id : null,
     };
 
     update(
@@ -416,52 +370,33 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               </thead>
               <tbody>
                 {viewOrder?.orderDetails?.map((single, key) => {
-                  const discountedPrice = getDiscountPrice(
-                    single.price ?? 0,
-                    0
-                  );
-                  const finalProductPrice =
-                    (single.price ?? 0) * currency.currencyRate;
+                  const discountedPrice = getDiscountPrice(single.price ?? 0, 0);
+                  const finalProductPrice = (single.price ?? 0) * currency.currencyRate;
 
-                  const finalDiscountedPrice =
-                    discountedPrice !== null
-                      ? discountedPrice * currency.currencyRate
-                      : 0.0;
+                  const finalDiscountedPrice = discountedPrice !== null ? discountedPrice * currency.currencyRate : 0.0;
 
                   discountedPrice !== null
-                    ? (cartTotalPrice +=
-                        finalDiscountedPrice * quantityCount[single.id])
-                    : (cartTotalPrice +=
-                        finalProductPrice * quantityCount[single.id]);
+                    ? (cartTotalPrice += finalDiscountedPrice * quantityCount[single.id])
+                    : (cartTotalPrice += finalProductPrice * quantityCount[single.id]);
 
                   return (
                     <tr key={key}>
                       <td className="product-thumbnail">
-                        <Link
-                          to={"/product/" + single.productDetail.product.id}
-                        >
-                          <img
-                            className="img-fluid"
-                            src={single.productDetail.image}
-                            alt=""
-                          />
+                        <Link to={"/product/" + single.productDetail.product.id}>
+                          <img className="img-fluid" src={single.productDetail.image} alt="" />
                         </Link>
                       </td>
 
                       <td className="product-name">
-                        <Link
-                          to={"/product/" + single.productDetail.product.id}
-                        >
+                        <Link to={"/product/" + single.productDetail.product.id}>
                           {single.productDetail.product.name}
                         </Link>
                         <div className="cart-item-variation">
                           <span>
-                            {t(`cart.table.head.color`)}:{" "}
-                            {single.productDetail.color.name}
+                            {t(`cart.table.head.color`)}: {single.productDetail.color.name}
                           </span>
                           <span>
-                            {t(`cart.table.head.size`)}:{" "}
-                            {single.productDetail.size.name}
+                            {t(`cart.table.head.size`)}: {single.productDetail.size.name}
                           </span>
                         </div>
                       </td>
@@ -469,23 +404,11 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <td className="product-price-cart">
                         {discountedPrice !== null ? (
                           <Fragment>
-                            <CurrencyFormatter
-                              className="amount old"
-                              value={finalProductPrice}
-                              currency={currency}
-                            />
-                            <CurrencyFormatter
-                              className="amount"
-                              value={finalDiscountedPrice}
-                              currency={currency}
-                            />
+                            <CurrencyFormatter className="amount old" value={finalProductPrice} currency={currency} />
+                            <CurrencyFormatter className="amount" value={finalDiscountedPrice} currency={currency} />
                           </Fragment>
                         ) : (
-                          <CurrencyFormatter
-                            className="amount"
-                            value={finalProductPrice}
-                            currency={currency}
-                          />
+                          <CurrencyFormatter className="amount" value={finalProductPrice} currency={currency} />
                         )}
                       </td>
 
@@ -502,8 +425,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                                 if (updatedQuantityCount[single.id] > 1) {
                                   updatedQuantityCount[single.id] -= 1;
                                 } else {
-                                  const cartCount =
-                                    viewOrder.orderDetails.length;
+                                  const cartCount = viewOrder.orderDetails.length;
                                   if (cartCount == 1) {
                                     showWarningConfirmDialog({
                                       options: {
@@ -520,16 +442,11 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                                   } else {
                                     showWarningConfirmDialog({
                                       options: {
-                                        message:
-                                          "Giảm số lượng về 0 tương đương với việc loại bỏ sản phẩm khỏi giỏ",
+                                        message: "Giảm số lượng về 0 tương đương với việc loại bỏ sản phẩm khỏi giỏ",
                                         accept: () => {
                                           setViewOrder((prev) => ({
                                             ...prev,
-                                            orderDetails:
-                                              prev.orderDetails.filter(
-                                                (detail) =>
-                                                  detail.id !== single.id
-                                              ),
+                                            orderDetails: prev.orderDetails.filter((detail) => detail.id !== single.id),
                                           }));
                                         },
                                         reject: () => {
@@ -555,9 +472,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                             onChange={(e) => {
                               const newValue = parseInt(e.target.value, 10);
                               if (newValue >= single.productDetail.quantity) {
-                                return showErrorToast(
-                                  "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
-                                );
+                                return showErrorToast("Rất tiếc, đã đạt giới hạn số lượng sản phẩm");
                               }
                               if (newValue > 5) {
                                 return showErrorToast(
@@ -581,13 +496,8 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                           <button
                             className="inc qtybutton"
                             onClick={() => {
-                              if (
-                                quantityCount[single.id] >=
-                                single.productDetail.quantity
-                              ) {
-                                return showErrorToast(
-                                  "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
-                                );
+                              if (quantityCount[single.id] >= single.productDetail.quantity) {
+                                return showErrorToast("Rất tiếc, đã đạt giới hạn số lượng sản phẩm");
                               }
 
                               if (quantityCount[single.id] >= 5) {
@@ -630,8 +540,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                             if (cartCount == 1) {
                               showWarningConfirmDialog({
                                 options: {
-                                  message:
-                                    "Loại bỏ sản phẩm duy nhất tương đương với việc huỷ đơn hàng",
+                                  message: "Loại bỏ sản phẩm duy nhất tương đương với việc huỷ đơn hàng",
                                   accept: () => {
                                     close();
                                     showCancel();
@@ -646,9 +555,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                                   accept: () => {
                                     setViewOrder((prev) => ({
                                       ...prev,
-                                      orderDetails: prev.orderDetails.filter(
-                                        (detail) => detail.id !== single.id
-                                      ),
+                                      orderDetails: prev.orderDetails.filter((detail) => detail.id !== single.id),
                                     }));
                                   },
                                   reject: () => {},
@@ -687,11 +594,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                         </Badge>
                       </div>
                       <div className="col-3">
-                        <CurrencyFormatter
-                          className="amount"
-                          value={cartTotalPrice}
-                          currency={currency}
-                        />
+                        <CurrencyFormatter className="amount" value={cartTotalPrice} currency={currency} />
                       </div>
                     </div>
                     <div className="row">
@@ -713,11 +616,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                         </Badge>
                       </div>
                       <div className="col-3">
-                        <CurrencyFormatter
-                          className="amount"
-                          value={viewOrder.shippingMoney}
-                          currency={currency}
-                        />
+                        <CurrencyFormatter className="amount" value={viewOrder.shippingMoney} currency={currency} />
                       </div>
                     </div>
                     <div className="row">
@@ -730,8 +629,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                           value={
                             viewOrder.voucher
                               ? viewOrder.voucher.type == "PERCENTAGE"
-                                ? (viewOrder.voucher.value * cartTotalPrice) /
-                                  100
+                                ? (viewOrder.voucher.value * cartTotalPrice) / 100
                                 : viewOrder.voucher.value
                               : 0
                           }
@@ -743,14 +641,8 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <div className="col-9">
                         <Badge
                           count={
-                            cartTotalPrice +
-                              viewOrder.shippingMoney -
-                              discount !==
-                            order.totalMoney ? (
-                              cartTotalPrice +
-                                viewOrder.shippingMoney -
-                                discount >
-                              order.totalMoney ? (
+                            cartTotalPrice + viewOrder.shippingMoney - discount !== order.totalMoney ? (
+                              cartTotalPrice + viewOrder.shippingMoney - discount > order.totalMoney ? (
                                 <CaretUpOutlined style={{ color: "red" }} />
                               ) : (
                                 <CaretDownOutlined style={{ color: "green" }} />
@@ -760,17 +652,13 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                             )
                           }
                         >
-                          <h4 className="grand-totall-title">
-                            {t(`cart.cart_total.grand_total`)}{" "}
-                          </h4>
+                          <h4 className="grand-totall-title">{t(`cart.cart_total.grand_total`)} </h4>
                         </Badge>
                       </div>
                       <div className="col-3">
                         <CurrencyFormatter
                           className="amount"
-                          value={
-                            cartTotalPrice + viewOrder.shippingMoney - discount
-                          }
+                          value={cartTotalPrice + viewOrder.shippingMoney - discount}
                           currency={currency}
                         />
                       </div>
@@ -780,31 +668,25 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                         <DiscountMessage>
                           <GiftOutlined /> Mua thêm{" "}
                           <DiscountMoney>
-                            {formatCurrency(
-                              FREE_SHIPPING_THRESHOLD - cartTotalPrice,
-                              currency
-                            )}
+                            {formatCurrency(FREE_SHIPPING_THRESHOLD - cartTotalPrice, currency)}
                           </DiscountMoney>{" "}
                           để được miễn phí vận chuyển
                         </DiscountMessage>
                       ) : (
                         ""
                       )}
-                      {legitVouchers.length > 0 && !viewOrder.voucher && (
-                        <DiscountMessage>
-                          <GiftOutlined /> Mua thêm{" "}
-                          <DiscountMoney>
-                            {formatCurrency(
-                              legitVouchers[0].constraint - cartTotalPrice,
-                              currency
-                            )}
-                          </DiscountMoney>{" "}
-                          để được giảm tới{" "}
-                          <DiscountMoney>
-                            {formatCurrency(legitVouchers[0].value, currency)}
-                          </DiscountMoney>
-                        </DiscountMessage>
-                      )}
+                      {legitVouchers.length > 0 &&
+                        cartTotalPrice < legitVouchers[0].constraint &&
+                        !viewOrder.voucher && (
+                          <DiscountMessage>
+                            <GiftOutlined /> Mua thêm{" "}
+                            <DiscountMoney>
+                              {formatCurrency(legitVouchers[0].constraint - cartTotalPrice, currency)}
+                            </DiscountMoney>{" "}
+                            để được giảm tới{" "}
+                            <DiscountMoney>{formatCurrency(legitVouchers[0].value, currency)}</DiscountMoney>
+                          </DiscountMessage>
+                        )}
                     </div>
                   </th>
                 </tr>
@@ -935,7 +817,5 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
 
 export default MyOrderModal;
 
-const filterOption = (
-  input: string,
-  option?: { label: string; value: number | string }
-) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+const filterOption = (input: string, option?: { label: string; value: number | string }) =>
+  (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
