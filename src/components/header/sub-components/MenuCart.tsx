@@ -1,10 +1,5 @@
 import { GiftOutlined } from "@ant-design/icons";
-import {
-  Authenticated,
-  HttpError,
-  useGetIdentity,
-  useList,
-} from "@refinedev/core";
+import { Authenticated, useGetIdentity } from "@refinedev/core";
 import { Typography } from "antd";
 import clsx from "clsx";
 import { Fragment, useEffect, useState } from "react";
@@ -14,7 +9,7 @@ import { Link } from "react-router-dom";
 import { FREE_SHIPPING_THRESHOLD } from "../../../constants";
 import { CurrencyFormatter, formatCurrency } from "../../../helpers/currency";
 import { getDiscountPrice } from "../../../helpers/product";
-import { ICustomerResponse, IVoucherResponse } from "../../../interfaces";
+import { ICustomerResponse, IVoucherList } from "../../../interfaces";
 import { deleteFromCart, deleteFromDB } from "../../../redux/slices/cart-slice";
 import { AppDispatch, RootState } from "../../../redux/store";
 import { DiscountMessage, DiscountMoney } from "../../../styled/CartStyled";
@@ -36,44 +31,25 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
 
   const { data: user } = useGetIdentity<ICustomerResponse>();
 
-  const {
-    data,
-    isLoading: isLoadingVoucher,
-    isError,
-  } = useList<IVoucherResponse, HttpError>({
-    resource: "vouchers",
-    pagination: {
-      pageSize: 1000,
-    },
-    filters: [
-      {
-        field: "customer",
-        operator: "eq",
-        value: user?.id,
-      },
-    ],
-  });
-
   // Todo: lưu identity vào local để đỡ phải call
 
-  const vouchers = data?.data ? data?.data : [];
-
-  const [legitVouchers, setLegitVouchers] = useState<IVoucherResponse[]>([]);
+  const [legitVouchers, setLegitVouchers] = useState<IVoucherList[]>([]);
 
   useEffect(() => {
-    if (vouchers) {
-      const convertedLegitVoucher = vouchers.map((voucher) => {
-        const updatedVoucher = { ...voucher };
-        if (voucher.type === "PERCENTAGE") {
-          updatedVoucher.value = (voucher.value * cartTotalPrice) / 100;
+    if (user && user.customerVoucherList) {
+      const convertedLegitVoucher = user.customerVoucherList.map((single) => {
+        const updatedVoucher = { ...single };
+        if (single.voucher.type === "PERCENTAGE") {
+          updatedVoucher.voucher.value =
+            (single.voucher.value * cartTotalPrice) / 100;
         }
         return updatedVoucher;
       });
 
-      convertedLegitVoucher.sort((a, b) => b.value - a.value);
+      convertedLegitVoucher.sort((a, b) => b.voucher.value - a.voucher.value);
       setLegitVouchers(convertedLegitVoucher);
     }
-  }, [vouchers]);
+  }, [user]);
 
   return (
     <div
@@ -178,13 +154,13 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
                 <GiftOutlined /> Mua thêm{" "}
                 <DiscountMoney>
                   {formatCurrency(
-                    legitVouchers[0].constraint - cartTotalPrice,
+                    legitVouchers[0].voucher.constraint - cartTotalPrice,
                     currency
                   )}
                 </DiscountMoney>{" "}
                 để được giảm tới{" "}
                 <DiscountMoney>
-                  {formatCurrency(legitVouchers[0].value, currency)}
+                  {formatCurrency(legitVouchers[0].voucher.value, currency)}
                 </DiscountMoney>
               </DiscountMessage>
             )}
