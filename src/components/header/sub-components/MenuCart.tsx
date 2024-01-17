@@ -42,8 +42,7 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
       convertedLegitVoucher.map((single) => {
         const updatedVoucher = { ...single };
         if (single.voucher.type === "PERCENTAGE") {
-          updatedVoucher.voucher.value =
-            (single.voucher.value * cartTotalPrice) / 100;
+          updatedVoucher.voucher.value = (single.voucher.value * cartTotalPrice) / 100;
         }
         return updatedVoucher;
       });
@@ -54,24 +53,15 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
   }, [user]);
 
   return (
-    <div
-      className={clsx("shopping-cart-content", { active: activeIndex === 2 })}
-    >
+    <div className={clsx("shopping-cart-content", { active: activeIndex === 2 })}>
       {cartItems && cartItems.length > 0 ? (
         <Fragment>
           <ul>
             {cartItems.map((item) => {
-              const discountedPrice = getDiscountPrice(
-                item.selectedProductSize?.price ?? 0,
-                0
-              );
-              const finalProductPrice =
-                (item.selectedProductSize?.price ?? 0) * currency.currencyRate;
+              const discountedPrice = getDiscountPrice(item.selectedProductSize?.price ?? 0, 0);
+              const finalProductPrice = (item.selectedProductSize?.price ?? 0) * currency.currencyRate;
 
-              const finalDiscountedPrice =
-                discountedPrice !== null
-                  ? discountedPrice * currency.currencyRate
-                  : 0.0;
+              const finalDiscountedPrice = discountedPrice !== null ? discountedPrice * currency.currencyRate : 0.0;
 
               discountedPrice !== null
                 ? (cartTotalPrice += finalDiscountedPrice * item.quantity)
@@ -86,31 +76,22 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
                   </div>
                   <div className="shopping-cart-title">
                     <h4>
-                      <Link to={"/product/" + item.cartItemId}>
-                        {" "}
-                        {item.name}{" "}
-                      </Link>
+                      <Link to={"/product/" + item.cartItemId}> {item.name} </Link>
                     </h4>
                     <h6>
                       {t("header.menu_cart.qty")}: {item.quantity}
                     </h6>
                     <CurrencyFormatter
-                      value={
-                        discountedPrice !== null
-                          ? finalDiscountedPrice
-                          : finalProductPrice
-                      }
+                      value={discountedPrice !== null ? finalDiscountedPrice : finalProductPrice}
                       currency={currency}
                     />
                     {item.selectedProductColor && item.selectedProductSize ? (
                       <div className="cart-item-variation">
                         <span>
-                          {t("header.menu_cart.color")}:{" "}
-                          {item.selectedProductColor.name}
+                          {t("header.menu_cart.color")}: {item.selectedProductColor.name}
                         </span>
                         <span>
-                          {t("header.menu_cart.size")}:{" "}
-                          {item.selectedProductSize.name}
+                          {t("header.menu_cart.size")}: {item.selectedProductSize.name}
                         </span>
                       </div>
                     ) : (
@@ -120,9 +101,7 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
                   <div className="shopping-cart-delete">
                     <Authenticated
                       fallback={
-                        <button
-                          onClick={() => dispatch(deleteFromCart(item?.id))}
-                        >
+                        <button onClick={() => dispatch(deleteFromCart(item?.id))}>
                           <i className="fa fa-times-circle" />
                         </button>
                       }
@@ -139,50 +118,36 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
           <div className="shopping-cart-total mt-2">
             {(() => {
               const freeShippingDifference =
-                cartTotalPrice < FREE_SHIPPING_THRESHOLD
-                  ? FREE_SHIPPING_THRESHOLD - cartTotalPrice
-                  : Infinity;
+                cartTotalPrice < FREE_SHIPPING_THRESHOLD ? FREE_SHIPPING_THRESHOLD - cartTotalPrice : Infinity;
 
               const voucherDifference =
                 legitVouchers && legitVouchers.length > 0
-                  ? legitVouchers[0].voucher.constraint - cartTotalPrice
+                  ? cartTotalPrice < legitVouchers[0].voucher.constraint
+                    ? legitVouchers[0].voucher.constraint - cartTotalPrice
+                    : Infinity
                   : Infinity;
 
               const shouldDisplayFreeShipping =
                 freeShippingDifference > 0 &&
+                freeShippingDifference !== Infinity &&
                 freeShippingDifference <= voucherDifference;
               const shouldDisplayVoucher =
-                voucherDifference > 0 &&
-                voucherDifference < freeShippingDifference;
-
-              console.log("voucherDifference", voucherDifference);
-              console.log("freeShippingDifference", freeShippingDifference);
-              console.log(
-                "voucherDifference < freeShippingDifference",
-                voucherDifference < freeShippingDifference
-              );
+                voucherDifference > 0 && voucherDifference !== Infinity && voucherDifference < freeShippingDifference;
 
               if (shouldDisplayFreeShipping) {
                 return (
                   <DiscountMessage>
                     <GiftOutlined /> Mua thêm{" "}
-                    <DiscountMoney>
-                      {formatCurrency(freeShippingDifference, currency)}
-                    </DiscountMoney>{" "}
-                    để được miễn phí vận chuyển
+                    <DiscountMoney>{formatCurrency(freeShippingDifference, currency)}</DiscountMoney> để được miễn phí
+                    vận chuyển
                   </DiscountMessage>
                 );
               } else if (shouldDisplayVoucher) {
                 return (
                   <DiscountMessage>
                     <GiftOutlined /> Mua thêm{" "}
-                    <DiscountMoney>
-                      {formatCurrency(voucherDifference, currency)}
-                    </DiscountMoney>{" "}
-                    để được giảm tới{" "}
-                    <DiscountMoney>
-                      {formatCurrency(legitVouchers[0].voucher.value, currency)}
-                    </DiscountMoney>
+                    <DiscountMoney>{formatCurrency(voucherDifference, currency)}</DiscountMoney> để được giảm tới{" "}
+                    <DiscountMoney>{formatCurrency(legitVouchers[0].voucher.value, currency)}</DiscountMoney>
                   </DiscountMessage>
                 );
               } else {
@@ -192,11 +157,7 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
 
             <Title level={4}>
               {t("header.menu_cart.total")} :{" "}
-              <CurrencyFormatter
-                className="shop-total"
-                value={cartTotalPrice}
-                currency={currency}
-              />
+              <CurrencyFormatter className="shop-total" value={cartTotalPrice} currency={currency} />
             </Title>
           </div>
           <div className="shopping-cart-btn btn-hover text-center">

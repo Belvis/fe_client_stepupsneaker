@@ -1,23 +1,8 @@
-import React, {
-  Dispatch,
-  Fragment,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
+import React, { Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import {
-  getDiscountPrice,
-  getProductCartQuantity,
-} from "../../helpers/product";
-import {
-  ICartItem,
-  IColorResponse,
-  IProductClient,
-  ISizeClient,
-  IVariation,
-} from "../../interfaces";
+import { getDiscountPrice, getProductCartQuantity } from "../../helpers/product";
+import { ICartItem, IColorResponse, IProductClient, ISizeClient, IVariation } from "../../interfaces";
 import { addToCart, addToDB } from "../../redux/slices/cart-slice";
 import { addToCompare } from "../../redux/slices/compare-slice";
 import { CurrencyState } from "../../redux/slices/currency-slice";
@@ -57,38 +42,21 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
   const dispatch: AppDispatch = useDispatch();
 
   const initialSelectedSize =
-    product.variation && product.variation.length > 0
-      ? product.variation[0].size[0]
-      : ({} as ISizeClient);
+    product.variation && product.variation.length > 0 ? product.variation[0].size[0] : ({} as ISizeClient);
   const initialProductStock =
-    product.variation && product.variation.length > 0
-      ? product.variation[0].size[0].stock
-      : 0;
+    product.variation && product.variation.length > 0 ? product.variation[0].size[0].stock : 0;
 
-  const [selectedProductSize, setSelectedProductSize] =
-    useState(initialSelectedSize);
+  const [selectedProductSize, setSelectedProductSize] = useState(initialSelectedSize);
 
   const [productStock, setProductStock] = useState(initialProductStock);
 
   const [quantityCount, setQuantityCount] = useState(1);
 
-  const productCartQty = getProductCartQuantity(
-    cartItems,
-    product,
-    selectedProductColor,
-    selectedProductSize
-  );
+  const productCartQty = getProductCartQuantity(cartItems, product, selectedProductColor, selectedProductSize);
 
-  const discountedPrice = getDiscountPrice(
-    selectedProductSize.price,
-    selectedProductSize.discount
-  );
-  const finalProductPrice = +(
-    selectedProductSize.price * currency.currencyRate
-  );
-  const finalDiscountedPrice = +(
-    (discountedPrice ?? selectedProductSize.discount) * currency.currencyRate
-  );
+  const discountedPrice = getDiscountPrice(selectedProductSize.price, selectedProductSize.discount);
+  const finalProductPrice = +(selectedProductSize.price * currency.currencyRate);
+  const finalDiscountedPrice = +((discountedPrice ?? selectedProductSize.discount) * currency.currencyRate);
 
   useEffect(() => {
     setSelectedProductSize(initialSelectedSize);
@@ -101,15 +69,8 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
       <div className="product-details-price">
         {discountedPrice !== null ? (
           <Fragment>
-            <CurrencyFormatter
-              value={finalDiscountedPrice}
-              currency={currency}
-            />{" "}
-            <CurrencyFormatter
-              className="old"
-              value={finalProductPrice}
-              currency={currency}
-            />
+            <CurrencyFormatter value={finalDiscountedPrice} currency={currency} />{" "}
+            <CurrencyFormatter className="old" value={finalProductPrice} currency={currency} />
           </Fragment>
         ) : (
           <CurrencyFormatter value={finalProductPrice} currency={currency} />
@@ -126,12 +87,10 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
       )} */}
       <div className="pro-details-list">
         <p>
-          Bước chân vào phong cách đương đại với đôi sneaker này - sự kết hợp
-          hoàn hảo giữa thiết kế hiện đại và thoải mái vô song. Với đế đàn hồi,
-          chất liệu chống nước và đường may tỉ mỉ, đôi sneaker này không chỉ là
-          một phần của bộ sưu tập thời trang của bạn mà còn là người bạn đồng
-          hành lý tưởng trong mọi hoạt động hàng ngày. Bước chân nhẹ nhàng, hãy
-          để đôi sneaker này làm nổi bật phong cách cá nhân của bạn.
+          Bước chân vào phong cách đương đại với đôi sneaker này - sự kết hợp hoàn hảo giữa thiết kế hiện đại và thoải
+          mái vô song. Với đế đàn hồi, chất liệu chống nước và đường may tỉ mỉ, đôi sneaker này không chỉ là một phần
+          của bộ sưu tập thời trang của bạn mà còn là người bạn đồng hành lý tưởng trong mọi hoạt động hàng ngày. Bước
+          chân nhẹ nhàng, hãy để đôi sneaker này làm nổi bật phong cách cá nhân của bạn.
         </p>
       </div>
       <div className="pro-details-meta">
@@ -149,19 +108,12 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
               <span>{t(`products.fields.colors`)}</span>
               <div className="pro-details-color-content">
                 {product.variation.map((single, key) => {
-                  const hasSale = single.size.some(
-                    (size) =>
-                      typeof size.discount === "number" && size.discount > 0
-                  );
+                  const hasSale = single.size.some((size) => typeof size.discount === "number" && size.discount > 0);
 
                   return (
                     <label
-                      className={`pro-details-color-content--single ${
-                        single.color
-                      } ${
-                        single.color.id === selectedProductColor.id
-                          ? "selected"
-                          : ""
+                      className={`pro-details-color-content--single ${single.color} ${
+                        single.color.id === selectedProductColor.id ? "selected" : ""
                       }`}
                       key={key}
                       style={{
@@ -216,10 +168,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
                           const hasSale = singleSize.discount > 0;
 
                           return (
-                            <label
-                              className={`pro-details-size-content--single`}
-                              key={key}
-                            >
+                            <label className={`pro-details-size-content--single`} key={key}>
                               <Badge
                                 count={
                                   hasSale ? (
@@ -238,18 +187,14 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
                                 <input
                                   type="radio"
                                   value={singleSize.name}
-                                  checked={
-                                    singleSize.id === selectedProductSize.id
-                                  }
+                                  checked={singleSize.id === selectedProductSize.id}
                                   onChange={() => {
                                     setSelectedProductSize(singleSize);
                                     setProductStock(singleSize.stock);
                                     setQuantityCount(1);
                                   }}
                                 />
-                                <span className="size-name">
-                                  {singleSize.name}
-                                </span>
+                                <span className="size-name">{singleSize.name}</span>
                               </Badge>
                             </label>
                           );
@@ -276,12 +221,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
           >
             -
           </button>
-          <input
-            className="cart-plus-minus-box"
-            type="text"
-            value={quantityCount}
-            readOnly
-          />
+          <input className="cart-plus-minus-box" type="text" value={quantityCount} readOnly />
           <button
             onClick={() => {
               if (quantityCount + productCartQty >= 5) {
@@ -291,9 +231,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
               }
 
               if (quantityCount >= productStock - productCartQty) {
-                return showErrorToast(
-                  "Rất tiếc, đã đạt giới hạn số lượng sản phẩm!"
-                );
+                return showErrorToast("Rất tiếc, đã đạt giới hạn số lượng sản phẩm!");
               }
               setQuantityCount(quantityCount + 1);
             }}
@@ -346,18 +284,14 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
               </button>
             </Authenticated>
           ) : (
-            <button disabled>{t(`products.buttons.out_of_stock`)}</button>
+            <button disabled>{t(`products.desc_tab.buttons.out_of_stock`)}</button>
           )}
         </div>
         <div className="pro-details-wishlist">
           <button
             className={wishlistItem !== undefined ? "active" : ""}
             disabled={wishlistItem !== undefined}
-            title={
-              wishlistItem !== undefined
-                ? "Added to wishlist"
-                : "Add to wishlist"
-            }
+            title={wishlistItem !== undefined ? "Added to wishlist" : "Add to wishlist"}
             onClick={() => dispatch(addToWishlist(product))}
           >
             <i className="pe-7s-like" />
@@ -367,9 +301,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
           <button
             className={compareItem !== undefined ? "active" : ""}
             disabled={compareItem !== undefined}
-            title={
-              compareItem !== undefined ? "Added to compare" : "Add to compare"
-            }
+            title={compareItem !== undefined ? "Added to compare" : "Add to compare"}
             onClick={() => dispatch(addToCompare(product))}
           >
             <i className="pe-7s-shuffle" />

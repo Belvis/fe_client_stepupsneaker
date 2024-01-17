@@ -6,10 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { EffectFade, Thumbs } from "swiper";
 import { CurrencyFormatter } from "../../helpers/currency";
-import {
-  getDiscountPrice,
-  getProductCartQuantity,
-} from "../../helpers/product";
+import { getDiscountPrice, getProductCartQuantity } from "../../helpers/product";
 import { IColorResponse, IProductClient, ISizeClient } from "../../interfaces";
 import { addToCart, addToDB } from "../../redux/slices/cart-slice";
 import { addToCompare } from "../../redux/slices/compare-slice";
@@ -29,64 +26,35 @@ type ProductModalProps = {
   compareItem: any;
 };
 
-const ProductModal: React.FC<ProductModalProps> = ({
-  product,
-  currency,
-  show,
-  onHide,
-  wishlistItem,
-  compareItem,
-}) => {
+const ProductModal: React.FC<ProductModalProps> = ({ product, currency, show, onHide, wishlistItem, compareItem }) => {
   const { t } = useTranslation();
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
   const dispatch: AppDispatch = useDispatch();
   const { cartItems } = useSelector((state: RootState) => state.cart);
 
   const initialSelectedColor =
-    product.variation && product.variation.length > 0
-      ? product.variation[0].color
-      : ({} as IColorResponse);
+    product.variation && product.variation.length > 0 ? product.variation[0].color : ({} as IColorResponse);
   const initialSelectedSize =
-    product.variation && product.variation.length > 0
-      ? product.variation[0].size[0]
-      : ({} as ISizeClient);
+    product.variation && product.variation.length > 0 ? product.variation[0].size[0] : ({} as ISizeClient);
   const initialProductStock =
-    product.variation && product.variation.length > 0
-      ? product.variation[0].size[0].stock
-      : 0;
+    product.variation && product.variation.length > 0 ? product.variation[0].size[0].stock : 0;
 
-  const [selectedProductColor, setSelectedProductColor] =
-    useState(initialSelectedColor);
+  const [selectedProductColor, setSelectedProductColor] = useState(initialSelectedColor);
 
-  const [selectedProductSize, setSelectedProductSize] =
-    useState(initialSelectedSize);
+  const [selectedProductSize, setSelectedProductSize] = useState(initialSelectedSize);
 
   const [selectedVariant, setSelectedVariant] = useState(product.variation[0]);
 
   const [productStock, setProductStock] = useState(initialProductStock);
 
   const [quantityCount, setQuantityCount] = useState(1);
-  const productCartQty = getProductCartQuantity(
-    cartItems,
-    product,
-    selectedProductColor,
-    selectedProductSize
-  );
-  const discountedPrice = getDiscountPrice(
-    selectedProductSize.price,
-    selectedProductSize.discount
-  );
-  const finalProductPrice = +(
-    selectedProductSize.price * currency.currencyRate
-  );
-  const finalDiscountedPrice = +(
-    (discountedPrice ?? selectedProductSize.discount) * currency.currencyRate
-  );
+  const productCartQty = getProductCartQuantity(cartItems, product, selectedProductColor, selectedProductSize);
+  const discountedPrice = getDiscountPrice(selectedProductSize.price, selectedProductSize.discount);
+  const finalProductPrice = +(selectedProductSize.price * currency.currencyRate);
+  const finalDiscountedPrice = +((discountedPrice ?? selectedProductSize.discount) * currency.currencyRate);
 
   useEffect(() => {
-    const selectedVariant = product.variation.find(
-      (variation) => variation.color.id === selectedProductColor.id
-    );
+    const selectedVariant = product.variation.find((variation) => variation.color.id === selectedProductColor.id);
     if (selectedVariant) setSelectedVariant(selectedVariant);
   }, [selectedProductColor]);
 
@@ -126,11 +94,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
   };
 
   return (
-    <Modal
-      show={show}
-      onHide={onCloseModal}
-      className="product-quickview-modal-wrapper"
-    >
+    <Modal show={show} onHide={onCloseModal} className="product-quickview-modal-wrapper">
       <Modal.Header closeButton></Modal.Header>
 
       <div className="modal-body">
@@ -174,21 +138,11 @@ const ProductModal: React.FC<ProductModalProps> = ({
               <div className="product-details-price">
                 {discountedPrice !== null ? (
                   <Fragment>
-                    <CurrencyFormatter
-                      value={finalDiscountedPrice}
-                      currency={currency}
-                    />
-                    <CurrencyFormatter
-                      className="old"
-                      value={finalProductPrice}
-                      currency={currency}
-                    />
+                    <CurrencyFormatter value={finalDiscountedPrice} currency={currency} />
+                    <CurrencyFormatter className="old" value={finalProductPrice} currency={currency} />
                   </Fragment>
                 ) : (
-                  <CurrencyFormatter
-                    value={finalProductPrice}
-                    currency={currency}
-                  />
+                  <CurrencyFormatter value={finalProductPrice} currency={currency} />
                 )}
               </div>
               {/* {product.rating && product.rating > 0 ? ( */}
@@ -215,19 +169,13 @@ const ProductModal: React.FC<ProductModalProps> = ({
                       <div className="pro-details-color-content">
                         {product.variation.map((single, key) => {
                           const hasSale = single.size.some(
-                            (size) =>
-                              typeof size.discount === "number" &&
-                              size.discount > 0
+                            (size) => typeof size.discount === "number" && size.discount > 0
                           );
 
                           return (
                             <label
-                              className={`pro-details-color-content--single ${
-                                single.color.id
-                              } ${
-                                single.color.id === selectedProductColor.id
-                                  ? "selected"
-                                  : ""
+                              className={`pro-details-color-content--single ${single.color.id} ${
+                                single.color.id === selectedProductColor.id ? "selected" : ""
                               }`}
                               key={key}
                               style={{
@@ -256,9 +204,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                                   type="radio"
                                   value={single.color.id}
                                   name="product-color"
-                                  checked={
-                                    single.color.id === selectedProductColor.id
-                                  }
+                                  checked={single.color.id === selectedProductColor.id}
                                   onChange={() => {
                                     setSelectedProductColor(single.color);
                                     setSelectedProductSize(single.size[0]);
@@ -283,10 +229,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                               ? single.size.map((singleSize, key) => {
                                   const hasSale = singleSize.discount > 0;
                                   return (
-                                    <label
-                                      className={`pro-details-size-content--single`}
-                                      key={key}
-                                    >
+                                    <label className={`pro-details-size-content--single`} key={key}>
                                       <Badge
                                         count={
                                           hasSale ? (
@@ -305,19 +248,14 @@ const ProductModal: React.FC<ProductModalProps> = ({
                                         <input
                                           type="radio"
                                           value={singleSize.id}
-                                          checked={
-                                            singleSize.id ===
-                                            selectedProductSize.id
-                                          }
+                                          checked={singleSize.id === selectedProductSize.id}
                                           onChange={() => {
                                             setSelectedProductSize(singleSize);
                                             setProductStock(singleSize.stock);
                                             setQuantityCount(1);
                                           }}
                                         />
-                                        <span className="size-name">
-                                          {singleSize.name}
-                                        </span>
+                                        <span className="size-name">{singleSize.name}</span>
                                       </Badge>
                                     </label>
                                   );
@@ -344,12 +282,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                   >
                     -
                   </button>
-                  <input
-                    className="cart-plus-minus-box"
-                    type="text"
-                    value={quantityCount}
-                    readOnly
-                  />
+                  <input className="cart-plus-minus-box" type="text" value={quantityCount} readOnly />
                   <button
                     onClick={() => {
                       if (quantityCount + productCartQty >= 5) {
@@ -359,9 +292,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                       }
 
                       if (quantityCount >= productStock - productCartQty) {
-                        return showErrorToast(
-                          "Rất tiếc, đã đạt giới hạn số lượng sản phẩm!"
-                        );
+                        return showErrorToast("Rất tiếc, đã đạt giới hạn số lượng sản phẩm!");
                       }
                       setQuantityCount(quantityCount + 1);
                     }}
@@ -414,20 +345,14 @@ const ProductModal: React.FC<ProductModalProps> = ({
                       </button>
                     </Authenticated>
                   ) : (
-                    <button disabled>
-                      {t(`products.buttons.out_of_stock`)}
-                    </button>
+                    <button disabled>{t(`products.desc_tab.buttons.out_of_stock`)}</button>
                   )}
                 </div>
                 <div className="pro-details-wishlist">
                   <button
                     className={wishlistItem !== undefined ? "active" : ""}
                     disabled={wishlistItem !== undefined}
-                    title={
-                      wishlistItem !== undefined
-                        ? "Added to wishlist"
-                        : "Add to wishlist"
-                    }
+                    title={wishlistItem !== undefined ? "Added to wishlist" : "Add to wishlist"}
                     onClick={() => dispatch(addToWishlist(product))}
                   >
                     <i className="pe-7s-like" />
@@ -437,11 +362,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                   <button
                     className={compareItem !== undefined ? "active" : ""}
                     disabled={compareItem !== undefined}
-                    title={
-                      compareItem !== undefined
-                        ? "Added to compare"
-                        : "Add to compare"
-                    }
+                    title={compareItem !== undefined ? "Added to compare" : "Add to compare"}
                     onClick={() => dispatch(addToCompare(product))}
                   >
                     <i className="pe-7s-shuffle" />
