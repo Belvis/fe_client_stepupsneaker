@@ -774,7 +774,10 @@ const CheckOut = () => {
                         <div className="discount-message">
                           {(() => {
                             const freeShippingDifference =
-                              FREE_SHIPPING_THRESHOLD - cartTotalPrice;
+                              cartTotalPrice < FREE_SHIPPING_THRESHOLD
+                                ? FREE_SHIPPING_THRESHOLD - cartTotalPrice
+                                : Infinity;
+
                             const voucherDifference =
                               legitVouchers && legitVouchers.length > 0
                                 ? legitVouchers[0].voucher.constraint -

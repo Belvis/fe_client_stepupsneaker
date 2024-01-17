@@ -139,7 +139,10 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
           <div className="shopping-cart-total mt-2">
             {(() => {
               const freeShippingDifference =
-                FREE_SHIPPING_THRESHOLD - cartTotalPrice;
+                cartTotalPrice < FREE_SHIPPING_THRESHOLD
+                  ? FREE_SHIPPING_THRESHOLD - cartTotalPrice
+                  : Infinity;
+
               const voucherDifference =
                 legitVouchers && legitVouchers.length > 0
                   ? legitVouchers[0].voucher.constraint - cartTotalPrice
@@ -151,6 +154,13 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
               const shouldDisplayVoucher =
                 voucherDifference > 0 &&
                 voucherDifference < freeShippingDifference;
+
+              console.log("voucherDifference", voucherDifference);
+              console.log("freeShippingDifference", freeShippingDifference);
+              console.log(
+                "voucherDifference < freeShippingDifference",
+                voucherDifference < freeShippingDifference
+              );
 
               if (shouldDisplayFreeShipping) {
                 return (

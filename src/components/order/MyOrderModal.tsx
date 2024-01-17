@@ -800,7 +800,9 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                     <div className="row">
                       {(() => {
                         const freeShippingDifference =
-                          FREE_SHIPPING_THRESHOLD - viewOrder.originMoney;
+                          viewOrder.originMoney < FREE_SHIPPING_THRESHOLD
+                            ? FREE_SHIPPING_THRESHOLD - viewOrder.originMoney
+                            : Infinity;
 
                         const voucherDifference =
                           legitVouchers && legitVouchers.length > 0
