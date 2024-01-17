@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IOrderRequest } from "../../interfaces";
+import { IOrderRequest, IVoucherResponse } from "../../interfaces";
 
 export interface OrderState {
   order: IOrderRequest;
@@ -17,8 +17,13 @@ const orderSlice = createSlice({
     clearOrder(state) {
       state.order = {} as IOrderRequest;
     },
+    clearVoucher(state) {
+      if (state.order && state.order.voucher) {
+        delete state.order.voucher;
+      }
+    },
   },
 });
 
-export const { setOrder, clearOrder } = orderSlice.actions;
+export const { setOrder, clearOrder, clearVoucher } = orderSlice.actions;
 export default orderSlice.reducer;

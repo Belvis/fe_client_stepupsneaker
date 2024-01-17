@@ -10,6 +10,7 @@ import {
   LoginFormTypes,
   useActiveAuthProvider,
   useLogin,
+  useNotification,
   useRegister,
 } from "@refinedev/core";
 import { Form, FormProps } from "antd";
@@ -38,6 +39,7 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
   const [registerForm] = Form.useForm<ICustomerRequest>();
 
   const authProvider = useActiveAuthProvider();
+  const { open } = useNotification();
 
   const { mutate: login, isLoading } = useLogin<LoginFormTypes>({
     v3LegacyAuthProviderCompatible: Boolean(authProvider?.isLegacy),
@@ -48,11 +50,15 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
   const onSubmitLogin = (values: LoginFormTypes) => {
     login(values, {
       onSuccess: (data) => {
-        alert(JSON.stringify(data));
         if (!data.success) {
-          return;
+          return console.log(data.error);
         }
-        alert(JSON.stringify(data));
+
+        open?.({
+          type: "success",
+          message: "Đăng nhập thành công",
+          description: `Xin chào`,
+        });
       },
     });
   };

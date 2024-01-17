@@ -21,6 +21,7 @@ import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import "./assets/scss/style.scss";
 import { store } from "./redux/store";
+import { Spin } from "antd";
 
 dayjs.extend(WeekDay);
 dayjs.extend(LocaleData);
@@ -33,7 +34,7 @@ const root = createRoot(container);
 
 root.render(
   <React.StrictMode>
-    <React.Suspense fallback="loading">
+    <React.Suspense fallback={<Spin fullscreen />}>
       <Provider store={store}>
         <PersistProvider>
           <App />

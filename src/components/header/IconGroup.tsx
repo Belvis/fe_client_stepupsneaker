@@ -1,8 +1,10 @@
-import { Authenticated, useLogout } from "@refinedev/core";
+import { Authenticated, useGetIdentity, useLogout } from "@refinedev/core";
+import { Avatar } from "antd";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { ICustomerResponse } from "../../interfaces";
 import { RootState } from "../../redux/store";
 import MenuCart from "./sub-components/MenuCart";
 
@@ -13,6 +15,8 @@ type IconGroupProps = {
 export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const { mutate: logout } = useLogout();
+
+  const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
 
   const handleClick = (index: number) => {
     setActiveIndex((prevIndex) => (prevIndex === index ? null : index));
@@ -45,6 +49,41 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
   const { wishlistItems } = useSelector((state: RootState) => state.wishlist);
   const { cartItems } = useSelector((state: RootState) => state.cart);
 
+  function getFirstLetterOfLastWord(fullName: string | undefined) {
+    if (!fullName) {
+      return "U";
+    }
+
+    const words = fullName.split(" ");
+    if (words.length === 0) {
+      return "U";
+    }
+
+    const lastWord = words[words.length - 1];
+    const firstLetter = lastWord.charAt(0);
+
+    return firstLetter;
+  }
+
+  function hashString(str: string) {
+    let hash = 0;
+    if (str.length === 0) return hash;
+
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+
+    return hash;
+  }
+
+  function getAvatarColor(fullName: string | undefined) {
+    const hashedValue = hashString(fullName || "User");
+    const color = `#${(hashedValue & 0x00ffffff).toString(16).toUpperCase()}`;
+    return color;
+  }
+
   return (
     <div className={clsx("header-right-wrap", iconWhiteClass)}>
       <div className="same-style header-search d-none d-lg-block">
@@ -70,7 +109,25 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
           })}
           onClick={() => handleClick(1)}
         >
-          <i className="pe-7s-user-female" />
+          <Authenticated fallback={<i className="pe-7s-user-female" />}>
+            {user && user.image ? (
+              <Avatar
+                size={24}
+                src={user.image}
+                style={{ verticalAlign: "baseline" }}
+              />
+            ) : (
+              <Avatar
+                size={24}
+                style={{
+                  verticalAlign: "baseline",
+                  backgroundColor: getAvatarColor(user?.fullName),
+                }}
+              >
+                {getFirstLetterOfLastWord(user?.fullName)}
+              </Avatar>
+            )}
+          </Authenticated>
         </button>
         <div
           className={clsx("account-dropdown", { active: activeIndex === 1 })}

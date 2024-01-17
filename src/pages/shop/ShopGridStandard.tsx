@@ -80,8 +80,6 @@ const ShopGridStandard: React.FC = () => {
       });
     }
 
-    console.log(filters);
-
     return filters;
   };
 

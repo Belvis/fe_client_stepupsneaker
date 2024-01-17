@@ -7,17 +7,17 @@ import {
 } from "@ant-design/icons";
 import { HttpError, useOne } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { Result, Typography } from "antd";
+import { Result, Spin } from "antd";
 import dayjs from "dayjs";
 import { Fragment, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { Link, useLocation, useParams } from "react-router-dom";
+import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 import { CurrencyFormatter } from "../../helpers/currency";
 import { IOrderResponse } from "../../interfaces";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 
 const Success = () => {
   const { t } = useTranslation();
@@ -41,14 +41,6 @@ const Success = () => {
 
   const currency = useSelector((state: RootState) => state.currency);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError) {
-    return <div>Something went wrong!</div>;
-  }
-
   return (
     <Fragment>
       <Breadcrumb
@@ -59,308 +51,324 @@ const Success = () => {
         ]}
       />
 
-      <div
-        className="success-area pb-80 bg-white"
-        style={{ padding: "80px 30px 100px 30px" }}
-      >
-        <Result
-          status="success"
-          title="Cảm ơn bạn đã mua hàng!"
-          subTitle={
-            <div>
-              <p>
-                Email xác nhận đơn hàng với chi tiết đơn hàng của bạn và một
-                liên kết để theo dõi tiến trình đã được gửi đến địa chỉ email
-                của bạn.
-              </p>
-              <p>Chúng tôi sẽ liên hệ với bạn trong 24h, xin hãy chờ đợi.</p>
-              <div className="order-code">
-                <Link to={"/tracking/" + order.code}>
-                  Mã đơn hàng: {order.code.toUpperCase()}
-                </Link>
-              </div>
-              <p>
-                Ngày mua hàng:{" "}
-                {dayjs(new Date(order.createdAt ?? 0)).format("DD/MM/YYYY")}
-              </p>
-            </div>
-          }
-          extra={[
-            <Link className="order-nav" to={`/shop`}>
-              <CaretLeftOutlined /> Tiếp tục mua sắm
-            </Link>,
-            <Link className="order-nav" to={`/shop`}>
-              <PrinterOutlined /> In hoá đơn
-            </Link>,
-          ]}
-        />
-        <div className="row ">
-          <div className="col-lg-6 col-md-6">
-            <div className="row">
-              <div className="col-lg-6 col-md-6 mb-4">
-                <div className="table-content table-responsive order-tracking-table-content">
-                  <table className="w-100">
-                    <thead>
-                      <tr>
-                        <th style={{ textAlign: "start" }}>
-                          <HomeFilled /> Địa chỉ giao hàng
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="field">
-                          {order.address && (
-                            <>
-                              <p>
-                                Tỉnh/thành phố: {order.address.provinceName}
-                              </p>
-                              <p>Quận/huyện: {order.address.districtName}</p>
-                              <p>Phường/xã: {order.address.wardName}</p>
-                              <p>Số điện thoại: {order.address.phoneNumber}</p>
-                              <p>Địa chỉ chi tiết: {order.address.more}</p>
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+      <Spin spinning={isLoading}>
+        {order && !isLoading && (
+          <div
+            className="success-area pb-80 bg-white"
+            style={{ padding: "80px 30px 100px 30px" }}
+          >
+            <Result
+              status="success"
+              title="Cảm ơn bạn đã mua hàng!"
+              subTitle={
+                <div>
+                  <p>
+                    Email xác nhận đơn hàng với chi tiết đơn hàng của bạn và một
+                    liên kết để theo dõi tiến trình đã được gửi đến địa chỉ
+                    email của bạn.
+                  </p>
+                  <p>
+                    Chúng tôi sẽ liên hệ với bạn trong 24h, xin hãy chờ đợi.
+                  </p>
+                  <div className="order-code">
+                    <Link to={"/tracking/" + order.code}>
+                      Mã đơn hàng: {order.code.toUpperCase()}
+                    </Link>
+                  </div>
+                  <p>
+                    Ngày mua hàng:{" "}
+                    {dayjs(new Date(order.createdAt ?? 0)).format("DD/MM/YYYY")}
+                  </p>
                 </div>
-              </div>
-              <div className="col-lg-6 col-md-6 mb-4">
-                <div className="table-content table-responsive order-tracking-table-content">
-                  <table className="w-100">
-                    <thead>
-                      <tr>
-                        <th style={{ textAlign: "start" }}>
-                          <HomeFilled /> Địa chỉ hóa đơn
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="field">
-                          {order.address &&
-                            order.customer &&
-                            order.customer.addressList.length > 0 && (
-                              <>
-                                <p>
-                                  Tỉnh/thành phố:{" "}
-                                  {order.customer.addressList[0].provinceName}
-                                </p>
-                                <p>
-                                  Quận/huyện:{" "}
-                                  {order.customer.addressList[0].districtName}
-                                </p>
-                                <p>
-                                  Phường/xã:{" "}
-                                  {order.customer.addressList[0].wardName}
-                                </p>
-                                <p>
-                                  Số điện thoại:{" "}
-                                  {order.customer.addressList[0].phoneNumber}
-                                </p>
-                                <p>
-                                  Địa chỉ chi tiết:{" "}
-                                  {order.customer.addressList[0].more}
-                                </p>
-                              </>
-                            )}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+              }
+              extra={[
+                <Link className="order-nav" to={`/shop`}>
+                  <CaretLeftOutlined /> Tiếp tục mua sắm
+                </Link>,
+                <Link className="order-nav" to={`/shop`}>
+                  <PrinterOutlined /> In hoá đơn
+                </Link>,
+              ]}
+            />
+            <div className="row ">
+              <div className="col-lg-6 col-md-6">
+                <div className="row">
+                  <div className="col-lg-6 col-md-6 mb-4">
+                    <div className="table-content table-responsive order-tracking-table-content">
+                      <table className="w-100">
+                        <thead>
+                          <tr>
+                            <th style={{ textAlign: "start" }}>
+                              <HomeFilled /> Địa chỉ giao hàng
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="field">
+                              {order.address && (
+                                <>
+                                  <p>
+                                    Tỉnh/thành phố: {order.address.provinceName}
+                                  </p>
+                                  <p>
+                                    Quận/huyện: {order.address.districtName}
+                                  </p>
+                                  <p>Phường/xã: {order.address.wardName}</p>
+                                  <p>
+                                    Số điện thoại: {order.address.phoneNumber}
+                                  </p>
+                                  <p>Địa chỉ chi tiết: {order.address.more}</p>
+                                </>
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div className="col-lg-6 col-md-6 mb-4">
+                    <div className="table-content table-responsive order-tracking-table-content">
+                      <table className="w-100">
+                        <thead>
+                          <tr>
+                            <th style={{ textAlign: "start" }}>
+                              <HomeFilled /> Địa chỉ hóa đơn
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="field">
+                              {order.address &&
+                                order.customer &&
+                                order.customer.addressList.length > 0 && (
+                                  <>
+                                    <p>
+                                      Tỉnh/thành phố:{" "}
+                                      {
+                                        order.customer.addressList[0]
+                                          .provinceName
+                                      }
+                                    </p>
+                                    <p>
+                                      Quận/huyện:{" "}
+                                      {
+                                        order.customer.addressList[0]
+                                          .districtName
+                                      }
+                                    </p>
+                                    <p>
+                                      Phường/xã:{" "}
+                                      {order.customer.addressList[0].wardName}
+                                    </p>
+                                    <p>
+                                      Số điện thoại:{" "}
+                                      {
+                                        order.customer.addressList[0]
+                                          .phoneNumber
+                                      }
+                                    </p>
+                                    <p>
+                                      Địa chỉ chi tiết:{" "}
+                                      {order.customer.addressList[0].more}
+                                    </p>
+                                  </>
+                                )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-lg-6 col-md-6 mb-4">
-                <div className="table-content table-responsive order-tracking-table-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th style={{ textAlign: "start" }}>
-                          <CarFilled /> Phương thức vận chuyển
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="field">Giao hàng tiết kiệm</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                <div className="row">
+                  <div className="col-lg-6 col-md-6 mb-4">
+                    <div className="table-content table-responsive order-tracking-table-content">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th style={{ textAlign: "start" }}>
+                              <CarFilled /> Phương thức vận chuyển
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="field">Giao hàng tiết kiệm</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
 
-              <div className="col-lg-6 col-md-6 mb-4">
-                <div className="table-content table-responsive order-tracking-table-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th style={{ textAlign: "start" }}>
-                          <CreditCardFilled /> Phương thức thanh toán
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="field">
-                          {order?.payments &&
-                            order.payments.map((payment, index) => (
-                              <span key={index}>
-                                {t(
-                                  `success.payment.methods.options.${payment.paymentMethod.name}`
-                                )}{" "}
-                                - {t("success.payment.transaction_code")}
-                                {": "}
-                                {payment.transactionCode}
-                                {index < order.payments.length - 1 ? ", " : ""}
-                              </span>
-                            ))}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <div className="col-lg-6 col-md-6 mb-4">
+                    <div className="table-content table-responsive order-tracking-table-content">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th style={{ textAlign: "start" }}>
+                              <CreditCardFilled /> Phương thức thanh toán
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="field">
+                              {order?.payments &&
+                                order.payments.map((payment, index) => (
+                                  <span key={index}>
+                                    {t(
+                                      `success.payment.methods.options.${payment.paymentMethod.name}`
+                                    )}{" "}
+                                    - {t("success.payment.transaction_code")}
+                                    {": "}
+                                    {payment.transactionCode}
+                                    {index < order.payments.length - 1
+                                      ? ", "
+                                      : ""}
+                                  </span>
+                                ))}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
+              </div>
+              <div className="col-lg-6 col-md-6 order-summary table-content table-responsive order-tracking-table-content ">
+                <table className="w-100">
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: "start" }}>Sản phẩm</th>
+                      <th style={{ textAlign: "end" }}>
+                        {t(`cart.table.head.subtotal`)}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {order.orderDetails &&
+                      order.orderDetails.length > 0 &&
+                      order.orderDetails.map((detail, key) => {
+                        return (
+                          <tr key={key}>
+                            <td className="product">
+                              <div className="row">
+                                <div className="product-thumbnail col-3">
+                                  <Link
+                                    to={
+                                      "/product/" +
+                                      detail.productDetail.product.id
+                                    }
+                                  >
+                                    <img
+                                      className="img-fluid"
+                                      src={detail.productDetail.image}
+                                      alt=""
+                                    />
+                                  </Link>
+                                </div>
+                                <div className="cart-item-variation col-9">
+                                  <span>
+                                    {t(`cart.table.head.product_name`)}:{" "}
+                                    <Link
+                                      to={"/product/" + detail.id}
+                                      className="fw-bold"
+                                    >
+                                      {detail.productDetail.product.name}
+                                    </Link>
+                                  </span>
+                                  <span>
+                                    {t(`cart.table.head.color`)}:{" "}
+                                    {detail.productDetail.color.name}
+                                  </span>
+                                  <span>
+                                    {t(`cart.table.head.size`)}:{" "}
+                                    {detail.productDetail.size.name}
+                                  </span>
+                                  <span>
+                                    {t(`cart.table.head.qty`)}:{" "}
+                                    {detail.quantity}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="value">
+                              <CurrencyFormatter
+                                className="amount"
+                                value={detail.totalPrice}
+                                currency={currency}
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th colSpan={2} style={{ textAlign: "end" }}>
+                        <div className="row">
+                          <div className="col-8">
+                            <h5>{t(`cart.cart_total.total`)} </h5>
+                          </div>
+                          <div className="col-4">
+                            <CurrencyFormatter
+                              value={order.originMoney}
+                              currency={currency}
+                            />
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col-8">
+                            <h5>{t(`cart.cart_total.shipping`)} </h5>
+                          </div>
+                          <div className="col-4">
+                            {order.originMoney >= FREE_SHIPPING_THRESHOLD ? (
+                              <span className="free-shipping">
+                                Miễn phí vận chuyển
+                              </span>
+                            ) : (
+                              <CurrencyFormatter
+                                value={order.shippingMoney}
+                                currency={currency}
+                              />
+                            )}
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col-8">
+                            <h5>Giảm giá</h5>
+                          </div>
+                          <div className="col-4">
+                            <CurrencyFormatter
+                              value={order.reduceMoney}
+                              currency={currency}
+                            />
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col-8">
+                            <h4 className="grand-total-title">
+                              {t(`cart.cart_total.grand_total`)}{" "}
+                            </h4>
+                          </div>
+                          <div className="col-4">
+                            <CurrencyFormatter
+                              value={order.totalMoney}
+                              currency={currency}
+                            />
+                          </div>
+                        </div>
+                      </th>
+                    </tr>
+                  </tfoot>
+                </table>
               </div>
             </div>
           </div>
-          <div className="col-lg-6 col-md-6 order-summary table-content table-responsive order-tracking-table-content ">
-            <table className="w-100">
-              <thead>
-                <tr>
-                  <th style={{ textAlign: "start" }}>Sản phẩm</th>
-                  <th style={{ textAlign: "end" }}>
-                    {t(`cart.table.head.subtotal`)}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {order.orderDetails &&
-                  order.orderDetails.length > 0 &&
-                  order.orderDetails.map((detail, key) => {
-                    return (
-                      <tr key={key}>
-                        <td className="product">
-                          <div className="row">
-                            <div className="product-thumbnail col-3">
-                              <Link
-                                to={
-                                  "/product/" + detail.productDetail.product.id
-                                }
-                              >
-                                <img
-                                  className="img-fluid"
-                                  src={detail.productDetail.image}
-                                  alt=""
-                                />
-                              </Link>
-                            </div>
-                            <div className="cart-item-variation col-9">
-                              <span>
-                                {t(`cart.table.head.product_name`)}:{" "}
-                                <Link
-                                  to={"/product/" + detail.id}
-                                  className="fw-bold"
-                                >
-                                  {detail.productDetail.product.name}
-                                </Link>
-                              </span>
-                              <span>
-                                {t(`cart.table.head.color`)}:{" "}
-                                {detail.productDetail.color.name}
-                              </span>
-                              <span>
-                                {t(`cart.table.head.size`)}:{" "}
-                                {detail.productDetail.size.name}
-                              </span>
-                              <span>
-                                {t(`cart.table.head.qty`)}: {detail.quantity}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="value">
-                          <CurrencyFormatter
-                            className="amount"
-                            value={detail.totalPrice}
-                            currency={currency}
-                          />
-                        </td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th colSpan={2} style={{ textAlign: "end" }}>
-                    <div className="row">
-                      <div className="col-9">
-                        <h5>{t(`cart.cart_total.total`)} </h5>
-                      </div>
-                      <div className="col-3">
-                        <CurrencyFormatter
-                          value={order.originMoney}
-                          currency={currency}
-                        />
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-9">
-                        <h5>{t(`cart.cart_total.shipping`)} </h5>
-                      </div>
-                      <div className="col-3">
-                        {order.originMoney >= FREE_SHIPPING_THRESHOLD ? (
-                          <span className="free-shipping">
-                            Miễn phí vận chuyển
-                          </span>
-                        ) : (
-                          <CurrencyFormatter
-                            value={order.shippingMoney}
-                            currency={currency}
-                          />
-                        )}
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-9">
-                        <h5>Giảm giá</h5>
-                      </div>
-                      <div className="col-3">
-                        <CurrencyFormatter
-                          value={
-                            order.voucher
-                              ? order.voucher.type == "PERCENTAGE"
-                                ? (order.voucher.value / 100) *
-                                  order.originMoney
-                                : order.voucher.value
-                              : 0
-                          }
-                          currency={currency}
-                        />
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-9">
-                        <h4 className="grand-totall-title">
-                          {t(`cart.cart_total.grand_total`)}{" "}
-                        </h4>
-                      </div>
-                      <div className="col-3">
-                        <CurrencyFormatter
-                          value={order.totalMoney}
-                          currency={currency}
-                        />
-                      </div>
-                    </div>
-                  </th>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-      </div>
+        )}
+      </Spin>
     </Fragment>
   );
 };

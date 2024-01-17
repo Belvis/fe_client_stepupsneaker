@@ -328,7 +328,6 @@ const cartSlice = createSlice({
       ),
       (state, action) => {
         state.cartItems = action.payload;
-        console.log(action);
 
         switch (action.type) {
           case "cart/mergeCart/fulfilled":

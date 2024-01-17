@@ -6,7 +6,8 @@ import {
   LoadingOutlined,
   QuestionOutlined,
 } from "@ant-design/icons";
-import { HttpError, useOne, useUpdate } from "@refinedev/core";
+import { useModal } from "@refinedev/antd";
+import { HttpError, useOne } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Button, Flex, Grid, Space, Steps, Tooltip } from "antd";
 import dayjs from "dayjs";
@@ -14,14 +15,13 @@ import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { Link, useLocation, useParams } from "react-router-dom";
-import { getDiscountPrice } from "../../helpers/product";
+import CancelReasonModal from "../../components/order/CancelReasonModal";
+import MyOrderModal from "../../components/order/MyOrderModal";
+import { CurrencyFormatter } from "../../helpers/currency";
 import { IEvent, IOrderResponse, OrderStatus } from "../../interfaces";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { CurrencyFormatter } from "../../helpers/currency";
-import { useModal } from "@refinedev/antd";
-import MyOrderModal from "../../components/order/MyOrderModal";
-import CancelReasonModal from "../../components/order/CancelReasonModal";
+import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 
 const { useBreakpoint } = Grid;
 
@@ -77,8 +77,6 @@ const OrderTracking = () => {
   const order = data?.data ? data?.data : ({} as IOrderResponse);
 
   const currency = useSelector((state: RootState) => state.currency);
-
-  let cartTotalPrice = 0;
 
   const {
     show,
@@ -302,21 +300,6 @@ const OrderTracking = () => {
               {order.orderDetails &&
                 order.orderDetails.length > 0 &&
                 order.orderDetails.map((detail, key) => {
-                  const discountedPrice = getDiscountPrice(
-                    detail?.totalPrice ?? 0,
-                    0
-                  );
-                  const finalProductPrice =
-                    (detail?.totalPrice ?? 0) * currency.currencyRate;
-                  const finalDiscountedPrice =
-                    discountedPrice !== null
-                      ? discountedPrice * currency.currencyRate
-                      : 0.0;
-
-                  discountedPrice !== null
-                    ? (cartTotalPrice += finalDiscountedPrice * detail.quantity)
-                    : (cartTotalPrice += finalProductPrice * detail.quantity);
-
                   return (
                     <tr key={key}>
                       <td className="product">
@@ -352,19 +335,11 @@ const OrderTracking = () => {
                         </div>
                       </td>
                       <td className="product-subtotal value">
-                        {discountedPrice !== null ? (
-                          <CurrencyFormatter
-                            className="amount"
-                            value={finalDiscountedPrice * detail.quantity}
-                            currency={currency}
-                          />
-                        ) : (
-                          <CurrencyFormatter
-                            className="amount"
-                            value={finalProductPrice * detail.quantity}
-                            currency={currency}
-                          />
-                        )}
+                        <CurrencyFormatter
+                          className="amount"
+                          value={detail.totalPrice}
+                          currency={currency}
+                        />
                       </td>
                     </tr>
                   );
@@ -380,7 +355,7 @@ const OrderTracking = () => {
                     <div className="col-3">
                       <CurrencyFormatter
                         className="amount"
-                        value={cartTotalPrice}
+                        value={order.originMoney}
                         currency={currency}
                       />
                     </div>
@@ -390,11 +365,17 @@ const OrderTracking = () => {
                       <h5>{t(`cart.cart_total.shipping`)} </h5>
                     </div>
                     <div className="col-3">
-                      <CurrencyFormatter
-                        className="amount"
-                        value={order.shippingMoney}
-                        currency={currency}
-                      />
+                      {order.originMoney < FREE_SHIPPING_THRESHOLD ? (
+                        <CurrencyFormatter
+                          className="amount"
+                          value={order.shippingMoney}
+                          currency={currency}
+                        />
+                      ) : (
+                        <span className="free-shipping">
+                          Miễn phí vận chuyển
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="row">
@@ -404,20 +385,14 @@ const OrderTracking = () => {
                     <div className="col-3">
                       <CurrencyFormatter
                         className="amount"
-                        value={
-                          order.voucher
-                            ? order.voucher.type == "PERCENTAGE"
-                              ? (order.voucher.value / 100) * order.originMoney
-                              : order.voucher.value
-                            : 0
-                        }
+                        value={order.reduceMoney}
                         currency={currency}
                       />
                     </div>
                   </div>
                   <div className="row">
                     <div className="col-9">
-                      <h4 className="grand-totall-title">
+                      <h4 className="grand-total-title">
                         {t(`cart.cart_total.grand_total`)}{" "}
                       </h4>
                     </div>
@@ -439,7 +414,7 @@ const OrderTracking = () => {
         restModalProps={restModalProps}
         close={close}
         showCancel={showCancel}
-        code={code}
+        order={order}
         callBack={refetch}
       />
       <CancelReasonModal

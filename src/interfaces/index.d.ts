@@ -112,13 +112,14 @@ export interface IVoucherResponse {
 export interface IOrderResponse {
   id: string;
   customer: ICustomerResponse;
-  voucher: IVoucherResponse;
+  voucher?: IVoucherResponse;
   address: IAddressResponse;
   phoneNumber: string;
   fullName: string;
   shippingMoney: number;
   totalMoney: number;
   originMoney: number;
+  reduceMoney: number;
   expectedDeliveryDate: number;
   confirmationDate: number;
   deliveryStartDate: number;
@@ -268,7 +269,7 @@ export interface ISizeClient {
   productDetailId: string;
 }
 export interface IOrderRequest {
-  voucher: IVoucherResponse;
+  voucher?: IVoucherResponse;
   shippingMoney: number;
   customer?: string;
   address: IAddressRequest;

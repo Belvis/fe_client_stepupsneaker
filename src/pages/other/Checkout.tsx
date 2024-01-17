@@ -1,4 +1,4 @@
-import { GiftOutlined } from "@ant-design/icons";
+import { GiftOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Form, RadioChangeEvent, Spin } from "antd";
 import { Fragment, useEffect, useState } from "react";
@@ -35,7 +35,11 @@ import {
   deleteAllFromCart,
   deleteAllFromDB,
 } from "../../redux/slices/cart-slice";
-import { clearOrder, setOrder } from "../../redux/slices/order-slice";
+import {
+  clearOrder,
+  clearVoucher,
+  setOrder,
+} from "../../redux/slices/order-slice";
 import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
 import { TOKEN_KEY } from "../../utils";
 import _ from "lodash";
@@ -750,7 +754,15 @@ const CheckOut = () => {
                             </li>
                           </ul>
                           <ul>
-                            <li className="your-order-shipping">Giảm giá</li>
+                            <li className="your-order-voucher">
+                              Giảm giá{" "}
+                              {order.voucher && (
+                                <MinusCircleOutlined
+                                  className="remove-voucher"
+                                  onClick={() => dispatch(clearVoucher())}
+                                />
+                              )}
+                            </li>
                             <li>
                               <CurrencyFormatter
                                 value={discount}
@@ -760,41 +772,58 @@ const CheckOut = () => {
                           </ul>
                         </div>
                         <div className="discount-message">
-                          {cartTotalPrice < FREE_SHIPPING_THRESHOLD ? (
-                            <DiscountMessage>
-                              <GiftOutlined /> Mua thêm{" "}
-                              <DiscountMoney>
-                                {formatCurrency(
-                                  FREE_SHIPPING_THRESHOLD - cartTotalPrice,
-                                  currency
-                                )}
-                              </DiscountMoney>{" "}
-                              để được miễn phí vận chuyển
-                            </DiscountMessage>
-                          ) : (
-                            ""
-                          )}
-                          {legitVouchers.length > 0 &&
-                            cartTotalPrice <
-                              legitVouchers[0].voucher.constraint && (
-                              <DiscountMessage>
-                                <GiftOutlined /> Mua thêm{" "}
-                                <DiscountMoney>
-                                  {formatCurrency(
-                                    legitVouchers[0].voucher.constraint -
-                                      cartTotalPrice,
-                                    currency
-                                  )}
-                                </DiscountMoney>{" "}
-                                để được giảm tới{" "}
-                                <DiscountMoney>
-                                  {formatCurrency(
-                                    legitVouchers[0].voucher.value,
-                                    currency
-                                  )}
-                                </DiscountMoney>
-                              </DiscountMessage>
-                            )}
+                          {(() => {
+                            const freeShippingDifference =
+                              FREE_SHIPPING_THRESHOLD - cartTotalPrice;
+                            const voucherDifference =
+                              legitVouchers && legitVouchers.length > 0
+                                ? legitVouchers[0].voucher.constraint -
+                                  cartTotalPrice
+                                : Infinity;
+
+                            const shouldDisplayFreeShipping =
+                              freeShippingDifference > 0 &&
+                              freeShippingDifference <= voucherDifference;
+                            const shouldDisplayVoucher =
+                              voucherDifference > 0 &&
+                              voucherDifference < freeShippingDifference;
+
+                            if (shouldDisplayFreeShipping) {
+                              return (
+                                <DiscountMessage className="message">
+                                  <GiftOutlined /> Mua thêm{" "}
+                                  <DiscountMoney>
+                                    {formatCurrency(
+                                      freeShippingDifference,
+                                      currency
+                                    )}
+                                  </DiscountMoney>{" "}
+                                  để được miễn phí vận chuyển
+                                </DiscountMessage>
+                              );
+                            } else if (shouldDisplayVoucher) {
+                              return (
+                                <DiscountMessage className="message">
+                                  <GiftOutlined /> Mua thêm{" "}
+                                  <DiscountMoney>
+                                    {formatCurrency(
+                                      voucherDifference,
+                                      currency
+                                    )}
+                                  </DiscountMoney>{" "}
+                                  để được giảm tới{" "}
+                                  <DiscountMoney>
+                                    {formatCurrency(
+                                      legitVouchers[0].voucher.value,
+                                      currency
+                                    )}
+                                  </DiscountMoney>
+                                </DiscountMessage>
+                              );
+                            } else {
+                              return null;
+                            }
+                          })()}
                         </div>
                         <div className="your-order-total">
                           <ul>

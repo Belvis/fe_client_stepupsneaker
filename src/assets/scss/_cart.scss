@@ -209,6 +209,20 @@ h3.cart-page-title {
       }
     }
   }
+  span {
+    &.free-shipping {
+      color: $theme-color;
+    }
+    &.remove-voucher:hover {
+      color: $theme-color;
+      cursor: pointer;
+    }
+    &.add-voucher:hover {
+      color: $theme-color;
+      cursor: pointer;
+    }
+  }
+
 }
 
 .cart-shiping-update-wrapper {
@@ -438,7 +452,7 @@ h3.cart-page-title {
   }
 }
 
-.grand-totall {
+.grand-total {
   padding: 45px 30px 50px;
 
   border: 1px solid #ebebeb;
@@ -540,7 +554,7 @@ h3.cart-page-title {
       }
     }
   }
-  h4.grand-totall-title {
+  h4.grand-total-title {
     font-size: 20px;
     font-weight: 500;
 

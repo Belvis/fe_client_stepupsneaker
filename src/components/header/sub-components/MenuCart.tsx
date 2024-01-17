@@ -136,36 +136,50 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
               );
             })}
           </ul>
-          <div className="shopping-cart-total">
-            {cartTotalPrice < FREE_SHIPPING_THRESHOLD ? (
-              <DiscountMessage>
-                <GiftOutlined /> Mua thêm{" "}
-                <DiscountMoney>
-                  {formatCurrency(
-                    FREE_SHIPPING_THRESHOLD - cartTotalPrice,
-                    currency
-                  )}
-                </DiscountMoney>{" "}
-                để được miễn phí vận chuyển
-              </DiscountMessage>
-            ) : (
-              ""
-            )}
-            {legitVouchers.length > 0 && (
-              <DiscountMessage>
-                <GiftOutlined /> Mua thêm{" "}
-                <DiscountMoney>
-                  {formatCurrency(
-                    legitVouchers[0].voucher.constraint - cartTotalPrice,
-                    currency
-                  )}
-                </DiscountMoney>{" "}
-                để được giảm tới{" "}
-                <DiscountMoney>
-                  {formatCurrency(legitVouchers[0].voucher.value, currency)}
-                </DiscountMoney>
-              </DiscountMessage>
-            )}
+          <div className="shopping-cart-total mt-2">
+            {(() => {
+              const freeShippingDifference =
+                FREE_SHIPPING_THRESHOLD - cartTotalPrice;
+              const voucherDifference =
+                legitVouchers && legitVouchers.length > 0
+                  ? legitVouchers[0].voucher.constraint - cartTotalPrice
+                  : Infinity;
+
+              const shouldDisplayFreeShipping =
+                freeShippingDifference > 0 &&
+                freeShippingDifference <= voucherDifference;
+              const shouldDisplayVoucher =
+                voucherDifference > 0 &&
+                voucherDifference < freeShippingDifference;
+
+              if (shouldDisplayFreeShipping) {
+                return (
+                  <DiscountMessage>
+                    <GiftOutlined /> Mua thêm{" "}
+                    <DiscountMoney>
+                      {formatCurrency(freeShippingDifference, currency)}
+                    </DiscountMoney>{" "}
+                    để được miễn phí vận chuyển
+                  </DiscountMessage>
+                );
+              } else if (shouldDisplayVoucher) {
+                return (
+                  <DiscountMessage>
+                    <GiftOutlined /> Mua thêm{" "}
+                    <DiscountMoney>
+                      {formatCurrency(voucherDifference, currency)}
+                    </DiscountMoney>{" "}
+                    để được giảm tới{" "}
+                    <DiscountMoney>
+                      {formatCurrency(legitVouchers[0].voucher.value, currency)}
+                    </DiscountMoney>
+                  </DiscountMessage>
+                );
+              } else {
+                return null;
+              }
+            })()}
+
             <Title level={4}>
               {t("header.menu_cart.total")} :{" "}
               <CurrencyFormatter

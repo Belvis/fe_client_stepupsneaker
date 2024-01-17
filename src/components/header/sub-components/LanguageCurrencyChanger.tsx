@@ -1,6 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { setCurrency } from "../../../redux/slices/currency-slice";
+import TextScroller from "../../text/TextScroller";
+import { Authenticated, useGetIdentity } from "@refinedev/core";
+import { ICustomerResponse } from "../../../interfaces";
 
 type LanguageCurrencyChangerProps = {
   currency: any;
@@ -21,6 +24,8 @@ const LanguageCurrencyChanger: React.FC<LanguageCurrencyChangerProps> = ({
     const currencyName = e.currentTarget.value;
     dispatch(setCurrency(currencyName));
   };
+
+  const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
 
   return (
     <div className="language-currency-wrap">
@@ -68,9 +73,42 @@ const LanguageCurrencyChanger: React.FC<LanguageCurrencyChangerProps> = ({
         </div>
       </div>
       <div className="same-language-currency">
-        <p>
-          Gọi cho chúng tôi: <span className="phone-number">0987654321</span>
-        </p>
+        <Authenticated
+          fallback={
+            <p>
+              Gọi cho chúng tôi:{" "}
+              <span className="phone-number">0987654321</span>
+            </p>
+          }
+        >
+          {user && user.fullName ? (
+            <TextScroller
+              text={[
+                <p>
+                  Xin chào:{" "}
+                  <span className="phone-number">{user.fullName}</span>
+                </p>,
+                <p>
+                  Gọi cho chúng tôi:{" "}
+                  <span className="phone-number">0987654321</span>
+                </p>,
+              ]}
+            />
+          ) : (
+            <TextScroller
+              text={[
+                <p>
+                  Xin chào:{" "}
+                  <span className="phone-number">Người dùng thân mến</span>
+                </p>,
+                <p>
+                  Gọi cho chúng tôi:{" "}
+                  <span className="phone-number">0987654321</span>
+                </p>,
+              ]}
+            />
+          )}
+        </Authenticated>
       </div>
     </div>
   );

@@ -66,7 +66,7 @@ const Cart = () => {
 
   const API_URL = useApiUrl();
 
-  const { getList } = dataProvider(API_URL);
+  const { getOne } = dataProvider(API_URL);
 
   const setTitle = useDocumentTitle();
 
@@ -297,18 +297,12 @@ const Cart = () => {
     try {
       event.preventDefault();
 
-      const { data } = await getList<IVoucherResponse>({
-        resource: "vouchers",
-        filters: [
-          {
-            field: "code",
-            operator: "eq",
-            value: voucherCode,
-          },
-        ],
+      const { data } = await getOne<IVoucherResponse>({
+        resource: "vouchers/code",
+        id: voucherCode,
       });
 
-      const voucher = data[0] ?? ({} as IVoucherResponse);
+      const voucher = data ?? ({} as IVoucherResponse);
 
       if (voucher) {
         dispatch(
@@ -329,13 +323,11 @@ const Cart = () => {
           description: "Thất bại",
         });
       }
-    } catch (error) {
-      console.error("Error in handleSubmit:", error);
-
+    } catch (error: any) {
       open?.({
         type: "error",
-        message: "Đã xảy ra lỗi",
-        description: "Vui lòng thử lại sau",
+        message: error.message,
+        description: "Áp dụng voucher không thành công",
       });
     }
   };
@@ -884,7 +876,7 @@ const Cart = () => {
                 </Authenticated>
 
                 <div className="col-lg-4 col-md-12">
-                  <div className="grand-totall">
+                  <div className="grand-total">
                     <div className="title-wrap">
                       <h4 className="cart-bottom-title section-bg-gary-cart">
                         {t(`cart.cart_total.title`)}
@@ -923,7 +915,7 @@ const Cart = () => {
                         currency={currency}
                       />
                     </h5>
-                    <h4 className="grand-totall-title">
+                    <h4 className="grand-total-title">
                       {t(`cart.cart_total.grand_total`)}{" "}
                       <CurrencyFormatter
                         value={cartTotalPrice}
@@ -932,41 +924,55 @@ const Cart = () => {
                     </h4>
                     <hr />
                     <div>
-                      {cartTotalPrice < FREE_SHIPPING_THRESHOLD ? (
-                        <DiscountMessage className="message">
-                          <GiftOutlined /> Mua thêm{" "}
-                          <DiscountMoney>
-                            {formatCurrency(
-                              FREE_SHIPPING_THRESHOLD - cartTotalPrice,
-                              currency
-                            )}
-                          </DiscountMoney>{" "}
-                          để được miễn phí vận chuyển
-                        </DiscountMessage>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                    <div>
-                      {legitVouchers.length > 0 && (
-                        <DiscountMessage className="message">
-                          <GiftOutlined /> Mua thêm{" "}
-                          <DiscountMoney>
-                            {formatCurrency(
-                              legitVouchers[0].voucher.constraint -
-                                cartTotalPrice,
-                              currency
-                            )}
-                          </DiscountMoney>{" "}
-                          để được giảm tới{" "}
-                          <DiscountMoney>
-                            {formatCurrency(
-                              legitVouchers[0].voucher.value,
-                              currency
-                            )}
-                          </DiscountMoney>
-                        </DiscountMessage>
-                      )}
+                      {(() => {
+                        const freeShippingDifference =
+                          FREE_SHIPPING_THRESHOLD - cartTotalPrice;
+                        const voucherDifference =
+                          legitVouchers && legitVouchers.length > 0
+                            ? legitVouchers[0].voucher.constraint -
+                              cartTotalPrice
+                            : Infinity;
+
+                        const shouldDisplayFreeShipping =
+                          freeShippingDifference > 0 &&
+                          freeShippingDifference <= voucherDifference;
+                        const shouldDisplayVoucher =
+                          voucherDifference > 0 &&
+                          voucherDifference < freeShippingDifference;
+
+                        if (shouldDisplayFreeShipping) {
+                          return (
+                            <DiscountMessage className="message">
+                              <GiftOutlined /> Mua thêm{" "}
+                              <DiscountMoney>
+                                {formatCurrency(
+                                  freeShippingDifference,
+                                  currency
+                                )}
+                              </DiscountMoney>{" "}
+                              để được miễn phí vận chuyển
+                            </DiscountMessage>
+                          );
+                        } else if (shouldDisplayVoucher) {
+                          return (
+                            <DiscountMessage className="message">
+                              <GiftOutlined /> Mua thêm{" "}
+                              <DiscountMoney>
+                                {formatCurrency(voucherDifference, currency)}
+                              </DiscountMoney>{" "}
+                              để được giảm tới{" "}
+                              <DiscountMoney>
+                                {formatCurrency(
+                                  legitVouchers[0].voucher.value,
+                                  currency
+                                )}
+                              </DiscountMoney>
+                            </DiscountMessage>
+                          );
+                        } else {
+                          return null;
+                        }
+                      })()}
                     </div>
                     <Link to={"/pages/checkout"} className="mt-3">
                       {t(`cart.buttons.proceed_to_checkout`)}

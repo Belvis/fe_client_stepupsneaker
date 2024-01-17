@@ -33,7 +33,7 @@ const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({
   const dispatch = useDispatch();
   const { order } = useSelector((state: RootState) => state.order);
   const { open } = useNotification();
-  const { getList } = dataProvider(API_URL);
+  const { getOne } = dataProvider(API_URL);
   const [voucherCode, setVoucherCode] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,18 +62,12 @@ const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({
     try {
       event.preventDefault();
 
-      const { data } = await getList<IVoucherResponse>({
-        resource: "vouchers",
-        filters: [
-          {
-            field: "code",
-            operator: "eq",
-            value: voucherCode,
-          },
-        ],
+      const { data } = await getOne<IVoucherResponse>({
+        resource: "vouchers/code",
+        id: voucherCode,
       });
 
-      const voucher = data[0] ?? ({} as IVoucherResponse);
+      const voucher = data ?? ({} as IVoucherResponse);
 
       if (voucher) {
         dispatch(
@@ -94,11 +88,11 @@ const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({
           description: "Thất bại",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       open?.({
         type: "error",
-        message: "Đã xảy ra lỗi",
-        description: "Vui lòng thử lại sau",
+        message: error.message,
+        description: "Áp dụng voucher không thành công",
       });
     }
   };

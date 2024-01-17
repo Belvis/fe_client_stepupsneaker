@@ -10,6 +10,7 @@ import {
 } from "@refinedev/core/dist/interfaces";
 import { store } from "../redux/store";
 import { deleteAllFromCart, mergeCart } from "../redux/slices/cart-slice";
+import { showSuccessToast } from "../helpers/toast";
 
 const httpClient: AxiosInstance = axiosInstance;
 
@@ -28,29 +29,46 @@ type AuthBindings = {
 
 export const authProvider = (url: string): AuthBindings => ({
   login: async ({ email, password }) => {
-    const response = await httpClient.post(`${url}/login`, {
-      email,
-      password,
-    });
+    try {
+      const token = await httpClient
+        .post(`${url}/login`, {
+          email,
+          password,
+        })
+        .then((res) => {
+          const token = res.data.token ?? null;
+          return token;
+        });
 
-    const token = response.data.token ?? null;
-
-    if (token) {
-      localStorage.setItem(TOKEN_KEY, token);
-      const cartState = store.getState().cart;
-      store.dispatch(mergeCart(cartState.cartItems));
-      return {
-        success: true,
-        redirectTo: "/",
-      };
-    } else {
-      return {
+      if (token) {
+        localStorage.setItem(TOKEN_KEY, token);
+        const cartState = store.getState().cart;
+        store.dispatch(mergeCart(cartState.cartItems));
+        showSuccessToast("Đăng nhập thành công");
+        // Resolve the promise with success data
+        return Promise.resolve({
+          success: true,
+          redirectTo: "/",
+        });
+      } else {
+        // Resolve the promise with error data
+        return Promise.resolve({
+          success: false,
+          error: {
+            message: "Đăng nhập thất bại",
+            name: "Sai mật khẩu hoặc email",
+          },
+        });
+      }
+    } catch (error: any) {
+      // Handle any exceptions and reject the promise
+      return Promise.resolve({
         success: false,
         error: {
-          message: "Login Error",
-          name: "Invalid email or password",
+          message: "Đăng nhập thất bại",
+          name: error.message,
         },
-      };
+      });
     }
   },
 
@@ -95,8 +113,8 @@ export const authProvider = (url: string): AuthBindings => ({
       );
       if (response.status == 200) {
         notification.success({
-          message: "Updated Password",
-          description: "Password updated successfully",
+          message: "Thành công",
+          description: "Mật Khẩu đã được cập nhật",
         });
         return {
           success: true,
@@ -147,7 +165,7 @@ export const authProvider = (url: string): AuthBindings => ({
 
   forgotPassword: async ({ email }) => {
     try {
-      const response = await httpClient
+      await httpClient
         .post(`${url}/forgot-password?email=${email}`)
         .then((res) => {
           return res.data.content;
@@ -170,13 +188,17 @@ export const authProvider = (url: string): AuthBindings => ({
       };
     }
   },
+
   logout: async () => {
     localStorage.removeItem(TOKEN_KEY);
+    store.dispatch(deleteAllFromCart());
+
     return {
       success: true,
       redirectTo: "/login",
     };
   },
+
   onError: async (error) => {
     return { error };
   },
