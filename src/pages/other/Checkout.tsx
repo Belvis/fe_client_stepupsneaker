@@ -343,6 +343,13 @@ const CheckOut = () => {
         resource: "orders",
         values: submitData,
         successNotification: false,
+        errorNotification:(error:any) => {
+          return {
+            message: error.message,
+            description: "Đã xẩy ra lỗi",
+            type: "error",
+          };
+        },
       },
       {
         onError: (error, variables, context) => {

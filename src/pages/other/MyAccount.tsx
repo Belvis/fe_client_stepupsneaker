@@ -147,6 +147,13 @@ const MyAccount = () => {
             toTimeStamp(values.dateOfBirth as string) ?? data?.dateOfBirth,
         },
         id: data?.id as any,
+        successNotification: (data, values, resource) => {
+          return {
+            message: `Thay đổi thông tin cá nhân thành công!`,
+            description: "Thành công",
+            type: "success",
+          };
+        },
       },
       {
         onError: (error, variables, context) => {},
@@ -256,6 +263,13 @@ const MyAccount = () => {
     redirect: false,
     autoSubmitClose: true,
     warnWhenUnsavedChanges: false,
+   successNotification: (data, values, resource) => {
+      return {
+        message: `Cập nhật địa chỉ thành công!`,
+        description: "Thành công",
+        type: "success",
+      };
+    },
   });
 
   function toTimeStamp(date: string) {
