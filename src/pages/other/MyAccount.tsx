@@ -23,6 +23,12 @@ import {
   Upload,
   message,
   Avatar,
+  Row,
+  Col,
+  Image,
+  Button,
+  Typography,
+  Card,
 } from "antd";
 import {
   IAddressResponse,
@@ -45,12 +51,15 @@ import {
 import { getBase64Image } from "../../helpers/image";
 import { CreateAddressModal } from "../../components/address/CreateAddressModal";
 import { EditAddressModal } from "../../components/address/EditAddressModal";
+import Voucher from "../../components/voucher/Voucher";
 
 type updatePasswordVariables = {
   password: string;
   confirm: string;
   oldPassword: string;
 };
+
+const { Text, Title } = Typography;
 
 const MyAccount = () => {
   const { t } = useTranslation();
@@ -254,57 +263,9 @@ const MyAccount = () => {
   }
 
   function renderItem(item: IVoucherResponse) {
-    const { id, code, value, constraint, image, endDate, quantity, type } =
-      item;
-
-    const constraintPrice = (
-      <CurrencyFormatter value={constraint} currency={currency} />
-    );
-    const cashPrice =
-      type === "CASH" ? (
-        <CurrencyFormatter value={value} currency={currency} />
-      ) : (
-        0
-      );
-
-    const handleCopyCode = () => {
-      if (code) {
-        navigator.clipboard.writeText(code);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 3000);
-      }
-    };
-
     return (
-      <AntdList.Item actions={[]}>
-        <AntdList.Item.Meta title={""} description={""} />
-        <div className="coupon-container">
-          <div className="coupon-card">
-            <img src={image} className="logo" />
-            {type === "PERCENTAGE" ? (
-              <h3>
-                Giảm giá {value}% cho đơn hàng trên {constraintPrice}
-                <br />
-                Nhân ngày t1 vô địch
-              </h3>
-            ) : (
-              <h3>
-                Giảm giá {cashPrice} cho đơn hàng trên {constraintPrice}
-                <br />
-                Nhân ngày t1 vô địch
-              </h3>
-            )}
-            <div className="coupon-row">
-              <span id="cpnCode">{code}</span>
-              <span id="cpnBtn" onClick={handleCopyCode}>
-                {copied ? "COPIED" : "COPY CODE"}
-              </span>
-            </div>
-            <p>Có hạn tới: {dayjs(new Date(endDate)).format("lll")}</p>
-            <div className="circle1"></div>
-            <div className="circle2"></div>
-          </div>
-        </div>
+      <AntdList.Item key={item.id}>
+        <Voucher item={item} currency={currency} type="copy" close={() => {}} />
       </AntdList.Item>
     );
   }
@@ -805,14 +766,13 @@ const MyAccount = () => {
                           <div className="account-info-wrapper">
                             <h5>Danh sách voucher dành cho bạn</h5>
                           </div>
-                          <div className="entries-wrapper">
-                            <AntdList
-                              itemLayout="horizontal"
-                              dataSource={vouchers}
-                              renderItem={renderItem}
-                              loading={isLoadingVoucher}
-                            />
-                          </div>
+                          {/* <div className="voucher-card"> */}
+                          <AntdList
+                            itemLayout="horizontal"
+                            dataSource={vouchers}
+                            renderItem={renderItem}
+                            loading={isLoadingVoucher}
+                          />
                         </div>
                       </Accordion.Body>
                     </Accordion.Item>

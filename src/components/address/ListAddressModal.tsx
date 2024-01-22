@@ -19,9 +19,14 @@ import {
   Tag,
   Tooltip,
 } from "antd";
+import _ from "lodash";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IAddressResponse, ICustomerResponse } from "../../interfaces";
+import {
+  IAddressResponse,
+  ICustomerResponse,
+  IOrderRequest,
+} from "../../interfaces";
 import { setOrder } from "../../redux/slices/order-slice";
 import { RootState } from "../../redux/store";
 import { CreateAddressModal } from "./CreateAddressModal";
@@ -31,12 +36,14 @@ type ListAddressModalProps = {
   modalProps: ModalProps;
   close: () => void;
   customer: ICustomerResponse | undefined;
+  setAddresses?: (order: IOrderRequest) => void;
 };
 
 export const ListAddressModal: React.FC<ListAddressModalProps> = ({
   modalProps,
   customer,
   close,
+  setAddresses: setViewAddress,
 }) => {
   const t = useTranslate();
   const breakpoint = Grid.useBreakpoint();
@@ -57,13 +64,13 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
         method: "put",
         values: { address: id },
         successNotification: () => ({
-          message: "Successfully set default.",
-          description: "Success with no errors",
+          message: "Đặt mặc định thành công.",
+          description: "Thành công",
           type: "success",
         }),
         errorNotification: () => ({
-          message: "Something went wrong when setting default address",
-          description: "Error",
+          message: "Có lỗi xảy ra khi đặt địa chỉ mặc định",
+          description: "Lỗi",
           type: "error",
         }),
       },
@@ -114,29 +121,31 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
             <Button
               size="small"
               onClick={() => {
-                dispatch(
-                  setOrder({
-                    ...order,
+                const newOrder = _.cloneDeep({
+                  ...order,
+                  phoneNumber: phoneNumber,
+                  address: {
+                    ...order.address,
                     phoneNumber: phoneNumber,
-                    address: {
-                      ...order.address,
-                      phoneNumber: phoneNumber,
-                      provinceName: provinceName,
-                      districtName: districtName,
-                      wardName: wardName,
-                      provinceId: provinceId,
-                      districtId: districtId,
-                      wardCode: wardCode,
-                      more: more,
-                    },
-                    //   shippingMoney: data?.response.data.total as number,
-                  })
-                );
-                open?.({
-                  type: "success",
-                  message: "Chọn địa chỉ thành công",
-                  description: "Thành công",
+                    provinceName: provinceName,
+                    districtName: districtName,
+                    wardName: wardName,
+                    provinceId: provinceId,
+                    districtId: districtId,
+                    wardCode: wardCode,
+                    more: more,
+                  },
                 });
+                if (!setViewAddress) {
+                  dispatch(setOrder(newOrder));
+                  open?.({
+                    type: "success",
+                    message: "Chọn địa chỉ thành công",
+                    description: "Thành công",
+                  });
+                } else {
+                  setViewAddress(newOrder);
+                }
                 close();
               }}
             >
@@ -204,6 +213,20 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
     action: "create",
     redirect: false,
     warnWhenUnsavedChanges: false,
+    successNotification: (data: any, values) => {
+      return {
+        message: "Tạo địa chỉ mới thành công",
+        description: "Thành công",
+        type: "success",
+      };
+    },
+    errorNotification: (error, values) => {
+      return {
+        message: `Đã xảy ra lỗi khi tạo địa chỉ`,
+        description: "Lỗi: " + error?.message,
+        type: "error",
+      };
+    },
   });
 
   const {
@@ -223,6 +246,20 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
     redirect: false,
     autoSubmitClose: true,
     warnWhenUnsavedChanges: false,
+    successNotification: (data: any, values) => {
+      return {
+        message: "Cập nhật địa chỉ mới thành công",
+        description: "Thành công",
+        type: "success",
+      };
+    },
+    errorNotification: (error, values) => {
+      return {
+        message: `Đã xảy ra lỗi khi Cập nhật địa chỉ`,
+        description: "Lỗi: " + error?.message,
+        type: "error",
+      };
+    },
   });
 
   return (

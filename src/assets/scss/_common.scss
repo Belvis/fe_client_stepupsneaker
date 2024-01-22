@@ -1939,6 +1939,32 @@ a.default-btn {
   }
 }
 
+.sharpen-btn {
+  button {
+    // font-size: 14px;
+    font-size: 12px;
+
+    font-weight: 500;
+
+    padding: 10px 30px 9px;
+
+    cursor: pointer;
+    transition: all 0.3s ease 0s;
+    text-transform: uppercase;
+
+    color: #fff;
+    border: medium none;
+    background-color: $theme-color;
+    &:hover {
+      background-color: #333;
+    }
+    @media #{$xs-layout} {
+      font-size: 12px;
+      padding: 10px 30px 9px;
+    }
+  }
+}
+
 .bg-black-2 {
   background-color: #1b1b1b;
 }

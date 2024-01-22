@@ -147,7 +147,12 @@ const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
-      <VoucherModal restModalProps={restModalProps} vouchers={vouchers} />
+      <VoucherModal
+        restModalProps={restModalProps}
+        vouchers={vouchers}
+        type="copy"
+        close={close}
+      />
     </Fragment>
   );
 };

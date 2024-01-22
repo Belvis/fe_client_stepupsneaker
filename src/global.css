@@ -1,0 +1,129 @@
+.coupon-qLp {
+    width: 100%;
+    height: 11.5rem;
+    position: relative;
+  }
+  .coupon-qLp .subtract-qVE {
+    width: 40.3rem;
+    height: 11.5rem;
+    position: absolute;
+    left: 1.7rem;
+    top: 0;
+    object-fit: contain;
+    vertical-align: top;
+  }
+  .coupon-qLp .coupon-Lgt {
+    width: 40.8rem;
+    height: 11.5rem;
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+  }
+  .coupon-qLp .coupon-Lgt .auto-group-vy7i-Rrk {
+    box-sizing: border-box;
+    padding: 3.8rem 4.15rem 4.201rem 4.3rem;
+    height: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url('../public/images/voucher/subtract-xRJ.png');
+    flex-shrink: 0;
+  }
+  .coupon-qLp .coupon-Lgt .auto-group-vy7i-Rrk .mc-donalds-logo-YAg {
+    width: 4rem;
+    height: 3.4989rem;
+    object-fit: contain;
+    vertical-align: top;
+  }
+  .coupon-qLp .coupon-Lgt .auto-group-fxhe-3t8 {
+    box-sizing: border-box;
+    padding: 1.5rem 0rem 1.5rem 1.15rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .auto-group-xh3i-y16 {
+    margin-right: 0.3rem;
+    width: 17.4rem;
+    height: 100%;
+    flex-shrink: 0;
+  }
+  .auto-group-xh3i-y16 .group-3-WFv {
+    margin-bottom: 0.6rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .auto-group-xh3i-y16 .group-3-WFv .gim-1000000-ed2 {
+    margin-bottom: 0.4rem;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.2175;
+    color: #fb5231;
+
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .auto-group-xh3i-y16 .group-3-WFv .cc-ruy-to-qqv {
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 1.2175;
+    color: #fb5231;
+
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .auto-group-xh3i-y16 .c-hiu-lc-n-12102024-xfe {
+    margin-bottom: 1.2rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.2175;
+    color: rgba(0, 0, 0, 0.400000006);
+
+    white-space: nowrap;
+  }
+  .auto-group-xh3i-y16 .chi-tit--Fue {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.2175;
+    color: rgba(251, 82, 49, 0.8000000119);
+
+    white-space: nowrap;
+  }
+  .primary-small-default-zMS {
+    margin-top: 5.1rem;
+    width: 9.5rem;
+    height: 3.2rem;
+    position: relative;
+    background-color: #fb5231;
+    flex-shrink: 0;
+  }
+  .primary-small-default-zMS .buttonbase-primary-default--W4t {
+    width: 9.5rem;
+    height: 3.2rem;
+    position: absolute;
+    left: 0;
+    top: -0.0002rem;
+    object-fit: contain;
+    vertical-align: top;
+  }
+  .primary-small-default-zMS .value-Djz {
+    width: 5.5rem;
+    height: 1.6rem;
+    position: absolute;
+    left: 2rem;
+    top: 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 2;
+    letter-spacing: 0.075rem;
+    text-transform: uppercase;
+    color: #ffffff;
+    font-family: Open Sans, 'Source Sans Pro';
+    white-space: nowrap;
+  }
+  

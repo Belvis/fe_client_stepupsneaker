@@ -1,11 +1,16 @@
 import React, { ReactNode, useState } from "react";
 import { Modal, List as AntdList } from "antd";
-import { IVoucherList, IVoucherResponse } from "../../interfaces";
+import {
+  IOrderResponse,
+  IVoucherList,
+  IVoucherResponse,
+} from "../../interfaces";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import dayjs from "dayjs";
 import { CurrencyFormatter } from "../../helpers/currency";
 import { HttpError, useList } from "@refinedev/core";
+import Voucher from "./Voucher";
 
 interface VoucherModalProps {
   restModalProps: {
@@ -14,68 +19,32 @@ interface VoucherModalProps {
     title?: ReactNode;
     closable?: boolean | undefined;
   };
+  close: () => void;
   vouchers: IVoucherList[];
+  type?: "apply" | "copy";
+  setViewOrder?: React.Dispatch<React.SetStateAction<IOrderResponse>>;
 }
 
 const VoucherModal: React.FC<VoucherModalProps> = ({
   restModalProps,
   vouchers,
+  type,
+  setViewOrder,
+  close,
 }) => {
   const currency = useSelector((state: RootState) => state.currency);
-  const [copied, setCopied] = useState(false);
 
   function renderItem(item: IVoucherList) {
-    const { id, code, value, constraint, image, endDate, quantity, type } =
-      item.voucher;
-
-    const constraintPrice = (
-      <CurrencyFormatter value={constraint} currency={currency} />
-    );
-    const cashPrice =
-      type === "CASH" ? (
-        <CurrencyFormatter value={value} currency={currency} />
-      ) : (
-        0
-      );
-
-    const handleCopyCode = () => {
-      if (code) {
-        navigator.clipboard.writeText(code);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 3000);
-      }
-    };
-
     return (
       <AntdList.Item actions={[]}>
         <AntdList.Item.Meta title={""} description={""} />
-        <div className="coupon-container">
-          <div className="coupon-card">
-            <img src={image} className="logo" />
-            {type === "PERCENTAGE" ? (
-              <h3>
-                Giảm giá {value}% cho đơn hàng trên {constraintPrice}
-                <br />
-                Nhân ngày t1 vô địch
-              </h3>
-            ) : (
-              <h3>
-                Giảm giá {cashPrice} cho đơn hàng trên {constraintPrice}
-                <br />
-                Nhân ngày t1 vô địch
-              </h3>
-            )}
-            <div className="coupon-row">
-              <span id="cpnCode">{code}</span>
-              <span id="cpnBtn" onClick={handleCopyCode}>
-                {copied ? "COPIED" : "COPY CODE"}
-              </span>
-            </div>
-            <p>Có hạn tới: {dayjs(new Date(endDate)).format("lll")}</p>
-            <div className="circle1"></div>
-            <div className="circle2"></div>
-          </div>
-        </div>
+        <Voucher
+          item={item.voucher}
+          currency={currency}
+          type={type}
+          setViewOrder={setViewOrder}
+          close={close}
+        />
       </AntdList.Item>
     );
   }
@@ -89,7 +58,6 @@ const VoucherModal: React.FC<VoucherModalProps> = ({
       footer={<></>}
     >
       <AntdList
-        bordered
         itemLayout="horizontal"
         dataSource={vouchers}
         renderItem={renderItem}
