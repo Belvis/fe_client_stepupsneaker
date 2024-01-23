@@ -376,6 +376,20 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
         resource: `orders`,
         values: submitData,
         id: viewOrder.id,
+        successNotification(data, values, resource) {
+          return {
+            message: "Cập nhật đơn hàng thành công!",
+            description: "Thành công",
+            type: "success",
+          };
+        },
+        errorNotification:(error:any) => {
+          return {
+            message: error.message,
+            description: "Đã xẩy ra lỗi",
+            type: "error",
+          };
+        },
       },
       {
         onError: (error, variables, context) => {},

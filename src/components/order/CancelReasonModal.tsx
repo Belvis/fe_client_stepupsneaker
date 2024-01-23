@@ -87,6 +87,13 @@ const CancelReasonModal: React.FC<CancelReasonModalProps> = ({
                 orderHistoryNote: selectedReason,
               },
               id: order.code,
+              successNotification: (data, values, resource) => {
+                return {
+                  message: `Hủy đơn hàng thành công!`,
+                  description: "Thành công",
+                  type: "success",
+                };
+              },
             },
             {
               onError: (error, variables, context) => {},
