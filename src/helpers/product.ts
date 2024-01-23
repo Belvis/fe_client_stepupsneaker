@@ -5,7 +5,6 @@ import {
   IProductDetailResponse,
   IProductResponse,
   IPromotionProductDetailResponse,
-  IPromotionResponse,
   ISizeClient,
   IVariation,
 } from "../interfaces";

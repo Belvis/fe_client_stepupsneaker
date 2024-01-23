@@ -1,12 +1,10 @@
-import { Card, Row, Col, Image } from "antd";
+import { Card, Col, Image, Row } from "antd";
 import dayjs from "dayjs";
-import { CurrencyFormatter } from "../../helpers/currency";
-import { CurrencyState } from "../../redux/slices/currency-slice";
-import { IOrderResponse, IVoucherResponse } from "../../interfaces";
 import { useState } from "react";
+import { CurrencyFormatter } from "../../helpers/currency";
 import { showErrorToast, showSuccessToast } from "../../helpers/toast";
-import { dataProvider } from "../../api/dataProvider";
-import { useApiUrl } from "@refinedev/core";
+import { IOrderResponse, IVoucherResponse } from "../../interfaces";
+import { CurrencyState } from "../../redux/slices/currency-slice";
 
 interface VoucherProps {
   item: IVoucherResponse;
@@ -23,9 +21,6 @@ const Voucher: React.FC<VoucherProps> = ({
   setViewOrder,
   close,
 }) => {
-  const API_URL = useApiUrl();
-  const { getOne } = dataProvider(API_URL);
-
   const { image, endDate, value, type: voucherType, constraint, code } = item;
 
   const [message, setMessage] = useState<string>("Dùng ngay");
@@ -56,22 +51,22 @@ const Voucher: React.FC<VoucherProps> = ({
   const handleApplyVoucher = async () => {
     if (type === "apply" && setViewOrder && close) {
       try {
-        const { data } = await getOne<IVoucherResponse>({
-          resource: "vouchers/code",
-          id: code,
+        setViewOrder((prev) => {
+          if (prev.originMoney > item.constraint) {
+            return {
+              ...prev,
+              voucher: item,
+            };
+          } else {
+            showErrorToast(
+              "Đơn hàng chưa đủ điều kiện để được áp dụng giảm giá"
+            );
+            // Trả về giá trị không thay đổi
+            return prev;
+          }
         });
 
-        const voucher = data ?? ({} as IVoucherResponse);
-
-        if (voucher) {
-          setViewOrder((prev) => ({
-            ...prev,
-            voucher: voucher,
-          }));
-          return close();
-        } else {
-          return showErrorToast("Voucher không hợp lệ");
-        }
+        return close();
       } catch (error: any) {
         return showErrorToast(
           "Áp dụng voucher không thành công: " + error.message

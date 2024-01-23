@@ -1,15 +1,8 @@
-import React, { ReactNode, useState } from "react";
-import { Modal, List as AntdList } from "antd";
-import {
-  IOrderResponse,
-  IVoucherList,
-  IVoucherResponse,
-} from "../../interfaces";
+import { List as AntdList, Modal } from "antd";
+import React, { ReactNode } from "react";
 import { useSelector } from "react-redux";
+import { IOrderResponse, IVoucherList } from "../../interfaces";
 import { RootState } from "../../redux/store";
-import dayjs from "dayjs";
-import { CurrencyFormatter } from "../../helpers/currency";
-import { HttpError, useList } from "@refinedev/core";
 import Voucher from "./Voucher";
 
 interface VoucherModalProps {

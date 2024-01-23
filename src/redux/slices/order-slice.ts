@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IOrderRequest, IVoucherResponse } from "../../interfaces";
+import { IOrderRequest } from "../../interfaces";
 
 export interface OrderState {
   order: IOrderRequest;

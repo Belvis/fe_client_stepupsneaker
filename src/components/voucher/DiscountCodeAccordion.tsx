@@ -1,23 +1,19 @@
-import React, { Fragment, useState } from "react";
-import { Space, Tooltip } from "antd";
 import { ContainerOutlined } from "@ant-design/icons";
-import { useTranslation } from "react-i18next";
+import { useModal } from "@refinedev/antd";
+import { useApiUrl, useNotification } from "@refinedev/core";
+import { Space, Tooltip } from "antd";
+import _ from "lodash";
+import React, { Fragment, useState } from "react";
 import { Accordion } from "react-bootstrap";
-import {
-  HttpError,
-  useApiUrl,
-  useList,
-  useNotification,
-  useOne,
-} from "@refinedev/core";
-import { IVoucherList, IVoucherResponse } from "../../interfaces";
-import { dataProvider } from "../../api/dataProvider";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
+import { dataProvider } from "../../api/dataProvider";
+import { calculateTotalPrice } from "../../helpers/cart";
+import { showErrorToast, showSuccessToast } from "../../helpers/toast";
+import { IVoucherList, IVoucherResponse } from "../../interfaces";
 import { setOrder } from "../../redux/slices/order-slice";
 import { RootState } from "../../redux/store";
-import { useModal } from "@refinedev/antd";
 import VoucherModal from "./VoucherModal";
-import _ from "lodash";
 
 interface DiscountCodeAccordionProps {
   totalMoney: number;
@@ -32,6 +28,7 @@ const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({
   const API_URL = useApiUrl();
   const dispatch = useDispatch();
   const { order } = useSelector((state: RootState) => state.order);
+  const { cartItems } = useSelector((state: RootState) => state.cart);
   const { open } = useNotification();
   const { getOne } = dataProvider(API_URL);
   const [voucherCode, setVoucherCode] = useState("");
@@ -70,30 +67,24 @@ const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({
       const voucher = data ?? ({} as IVoucherResponse);
 
       if (voucher) {
-        dispatch(
-          setOrder({
-            ...order,
-            voucher: voucher,
-          })
-        );
-        open?.({
-          type: "success",
-          message: "Áp dụng voucher thành công",
-          description: "Thành công",
-        });
+        if (calculateTotalPrice(cartItems) >= voucher.constraint) {
+          dispatch(
+            setOrder({
+              ...order,
+              voucher: voucher,
+            })
+          );
+          return showSuccessToast("Áp dụng voucher thành công");
+        } else {
+          return showErrorToast(
+            "Đơn hàng chưa đủ điều kiện để được áp dụng giảm giá"
+          );
+        }
       } else {
-        open?.({
-          type: "error",
-          message: "Voucher không hợp lệ",
-          description: "Thất bại",
-        });
+        return showErrorToast("Voucher không hợp lệ");
       }
     } catch (error: any) {
-      open?.({
-        type: "error",
-        message: error.message,
-        description: "Áp dụng voucher không thành công",
-      });
+      return showErrorToast("Voucher không hợp lệ");
     }
   };
 

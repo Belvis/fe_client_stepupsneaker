@@ -49,6 +49,7 @@ import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
 import { useModal } from "@refinedev/antd";
 import VoucherModal from "../voucher/VoucherModal";
 import { ListAddressModal } from "../address/ListAddressModal";
+import Voucher from "../voucher/Voucher";
 
 const { Text } = Typography;
 
@@ -163,12 +164,11 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
 
   useEffect(() => {
     if (viewOrder.voucher) {
-      console.log("ran here");
       if (viewOrder.voucher !== order.voucher) {
         const newReduceMoney =
           viewOrder.voucher.type === "PERCENTAGE"
             ? (viewOrder.voucher.value * viewOrder.originMoney) / 100
-            : 0;
+            : viewOrder.voucher.value;
         const newTotalMoney =
           viewOrder.originMoney + viewOrder.shippingMoney - newReduceMoney;
         setViewOrder((prev) => ({
