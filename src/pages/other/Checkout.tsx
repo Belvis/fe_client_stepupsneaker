@@ -1,6 +1,6 @@
 import { GiftOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { Form, RadioChangeEvent, Spin } from "antd";
+import { Form, Image, RadioChangeEvent, Spin } from "antd";
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
@@ -389,7 +389,7 @@ const CheckOut = () => {
         resource: "orders",
         values: submitData,
         successNotification: false,
-        errorNotification:(error:any) => {
+        errorNotification: (error: any) => {
           return {
             message: error.message,
             description: "Đã xẩy ra lỗi",
@@ -744,7 +744,12 @@ const CheckOut = () => {
                         <div className="your-order-bottom">
                           <ul>
                             <li className="your-order-shipping">
-                              {t("checkout.your_order.shipping")}
+                              {t("checkout.your_order.shipping")}{" "}
+                              <Image
+                                preview={false}
+                                src="/images/payment-methods/Icon-GHN.png"
+                                style={{ maxWidth: "50px", height: "auto" }}
+                              />
                             </li>
                             <li>
                               {cartTotalPrice >= FREE_SHIPPING_THRESHOLD ? (

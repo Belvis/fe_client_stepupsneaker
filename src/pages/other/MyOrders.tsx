@@ -59,6 +59,7 @@ const MyOrders = () => {
       value: "CANCELED",
     },
   ];
+
   const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
 
   const { data, isLoading, isError } = useList<IOrderResponse, HttpError>({

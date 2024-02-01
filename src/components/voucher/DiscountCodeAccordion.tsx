@@ -141,7 +141,7 @@ const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({
       <VoucherModal
         restModalProps={restModalProps}
         vouchers={vouchers}
-        type="copy"
+        type="apply"
         close={close}
       />
     </Fragment>

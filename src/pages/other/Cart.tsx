@@ -918,7 +918,15 @@ const Cart = () => {
                     <h4 className="grand-total-title">
                       {t(`cart.cart_total.grand_total`)}{" "}
                       <CurrencyFormatter
-                        value={cartTotalPrice}
+                        value={
+                          cartTotalPrice +
+                          order.shippingMoney -
+                          (order.voucher
+                            ? order.voucher.type == "PERCENTAGE"
+                              ? (order.voucher.value / 100) * cartTotalPrice
+                              : order.voucher.value
+                            : 0)
+                        }
                         currency={currency}
                       />
                     </h4>
@@ -1011,7 +1019,7 @@ const Cart = () => {
         <VoucherModal
           restModalProps={restModalProps}
           vouchers={user?.customerVoucherList || []}
-          type="copy"
+          type="apply"
           close={close}
         />
       </Authenticated>

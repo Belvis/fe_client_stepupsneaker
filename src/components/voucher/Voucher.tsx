@@ -5,6 +5,9 @@ import { CurrencyFormatter } from "../../helpers/currency";
 import { showErrorToast, showSuccessToast } from "../../helpers/toast";
 import { IOrderResponse, IVoucherResponse } from "../../interfaces";
 import { CurrencyState } from "../../redux/slices/currency-slice";
+import { useDispatch, useSelector } from "react-redux";
+import { setOrder } from "../../redux/slices/order-slice";
+import { RootState } from "../../redux/store";
 
 interface VoucherProps {
   item: IVoucherResponse;
@@ -21,6 +24,8 @@ const Voucher: React.FC<VoucherProps> = ({
   setViewOrder,
   close,
 }) => {
+  const dispatch = useDispatch();
+  const { order } = useSelector((state: RootState) => state.order);
   const { image, endDate, value, type: voucherType, constraint, code } = item;
 
   const [message, setMessage] = useState<string>("Dùng ngay");
@@ -48,9 +53,9 @@ const Voucher: React.FC<VoucherProps> = ({
     }
   };
 
-  const handleApplyVoucher = async () => {
-    if (type === "apply" && setViewOrder && close) {
-      try {
+  const handleApplyVoucher = () => {
+    if (type === "apply" && close) {
+      if (setViewOrder) {
         setViewOrder((prev) => {
           if (prev.originMoney > item.constraint) {
             return {
@@ -61,17 +66,22 @@ const Voucher: React.FC<VoucherProps> = ({
             showErrorToast(
               "Đơn hàng chưa đủ điều kiện để được áp dụng giảm giá"
             );
-            // Trả về giá trị không thay đổi
             return prev;
           }
         });
-
-        return close();
-      } catch (error: any) {
-        return showErrorToast(
-          "Áp dụng voucher không thành công: " + error.message
+      } else {
+        dispatch(
+          setOrder({
+            ...order,
+            voucher: item,
+          })
         );
       }
+
+      close();
+      showSuccessToast("Áp dụng voucher thành công");
+    } else {
+      showErrorToast("Không hợp lệ");
     }
   };
 
