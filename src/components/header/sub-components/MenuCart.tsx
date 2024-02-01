@@ -58,7 +58,8 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
         <Fragment>
           <ul>
             {cartItems.map((item) => {
-              const discountedPrice = getDiscountPrice(item.selectedProductSize?.price ?? 0, 0);
+              const discountValue = item.selectedProductSize?.discount ?? 0;
+              const discountedPrice = getDiscountPrice(item.selectedProductSize?.price ?? 0, discountValue);
               const finalProductPrice = (item.selectedProductSize?.price ?? 0) * currency.currencyRate;
 
               const finalDiscountedPrice = discountedPrice !== null ? discountedPrice * currency.currencyRate : 0.0;
