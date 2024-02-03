@@ -176,6 +176,7 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                               rules={[
                                 {
                                   required: true,
+                                  whitespace: true,
                                   message: "Vui lòng nhập vào địa chỉ email",
                                 },
                                 {
@@ -197,7 +198,7 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                             </Form.Item>
                             <Form.Item
                               name="password"
-                              rules={[{ required: true }]}
+                              rules={[{ required: true, whitespace: true }]}
                             >
                               <PasswordField />
                             </Form.Item>
@@ -242,6 +243,7 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                               rules={[
                                 {
                                   required: true,
+                                  whitespace: true,
                                   message: "Vui lòng nhập vào địa chỉ email",
                                 },
                                 {
@@ -298,7 +300,12 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                             </Form.Item>
                             <Form.Item
                               name="password"
-                              rules={[{ required: true }]}
+                              rules={[
+                                {
+                                  whitespace: true,
+                                  required: true,
+                                },
+                              ]}
                             >
                               <PasswordField />
                             </Form.Item>

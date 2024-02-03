@@ -128,6 +128,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
                         name="password"
                         rules={[
                           {
+                            whitespace: true,
                             required: true,
                             message: "Mật khẩu mới không được để trống",
                           },

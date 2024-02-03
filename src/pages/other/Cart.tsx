@@ -89,8 +89,9 @@ const Cart = () => {
   const currency = useSelector((state: RootState) => state.currency);
   const { cartItems } = useSelector((state: RootState) => state.cart);
   const sortedCartItems = [...cartItems].sort((a, b) => {
-    return a.createdAt - b.createdAt;
+    return (a.createdAt ?? 0) - (b.createdAt ?? 0);
   });
+
   const totalCartQty = getTotalCartQuantity(cartItems);
   const { order } = useSelector((state: RootState) => state.order);
 

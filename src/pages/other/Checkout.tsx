@@ -256,7 +256,9 @@ const CheckOut = () => {
           setProvinceName(defaultAddress.provinceName);
           setWardName(defaultAddress.wardName);
         }
+      }
 
+      if (!order.fullName && !order.email) {
         const dob = dayjs(new Date(user.dateOfBirth)).format("YYYY-MM-DD");
         form.setFieldsValue({
           full_name: user.fullName,
@@ -514,7 +516,7 @@ const CheckOut = () => {
                     order.address?.wardCode,
                     null
                   ),
-                  more: getDefaultIfEmptyOrNull(order.address?.more, null),
+                  line: getDefaultIfEmptyOrNull(order.address?.more, null),
                 }}
               >
                 <div className="col-lg-7">
@@ -549,6 +551,7 @@ const CheckOut = () => {
                             rules={[
                               {
                                 required: true,
+                                whitespace: true,
                                 message: "Họ và tên không được để trống!",
                               },
                             ]}
@@ -567,6 +570,7 @@ const CheckOut = () => {
                             rules={[
                               {
                                 required: true,
+                                whitespace: true,
                                 message: "Số điện thoại không được để trống!",
                               },
                             ]}
@@ -583,6 +587,7 @@ const CheckOut = () => {
                             rules={[
                               {
                                 required: true,
+                                whitespace: true,
                                 message: "Email không được để trống!",
                               },
                             ]}
@@ -702,6 +707,7 @@ const CheckOut = () => {
                             rules={[
                               {
                                 required: true,
+                                whitespace: true,
                                 message:
                                   "Chi tiết địa chỉ không được để trống!",
                               },

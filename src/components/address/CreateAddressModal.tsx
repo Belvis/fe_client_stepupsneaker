@@ -191,6 +191,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                   rules={[
                     {
                       required: true,
+                      whitespace: true,
                     },
                   ]}
                 >

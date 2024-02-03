@@ -263,7 +263,7 @@ const MyAccount = () => {
     redirect: false,
     autoSubmitClose: true,
     warnWhenUnsavedChanges: false,
-   successNotification: (data, values, resource) => {
+    successNotification: (data, values, resource) => {
       return {
         message: `Cập nhật địa chỉ thành công!`,
         description: "Thành công",
@@ -451,6 +451,7 @@ const MyAccount = () => {
                                     rules={[
                                       {
                                         required: true,
+                                        whitespace: true,
                                         message:
                                           "Họ và tên không được để trống!",
                                       },
@@ -486,6 +487,7 @@ const MyAccount = () => {
                                     rules={[
                                       {
                                         required: true,
+                                        whitespace: true,
                                         message: "Email không được để trống!",
                                         type: "email",
                                       },
@@ -566,7 +568,12 @@ const MyAccount = () => {
                                   <label>Mật khẩu cũ</label>
                                   <Form.Item
                                     name="oldPassword"
-                                    rules={[{ required: true }]}
+                                    rules={[
+                                      {
+                                        whitespace: true,
+                                        required: true,
+                                      },
+                                    ]}
                                   >
                                     <OldPasswordField />
                                   </Form.Item>
@@ -577,7 +584,12 @@ const MyAccount = () => {
                                   <label>Mật khẩu mới</label>
                                   <Form.Item
                                     name="password"
-                                    rules={[{ required: true }]}
+                                    rules={[
+                                      {
+                                        whitespace: true,
+                                        required: true,
+                                      },
+                                    ]}
                                   >
                                     <PasswordField />
                                   </Form.Item>
