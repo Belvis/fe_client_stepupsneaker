@@ -11,6 +11,7 @@ import {
 import { store } from "../redux/store";
 import { deleteAllFromCart, mergeCart } from "../redux/slices/cart-slice";
 import { showSuccessToast } from "../helpers/toast";
+import { clearOrder } from "../redux/slices/order-slice";
 
 const httpClient: AxiosInstance = axiosInstance;
 
@@ -192,6 +193,7 @@ export const authProvider = (url: string): AuthBindings => ({
   logout: async () => {
     localStorage.removeItem(TOKEN_KEY);
     store.dispatch(deleteAllFromCart());
+    store.dispatch(clearOrder());
 
     return {
       success: true,

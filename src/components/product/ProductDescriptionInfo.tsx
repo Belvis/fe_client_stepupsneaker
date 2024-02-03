@@ -6,10 +6,11 @@ import React, {
   useState,
 } from "react";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   getDiscountPrice,
   getProductCartQuantity,
+  getTotalCartQuantity,
 } from "../../helpers/product";
 import {
   ICartItem,
@@ -53,6 +54,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
   selectedVariant,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const dispatch: AppDispatch = useDispatch();
 
@@ -79,6 +81,8 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
     selectedProductSize
   );
 
+  const totalCartQty = getTotalCartQuantity(cartItems);
+
   const discountedPrice = getDiscountPrice(
     selectedProductSize.price,
     selectedProductSize.discount
@@ -94,6 +98,39 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
     setSelectedProductSize(initialSelectedSize);
     setProductStock(initialProductStock);
   }, []);
+
+  const isButtonDisabled =
+    productCartQty >= productStock ||
+    quantityCount + productCartQty > 5 ||
+    totalCartQty >= 5;
+
+  const handleButtonClick = () => {
+    dispatch(
+      addToCart({
+        id: "",
+        cartItemId: product.id,
+        quantity: quantityCount,
+        image: selectedVariant.image[0],
+        name: product.name,
+        selectedProductColor: selectedProductColor,
+        selectedProductSize: selectedProductSize,
+      })
+    );
+  };
+
+  const handleDBButtonClick = () => {
+    dispatch(
+      addToDB({
+        id: "",
+        cartItemId: product.id,
+        quantity: quantityCount,
+        image: selectedVariant.image[0],
+        name: product.name,
+        selectedProductColor: selectedProductColor,
+        selectedProductSize: selectedProductSize,
+      })
+    );
+  };
 
   return (
     <div className="product-details-content ml-70">
@@ -137,10 +174,6 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
       <div className="pro-details-meta">
         <span>Mã :</span>
         <span className="fw-bold">{product.code}</span>
-      </div>
-      <div className="pro-details-meta">
-        <span>Số lượng tồn :</span>
-        <span className="fw-bold">{productStock}</span>
       </div>
       {product.variation ? (
         <div className="pro-details-size-color">
@@ -284,7 +317,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
           />
           <button
             onClick={() => {
-              if (quantityCount + productCartQty >= 5) {
+              if (quantityCount + productCartQty >= 5 || totalCartQty >= 5) {
                 return showErrorToast(
                   "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
                 );
@@ -302,13 +335,19 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
             +
           </button>
         </div>
+        <div className="pro-details-stock">
+          <span className="fw-bold">{productStock}</span>
+          <span>Sản phẩm có sẵn</span>
+        </div>
+      </div>
+      <div className="pro-details-quality">
         <div className="pro-details-cart btn-hover">
           {productStock && productStock > 0 ? (
             <Authenticated
               fallback={
                 <Tooltip
                   title={
-                    quantityCount + productCartQty > 5
+                    isButtonDisabled
                       ? "Bạn chỉ có thể mua tối đa 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
                       : productCartQty >= productStock
                       ? "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
@@ -316,23 +355,9 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
                   }
                 >
                   <button
-                    onClick={() =>
-                      dispatch(
-                        addToCart({
-                          id: "",
-                          cartItemId: product.id,
-                          quantity: quantityCount,
-                          image: selectedVariant.image[0],
-                          name: product.name,
-                          selectedProductColor: selectedProductColor,
-                          selectedProductSize: selectedProductSize,
-                        })
-                      )
-                    }
-                    disabled={
-                      productCartQty >= productStock ||
-                      quantityCount + productCartQty > 5
-                    }
+                    className="mw-250 button-white"
+                    onClick={handleButtonClick}
+                    disabled={isButtonDisabled}
                   >
                     {t(`products.buttons.add_to_cart`)}
                   </button>
@@ -341,7 +366,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
             >
               <Tooltip
                 title={
-                  quantityCount + productCartQty > 5
+                  isButtonDisabled
                     ? "Bạn chỉ có thể mua tối đa 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
                     : productCartQty >= productStock
                     ? "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
@@ -349,34 +374,69 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
                 }
               >
                 <button
-                  onClick={() => {
-                    dispatch(
-                      addToDB({
-                        id: "",
-                        cartItemId: product.id,
-                        quantity: quantityCount,
-                        image: selectedVariant.image[0],
-                        name: product.name,
-                        selectedProductColor: selectedProductColor,
-                        selectedProductSize: selectedProductSize,
-                      })
-                    );
-                  }}
-                  disabled={
-                    productCartQty >= productStock ||
-                    quantityCount + productCartQty > 5
-                  }
+                  className="mw-250 button-white"
+                  onClick={handleDBButtonClick}
+                  disabled={isButtonDisabled}
                 >
                   {t(`products.buttons.add_to_cart`)}
                 </button>
               </Tooltip>
             </Authenticated>
           ) : (
-            <button disabled>
+            <button className="mw-250 button-black" disabled>
               {t(`products.desc_tab.buttons.out_of_stock`)}
             </button>
           )}
         </div>
+        {productStock > 0 && (
+          <div className="pro-details-cart btn-hover">
+            <Authenticated
+              fallback={
+                <Tooltip
+                  title={
+                    isButtonDisabled
+                      ? "Bạn chỉ có thể mua tối đa 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                      : productCartQty >= productStock
+                      ? "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                      : ""
+                  }
+                >
+                  <button
+                    className="button-black"
+                    onClick={() => {
+                      handleButtonClick();
+                      navigate("/pages/checkout");
+                    }}
+                    disabled={isButtonDisabled}
+                  >
+                    Mua ngay
+                  </button>
+                </Tooltip>
+              }
+            >
+              <Tooltip
+                title={
+                  isButtonDisabled
+                    ? "Bạn chỉ có thể mua tối đa 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                    : productCartQty >= productStock
+                    ? "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                    : ""
+                }
+              >
+                <button
+                  className="button-black"
+                  onClick={() => {
+                    handleDBButtonClick();
+                    navigate("/pages/checkout");
+                  }}
+                  disabled={isButtonDisabled}
+                >
+                  Mua ngay
+                </button>
+              </Tooltip>
+            </Authenticated>
+          </div>
+        )}
         <div className="pro-details-wishlist">
           <button
             className={wishlistItem !== undefined ? "active" : ""}

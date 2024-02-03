@@ -141,12 +141,14 @@ export interface ICartItem {
   quantity: number;
   selectedProductColor: IColorResponse;
   selectedProductSize: ISizeClient;
+  createdAt?: number;
 }
 export interface ICartDetailResponse {
   id: string;
   cart: ICartResponse;
   productDetail: IProductDetailResponse;
   quantity: number;
+  createdAt: number;
 }
 export interface ICartDetailRequest {
   productDetail: string;
@@ -274,6 +276,7 @@ export interface IOrderRequest {
   customer?: string;
   address: IAddressRequest;
   fullName: string;
+  email: string;
   phoneNumber: string;
   expectedDeliveryDate: number;
   cartItems: ICartItem[];
