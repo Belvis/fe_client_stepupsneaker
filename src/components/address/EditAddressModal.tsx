@@ -190,6 +190,7 @@ export const EditAddressModal: React.FC<EditAddressModalProps> = ({
                   rules={[
                     {
                       required: true,
+                      whitespace: true,
                     },
                   ]}
                 >

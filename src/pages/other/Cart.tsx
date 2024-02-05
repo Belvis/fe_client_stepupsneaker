@@ -1,4 +1,8 @@
-import { ContainerOutlined, LoadingOutlined, GiftOutlined } from "@ant-design/icons";
+import {
+  ContainerOutlined,
+  LoadingOutlined,
+  GiftOutlined,
+} from "@ant-design/icons";
 import { useModal } from "@refinedev/antd";
 import {
   Authenticated,
@@ -19,7 +23,11 @@ import { Link, useLocation } from "react-router-dom";
 import { dataProvider } from "../../api/dataProvider";
 import VoucherModal from "../../components/voucher/VoucherModal";
 import { CurrencyFormatter, formatCurrency } from "../../helpers/currency";
-import { cartItemStock, getDiscountPrice } from "../../helpers/product";
+import {
+  cartItemStock,
+  getDiscountPrice,
+  getTotalCartQuantity,
+} from "../../helpers/product";
 import {
   ICartItem,
   ICustomerResponse,
@@ -70,7 +78,8 @@ const Cart = () => {
     setTitle(t("nav.pages.cart") + " | SUNS");
   }, [t]);
 
-  const { mutate: calculateFeeMutate, isLoading: isLoadingFee } = useCustomMutation<any>();
+  const { mutate: calculateFeeMutate, isLoading: isLoadingFee } =
+    useCustomMutation<any>();
 
   let cartTotalPrice = 0;
 
@@ -79,6 +88,11 @@ const Cart = () => {
 
   const currency = useSelector((state: RootState) => state.currency);
   const { cartItems } = useSelector((state: RootState) => state.cart);
+  const sortedCartItems = [...cartItems].sort((a, b) => {
+    return (a.createdAt ?? 0) - (b.createdAt ?? 0);
+  });
+
+  const totalCartQty = getTotalCartQuantity(cartItems);
   const { order } = useSelector((state: RootState) => state.order);
 
   const [form] = Form.useForm<{
@@ -96,7 +110,9 @@ const Cart = () => {
   const [districtName, setDistrictName] = useState("");
   const [wardName, setWardName] = useState("");
 
-  const { isLoading: isLoadingProvince, refetch: refetchProvince } = useCustom<IProvince[]>({
+  const { isLoading: isLoadingProvince, refetch: refetchProvince } = useCustom<
+    IProvince[]
+  >({
     url: `${GHN_API_BASE_URL}/master-data/province`,
     method: "get",
     config: {
@@ -112,7 +128,9 @@ const Cart = () => {
     },
   });
 
-  const { isLoading: isLoadingDistrict, refetch: refetchDistrict } = useCustom<IDistrict[]>({
+  const { isLoading: isLoadingDistrict, refetch: refetchDistrict } = useCustom<
+    IDistrict[]
+  >({
     url: `${GHN_API_BASE_URL}/master-data/district`,
     method: "get",
     config: {
@@ -131,24 +149,26 @@ const Cart = () => {
     },
   });
 
-  const { isLoading: isLoadingWard, refetch: refetchWard } = useCustom<IWard[]>({
-    url: `${GHN_API_BASE_URL}/master-data/ward`,
-    method: "get",
-    config: {
-      headers: {
-        token: GHN_TOKEN,
+  const { isLoading: isLoadingWard, refetch: refetchWard } = useCustom<IWard[]>(
+    {
+      url: `${GHN_API_BASE_URL}/master-data/ward`,
+      method: "get",
+      config: {
+        headers: {
+          token: GHN_TOKEN,
+        },
+        query: {
+          district_id: districtId,
+        },
       },
-      query: {
-        district_id: districtId,
+      queryOptions: {
+        enabled: false,
+        onSuccess: (data: any) => {
+          setWards(data.response.data);
+        },
       },
-    },
-    queryOptions: {
-      enabled: false,
-      onSuccess: (data: any) => {
-        setWards(data.response.data);
-      },
-    },
-  });
+    }
+  );
 
   useEffect(() => {
     setProvinces([]);
@@ -181,7 +201,11 @@ const Cart = () => {
     setWardName(option.label);
   };
 
-  function onFinish(values: { provinceId: number; districtId: number; wardCode: string }): void {
+  function onFinish(values: {
+    provinceId: number;
+    districtId: number;
+    wardCode: string;
+  }): void {
     calculateFeeMutate(
       {
         url: `${GHN_API_BASE_URL}/v2/shipping-order/fee`,
@@ -205,9 +229,13 @@ const Cart = () => {
           },
         },
         successNotification: (data: any, values) => {
-          const shippingMoney = formatCurrency(data?.response.data.total ?? 0, currency);
+          const shippingMoney = formatCurrency(
+            data?.response.data.total ?? 0,
+            currency
+          );
           return {
-            message: "Chi phí vận chuyển của bạn được ước tính là " + shippingMoney,
+            message:
+              "Chi phí vận chuyển của bạn được ước tính là " + shippingMoney,
             description: "Thành công",
             type: "success",
           };
@@ -263,7 +291,8 @@ const Cart = () => {
       convertedLegitVoucher.map((single) => {
         const updatedVoucher = { ...single };
         if (single.voucher.type === "PERCENTAGE") {
-          updatedVoucher.voucher.value = (single.voucher.value * cartTotalPrice) / 100;
+          updatedVoucher.voucher.value =
+            (single.voucher.value * cartTotalPrice) / 100;
         }
         return updatedVoucher;
       });
@@ -352,37 +381,53 @@ const Cart = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {cartItems.map((cartItem, key) => {
-                          const discountValue = cartItem.selectedProductSize?.discount ?? 0;
+                        {sortedCartItems.map((cartItem, key) => {
+                          const discountValue =
+                            cartItem.selectedProductSize?.discount ?? 0;
                           const discountedPrice = getDiscountPrice(
                             cartItem.selectedProductSize?.price ?? 0,
                             discountValue
                           );
-                          const finalProductPrice = (cartItem.selectedProductSize?.price ?? 0) * currency.currencyRate;
+                          const finalProductPrice =
+                            (cartItem.selectedProductSize?.price ?? 0) *
+                            currency.currencyRate;
                           const finalDiscountedPrice =
-                            discountedPrice !== null ? discountedPrice * currency.currencyRate : 0.0;
+                            discountedPrice !== null
+                              ? discountedPrice * currency.currencyRate
+                              : 0.0;
 
                           discountedPrice !== null
-                            ? (cartTotalPrice += finalDiscountedPrice * cartItem.quantity)
-                            : (cartTotalPrice += finalProductPrice * cartItem.quantity);
+                            ? (cartTotalPrice +=
+                                finalDiscountedPrice * cartItem.quantity)
+                            : (cartTotalPrice +=
+                                finalProductPrice * cartItem.quantity);
 
                           return (
                             <tr key={key}>
                               <td className="product-thumbnail">
                                 <Link to={"/product/" + cartItem.cartItemId}>
-                                  <img className="img-fluid" src={cartItem.image} alt="" />
+                                  <img
+                                    className="img-fluid"
+                                    src={cartItem.image}
+                                    alt=""
+                                  />
                                 </Link>
                               </td>
 
                               <td className="product-name">
-                                <Link to={"/product/" + cartItem.cartItemId}>{cartItem.name}</Link>
-                                {cartItem.selectedProductColor && cartItem.selectedProductSize ? (
+                                <Link to={"/product/" + cartItem.cartItemId}>
+                                  {cartItem.name}
+                                </Link>
+                                {cartItem.selectedProductColor &&
+                                cartItem.selectedProductSize ? (
                                   <div className="cart-item-variation">
                                     <span>
-                                      {t(`cart.table.head.color`)}: {cartItem.selectedProductColor.name}
+                                      {t(`cart.table.head.color`)}:{" "}
+                                      {cartItem.selectedProductColor.name}
                                     </span>
                                     <span>
-                                      {t(`cart.table.head.size`)}: {cartItem.selectedProductSize.name}
+                                      {t(`cart.table.head.size`)}:{" "}
+                                      {cartItem.selectedProductSize.name}
                                     </span>
                                   </div>
                                 ) : (
@@ -405,7 +450,11 @@ const Cart = () => {
                                     />
                                   </Fragment>
                                 ) : (
-                                  <CurrencyFormatter className="amount" value={finalProductPrice} currency={currency} />
+                                  <CurrencyFormatter
+                                    className="amount"
+                                    value={finalProductPrice}
+                                    currency={currency}
+                                  />
                                 )}
                               </td>
 
@@ -422,14 +471,18 @@ const Cart = () => {
                                                 message:
                                                   "Giảm số lượng về 0 tương đương với việc loại bỏ sản phẩm khỏi giỏ",
                                                 accept: () => {
-                                                  dispatch(decreaseQuantity(cartItem));
+                                                  dispatch(
+                                                    decreaseQuantity(cartItem)
+                                                  );
                                                 },
                                                 reject: () => {},
                                               },
                                               t: t,
                                             });
                                           } else {
-                                            dispatch(decreaseQuantity(cartItem));
+                                            dispatch(
+                                              decreaseQuantity(cartItem)
+                                            );
                                           }
                                         }}
                                       >
@@ -446,7 +499,9 @@ const Cart = () => {
                                               message:
                                                 "Giảm số lượng về 0 tương đương với việc loại bỏ sản phẩm khỏi giỏ",
                                               accept: () => {
-                                                dispatch(decreaseFromDB(cartItem));
+                                                dispatch(
+                                                  decreaseFromDB(cartItem)
+                                                );
                                               },
                                               reject: () => {},
                                             },
@@ -467,11 +522,24 @@ const Cart = () => {
                                         type="text"
                                         value={cartItem.quantity}
                                         onChange={(e) => {
-                                          const newValue = parseInt(e.target.value, 10);
-                                          if (newValue >= cartItemStock(cartItem.selectedProductSize)) {
-                                            return showErrorToast("Rất tiếc, đã đạt giới hạn số lượng sản phẩm");
+                                          const newValue = parseInt(
+                                            e.target.value,
+                                            10
+                                          );
+                                          if (
+                                            newValue >=
+                                            cartItemStock(
+                                              cartItem.selectedProductSize
+                                            )
+                                          ) {
+                                            return showErrorToast(
+                                              "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                                            );
                                           }
-                                          if (newValue > 5) {
+                                          if (
+                                            newValue > 5 ||
+                                            totalCartQty >= 5
+                                          ) {
                                             return showErrorToast(
                                               "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
                                             );
@@ -491,11 +559,21 @@ const Cart = () => {
                                       type="text"
                                       value={cartItem.quantity}
                                       onChange={(e) => {
-                                        const newValue = parseInt(e.target.value, 10);
-                                        if (newValue >= cartItemStock(cartItem.selectedProductSize)) {
-                                          return showErrorToast("Rất tiếc, đã đạt giới hạn số lượng sản phẩm");
+                                        const newValue = parseInt(
+                                          e.target.value,
+                                          10
+                                        );
+                                        if (
+                                          newValue >=
+                                          cartItemStock(
+                                            cartItem.selectedProductSize
+                                          )
+                                        ) {
+                                          return showErrorToast(
+                                            "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                                          );
                                         }
-                                        if (newValue > 5) {
+                                        if (newValue > 5 || totalCartQty >= 5) {
                                           return showErrorToast(
                                             "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
                                           );
@@ -522,12 +600,20 @@ const Cart = () => {
                                           if (
                                             cartItem !== undefined &&
                                             cartItem.quantity !== undefined &&
-                                            cartItem.quantity >= cartItemStock(cartItem.selectedProductSize)
+                                            cartItem.quantity >=
+                                              cartItemStock(
+                                                cartItem.selectedProductSize
+                                              )
                                           ) {
-                                            return showErrorToast("Rất tiếc, đã đạt giới hạn số lượng sản phẩm");
+                                            return showErrorToast(
+                                              "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                                            );
                                           }
 
-                                          if (cartItem.quantity >= 5) {
+                                          if (
+                                            cartItem.quantity >= 5 ||
+                                            totalCartQty >= 5
+                                          ) {
                                             return showErrorToast(
                                               "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
                                             );
@@ -550,12 +636,20 @@ const Cart = () => {
                                         if (
                                           cartItem !== undefined &&
                                           cartItem.quantity !== undefined &&
-                                          cartItem.quantity >= cartItemStock(cartItem.selectedProductSize)
+                                          cartItem.quantity >=
+                                            cartItemStock(
+                                              cartItem.selectedProductSize
+                                            )
                                         ) {
-                                          return showErrorToast("Rất tiếc, đã đạt giới hạn số lượng sản phẩm");
+                                          return showErrorToast(
+                                            "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                                          );
                                         }
 
-                                        if (cartItem.quantity >= 5) {
+                                        if (
+                                          cartItem.quantity >= 5 ||
+                                          totalCartQty >= 5
+                                        ) {
                                           return showErrorToast(
                                             "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
                                           );
@@ -588,12 +682,20 @@ const Cart = () => {
                               <td className="product-remove">
                                 <Authenticated
                                   fallback={
-                                    <button onClick={() => dispatch(deleteFromCart(cartItem.id))}>
+                                    <button
+                                      onClick={() =>
+                                        dispatch(deleteFromCart(cartItem.id))
+                                      }
+                                    >
                                       <i className="fa fa-times"></i>
                                     </button>
                                   }
                                 >
-                                  <button onClick={() => dispatch(deleteFromDB(cartItem.id))}>
+                                  <button
+                                    onClick={() =>
+                                      dispatch(deleteFromDB(cartItem.id))
+                                    }
+                                  >
                                     <i className="fa fa-times"></i>
                                   </button>
                                 </Authenticated>
@@ -610,15 +712,21 @@ const Cart = () => {
                 <div className="col-lg-12">
                   <div className="cart-shiping-update-wrapper">
                     <div className="cart-shiping-update">
-                      <Link to={"/shop"}>{t(`cart.buttons.continue_shopping`)}</Link>
+                      <Link to={"/shop"}>
+                        {t(`cart.buttons.continue_shopping`)}
+                      </Link>
                     </div>
                     <div className="cart-clear">
                       <Authenticated
                         fallback={
-                          <button onClick={() => dispatch(deleteAllFromCart())}>{t(`cart.buttons.clear_cart`)}</button>
+                          <button onClick={() => dispatch(deleteAllFromCart())}>
+                            {t(`cart.buttons.clear_cart`)}
+                          </button>
                         }
                       >
-                        <button onClick={() => dispatch(deleteAllFromDB())}>{t(`cart.buttons.clear_cart`)}</button>
+                        <button onClick={() => dispatch(deleteAllFromDB())}>
+                          {t(`cart.buttons.clear_cart`)}
+                        </button>
                       </Authenticated>
                     </div>
                   </div>
@@ -629,7 +737,9 @@ const Cart = () => {
                 <div className="col-lg-4 col-md-6">
                   <div className="cart-tax">
                     <div className="title-wrap">
-                      <h4 className="cart-bottom-title section-bg-gray">{t(`cart.shipping.title`)}</h4>
+                      <h4 className="cart-bottom-title section-bg-gray">
+                        {t(`cart.shipping.title`)}
+                      </h4>
                     </div>
                     <div className="tax-wrapper">
                       <p>{t(`cart.shipping.subtitle`)}</p>
@@ -652,7 +762,11 @@ const Cart = () => {
                                   message: "Hãy chọn tỉnh/thành phố trước!",
                                 },
                               ]}
-                              initialValue={order.address ? Number(order.address.provinceId) : ""}
+                              initialValue={
+                                order.address
+                                  ? Number(order.address.provinceId)
+                                  : ""
+                              }
                             >
                               <Select
                                 className="email s-email s-wid"
@@ -678,7 +792,11 @@ const Cart = () => {
                                   message: "Vui lòng chọn quận/huyện!",
                                 },
                               ]}
-                              initialValue={order.address ? Number(order.address.districtId) : ""}
+                              initialValue={
+                                order.address
+                                  ? Number(order.address.districtId)
+                                  : ""
+                              }
                             >
                               <Select
                                 className="email s-email s-wid"
@@ -704,7 +822,9 @@ const Cart = () => {
                                   message: "Vui lòng chọn phường/xã!",
                                 },
                               ]}
-                              initialValue={order.address ? order.address.wardCode : ""}
+                              initialValue={
+                                order.address ? order.address.wardCode : ""
+                              }
                             >
                               <Select
                                 className="email s-email s-wid"
@@ -720,7 +840,10 @@ const Cart = () => {
                               />
                             </Form.Item>
                           </div>
-                          <button className="cart-btn-2" disabled={isLoadingFee}>
+                          <button
+                            className="cart-btn-2"
+                            disabled={isLoadingFee}
+                          >
                             {isLoadingFee && (
                               <span className="loading">
                                 <LoadingOutlined />
@@ -738,18 +861,30 @@ const Cart = () => {
                   <div className="col-lg-4 col-md-6">
                     <div className="discount-code-wrapper">
                       <div className="title-wrap">
-                        <h4 className="cart-bottom-title section-bg-gray">{t(`cart.voucher.title`)}</h4>
+                        <h4 className="cart-bottom-title section-bg-gray">
+                          {t(`cart.voucher.title`)}
+                        </h4>
                       </div>
                       <div className="discount-code">
                         <p>{t(`cart.voucher.subtitle`)}</p>
                         <form onSubmit={handleSubmit}>
-                          <input type="text" required name="voucher_code" value={voucherCode} onChange={handleChange} />
+                          <input
+                            type="text"
+                            required
+                            name="voucher_code"
+                            value={voucherCode}
+                            onChange={handleChange}
+                          />
                           <Space>
                             <button className="cart-btn-2" type="submit">
                               {t(`cart.buttons.apply_voucher`)}
                             </button>
                             <Tooltip title="Xem voucher">
-                              <button className="cart-btn-3" type="button" onClick={show}>
+                              <button
+                                className="cart-btn-3"
+                                type="button"
+                                onClick={show}
+                              >
                                 <ContainerOutlined />
                               </button>
                             </Tooltip>
@@ -763,17 +898,28 @@ const Cart = () => {
                 <div className="col-lg-4 col-md-12">
                   <div className="grand-total">
                     <div className="title-wrap">
-                      <h4 className="cart-bottom-title section-bg-gary-cart">{t(`cart.cart_total.title`)}</h4>
+                      <h4 className="cart-bottom-title section-bg-gary-cart">
+                        {t(`cart.cart_total.title`)}
+                      </h4>
                     </div>
                     <h5>
-                      {t(`cart.cart_total.total`)} <CurrencyFormatter value={cartTotalPrice} currency={currency} />
+                      {t(`cart.cart_total.total`)}{" "}
+                      <CurrencyFormatter
+                        value={cartTotalPrice}
+                        currency={currency}
+                      />
                     </h5>
                     <h5>
                       {t(`cart.cart_total.shipping`)}{" "}
                       {cartTotalPrice >= FREE_SHIPPING_THRESHOLD ? (
-                        <span className="free-shipping">Miễn phí vận chuyển</span>
+                        <span className="free-shipping">
+                          Miễn phí vận chuyển
+                        </span>
                       ) : (
-                        <CurrencyFormatter value={order.shippingMoney ?? 0} currency={currency} />
+                        <CurrencyFormatter
+                          value={order.shippingMoney ?? 0}
+                          currency={currency}
+                        />
                       )}
                     </h5>
                     <h5>
@@ -814,8 +960,10 @@ const Cart = () => {
 
                         const voucherDifference =
                           legitVouchers && legitVouchers.length > 0
-                            ? cartTotalPrice < legitVouchers[0].voucher.constraint
-                              ? legitVouchers[0].voucher.constraint - cartTotalPrice
+                            ? cartTotalPrice <
+                              legitVouchers[0].voucher.constraint
+                              ? legitVouchers[0].voucher.constraint -
+                                cartTotalPrice
                               : Infinity
                             : Infinity;
 
@@ -832,17 +980,29 @@ const Cart = () => {
                           return (
                             <DiscountMessage className="message">
                               <GiftOutlined /> Mua thêm{" "}
-                              <DiscountMoney>{formatCurrency(freeShippingDifference, currency)}</DiscountMoney> để được
-                              miễn phí vận chuyển
+                              <DiscountMoney>
+                                {formatCurrency(
+                                  freeShippingDifference,
+                                  currency
+                                )}
+                              </DiscountMoney>{" "}
+                              để được miễn phí vận chuyển
                             </DiscountMessage>
                           );
                         } else if (shouldDisplayVoucher) {
                           return (
                             <DiscountMessage className="message">
                               <GiftOutlined /> Mua thêm{" "}
-                              <DiscountMoney>{formatCurrency(voucherDifference, currency)}</DiscountMoney> để được giảm
-                              tới{" "}
-                              <DiscountMoney>{formatCurrency(legitVouchers[0].voucher.value, currency)}</DiscountMoney>
+                              <DiscountMoney>
+                                {formatCurrency(voucherDifference, currency)}
+                              </DiscountMoney>{" "}
+                              để được giảm tới{" "}
+                              <DiscountMoney>
+                                {formatCurrency(
+                                  legitVouchers[0].voucher.value,
+                                  currency
+                                )}
+                              </DiscountMoney>
                             </DiscountMessage>
                           );
                         } else {
@@ -866,7 +1026,8 @@ const Cart = () => {
                   </div>
                   <div className="item-empty-area__text">
                     {t(`cart.no_items_found`)}
-                    <br /> <Link to={"/shop"}>{t(`cart.buttons.add_items`)}</Link>
+                    <br />{" "}
+                    <Link to={"/shop"}>{t(`cart.buttons.add_items`)}</Link>
                   </div>
                 </div>
               </div>
@@ -888,5 +1049,7 @@ const Cart = () => {
 
 export default Cart;
 
-const filterOption = (input: string, option?: { label: string; value: number | string }) =>
-  (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+const filterOption = (
+  input: string,
+  option?: { label: string; value: number | string }
+) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());

@@ -161,6 +161,18 @@ const getProductCartQuantity = (
   }
 };
 
+// get total cart quantity
+const getTotalCartQuantity = (cartItems: ICartItem[]): number => {
+  if (cartItems.length >= 1) {
+    // Using reduce to calculate the total quantity
+    return cartItems.reduce((totalQuantity, currentItem) => {
+      return totalQuantity + currentItem.quantity;
+    }, 0);
+  } else {
+    return 0;
+  }
+};
+
 export const getDiscountInfo = (
   promotionProductDetails: IPromotionProductDetailResponse[]
 ): IDiscountInfo | null => {
@@ -212,4 +224,4 @@ export const setActiveLayout = (
   e.currentTarget.classList.add("active");
 };
 
-export { mapProductsToClients, getProductCartQuantity };
+export { mapProductsToClients, getProductCartQuantity, getTotalCartQuantity };

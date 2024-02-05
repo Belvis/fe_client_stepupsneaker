@@ -1,8 +1,8 @@
 import React, { Fragment } from "react";
 import { useSelector } from "react-redux";
 import ProductGridListSingle from "../../components/product/ProductGridListSingle";
+import { IProductClient } from "../../interfaces";
 import { RootState } from "../../redux/store";
-import { ICartItem, IProductClient } from "../../interfaces";
 
 interface ProductGridListProps {
   products: IProductClient[];

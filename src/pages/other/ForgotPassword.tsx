@@ -65,6 +65,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ formProps }) => {
                         rules={[
                           {
                             required: true,
+                            whitespace: true,
                             message: "Địa chỉ email không được để trống",
                           },
                         ]}
