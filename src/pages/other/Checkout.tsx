@@ -971,6 +971,7 @@ const CheckOut = () => {
         <ListAddressModal
           customer={user}
           modalProps={restModalProps}
+          form={form}
           close={close}
         />
       </Authenticated>

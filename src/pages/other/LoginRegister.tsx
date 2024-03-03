@@ -166,8 +166,12 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                             requiredMark={false}
                             initialValues={{
                               remember: false,
-                              email: "",
-                              password: "",
+                              email: localStorage.getItem(
+                                "SUNS_USER_INFO_EMAIL"
+                              ),
+                              password: localStorage.getItem(
+                                "SUNS_USER_INFO_PASS"
+                              ),
                             }}
                             {...formProps}
                           >
@@ -204,7 +208,9 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                             </Form.Item>
                             <div className="button-box">
                               <div className="login-toggle-btn">
-                                <input type="checkbox" />
+                                <Form.Item name="remember" noStyle>
+                                  <input type="checkbox" />
+                                </Form.Item>
                                 <label className="ml-10">
                                   Lưu thông tin đăng nhập
                                 </label>
@@ -316,7 +322,8 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                               rules={[
                                 {
                                   required: true,
-                                  message: "Please confirm your password!",
+                                  message:
+                                    "Vui lòng xác nhận mật khẩu của bạn!",
                                 },
                                 ({ getFieldValue }) => ({
                                   validator(_, value) {

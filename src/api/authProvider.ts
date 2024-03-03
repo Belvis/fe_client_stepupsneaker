@@ -29,7 +29,7 @@ type AuthBindings = {
 };
 
 export const authProvider = (url: string): AuthBindings => ({
-  login: async ({ email, password }) => {
+  login: async ({ email, password, remember }) => {
     try {
       const token = await httpClient
         .post(`${url}/login`, {
@@ -38,6 +38,13 @@ export const authProvider = (url: string): AuthBindings => ({
         })
         .then((res) => {
           const token = res.data.token ?? null;
+          if (remember) {
+            localStorage.setItem("SUNS_USER_INFO_EMAIL", email);
+            localStorage.setItem("SUNS_USER_INFO_PASS", password);
+          } else {
+            localStorage.removeItem("SUNS_USER_INFO_EMAIL");
+            localStorage.removeItem("SUNS_USER_INFO_PASS");
+          }
           return token;
         });
 
@@ -145,10 +152,6 @@ export const authProvider = (url: string): AuthBindings => ({
           return res.data.content;
         });
 
-      notification.success({
-        message: "Đặt lại mật khẩu",
-        description: "Mật khẩu được đặt lại thành công",
-      });
       return {
         success: true,
         redirectTo: "/login",

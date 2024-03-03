@@ -273,7 +273,10 @@ const Success = () => {
                                   <span>
                                     {t(`cart.table.head.product_name`)}:{" "}
                                     <Link
-                                      to={"/product/" + detail.id}
+                                      to={
+                                        "/product/" +
+                                        detail.productDetail.product.id
+                                      }
                                       className="fw-bold"
                                     >
                                       {detail.productDetail.product.name}

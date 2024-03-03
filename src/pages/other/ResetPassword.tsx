@@ -1,9 +1,14 @@
-import { LoginFormTypes } from "@refinedev/core";
+import { LoginFormTypes, useNotification } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Form, FormProps } from "antd";
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useParams, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { authProvider } from "../../api/authProvider";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import clsx from "clsx";
@@ -18,10 +23,12 @@ type resetPasswordVariables = {
   token: string;
 };
 
-const AUTH_API_URL = import.meta.env.VITE_BACKEND_API_LOCAL_AUTH_URL;
+const AUTH_API_URL = import.meta.env.VITE_BACKEND_API_AUTH_URL;
 
 const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { open } = useNotification();
 
   const [searchParams] = useSearchParams();
 
@@ -44,8 +51,32 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
       ...values,
       token,
     };
-    const response = resetPassword(submitData);
-    console.log(response);
+    resetPassword(submitData)
+      .then((response) => {
+        if (response.success) {
+          open?.({
+            type: "success",
+            message: `Đang chuyển hướng đến trang đăng nhập...`,
+            description: "Đặt lại mật khẩu thành công!",
+          });
+          navigate("/login");
+        } else {
+          open?.({
+            type: "error",
+            message: `Lý do: ${response.error?.name}`,
+            description: "Đặt lại mật khẩu thất bại!",
+          });
+          console.log(response.error);
+        }
+      })
+      .catch((error) => {
+        open?.({
+          type: "error",
+          message: `Lý do: xem console`,
+          description: "Đã xảy ra lỗi!",
+        });
+        console.error("Error occurred:", error);
+      });
   };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -143,7 +174,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
                         rules={[
                           {
                             required: true,
-                            message: "Please confirm your password!",
+                            message: "Vui lòng xác nhận mật khẩu của bạn!",
                           },
                           ({ getFieldValue }) => ({
                             validator(_, value) {

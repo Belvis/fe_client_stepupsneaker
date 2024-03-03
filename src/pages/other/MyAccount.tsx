@@ -165,7 +165,13 @@ const MyAccount = () => {
   };
 
   const updateUserPassword = (values: updatePasswordVariables) => {
-    updatePassword(values);
+    updatePassword(values, {
+      onSuccess: (data) => {
+        if (!data.success) {
+          // handle error
+        }
+      },
+    });
   };
 
   const removeAddress = (id: string) => {

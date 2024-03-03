@@ -104,7 +104,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
     quantityCount + productCartQty > 5 ||
     totalCartQty >= 5;
 
-  const handleButtonClick = () => {
+  const handleDispatchAddToCart = () => {
     dispatch(
       addToCart({
         id: "",
@@ -118,18 +118,30 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
     );
   };
 
-  const handleDBButtonClick = () => {
-    dispatch(
-      addToDB({
-        id: "",
-        cartItemId: product.id,
-        quantity: quantityCount,
-        image: selectedVariant.image[0],
-        name: product.name,
-        selectedProductColor: selectedProductColor,
-        selectedProductSize: selectedProductSize,
-      })
-    );
+  const handleDispatchAddToDB = () => {
+    return new Promise<void>((resolve, reject) => {
+      dispatch(
+        addToDB({
+          id: "",
+          cartItemId: product.id,
+          quantity: quantityCount,
+          image: selectedVariant.image[0],
+          name: product.name,
+          selectedProductColor: selectedProductColor,
+          selectedProductSize: selectedProductSize,
+        })
+      );
+      resolve(); // Resolve the promise once dispatch is done.
+    });
+  };
+
+  const handleDBShopNowButtonClick = async () => {
+    await handleDispatchAddToDB();
+    navigate("/pages/checkout");
+  };
+  const handleShopNowButtonClick = () => {
+    handleDispatchAddToCart();
+    navigate("/pages/checkout");
   };
 
   return (
@@ -356,7 +368,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
                 >
                   <button
                     className="mw-250 button-white"
-                    onClick={handleButtonClick}
+                    onClick={handleDispatchAddToCart}
                     disabled={isButtonDisabled}
                   >
                     {t(`products.buttons.add_to_cart`)}
@@ -375,7 +387,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
               >
                 <button
                   className="mw-250 button-white"
-                  onClick={handleDBButtonClick}
+                  onClick={handleDispatchAddToDB}
                   disabled={isButtonDisabled}
                 >
                   {t(`products.buttons.add_to_cart`)}
@@ -403,10 +415,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
                 >
                   <button
                     className="button-black"
-                    onClick={() => {
-                      handleButtonClick();
-                      navigate("/pages/checkout");
-                    }}
+                    onClick={handleShopNowButtonClick}
                     disabled={isButtonDisabled}
                   >
                     Mua ngay
@@ -425,10 +434,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
               >
                 <button
                   className="button-black"
-                  onClick={() => {
-                    handleDBButtonClick();
-                    navigate("/pages/checkout");
-                  }}
+                  onClick={handleDBShopNowButtonClick}
                   disabled={isButtonDisabled}
                 >
                   Mua ngay

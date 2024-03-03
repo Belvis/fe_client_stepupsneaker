@@ -11,6 +11,7 @@ import {
   List as AntdList,
   Button,
   Col,
+  FormInstance,
   Grid,
   Modal,
   ModalProps,
@@ -27,7 +28,6 @@ import {
   ICustomerResponse,
   IOrderRequest,
 } from "../../interfaces";
-import { setOrder } from "../../redux/slices/order-slice";
 import { RootState } from "../../redux/store";
 import { CreateAddressModal } from "./CreateAddressModal";
 import { EditAddressModal } from "./EditAddressModal";
@@ -37,6 +37,7 @@ type ListAddressModalProps = {
   close: () => void;
   customer: ICustomerResponse | undefined;
   setAddresses?: (order: IOrderRequest) => void;
+  form?: FormInstance<any>;
 };
 
 export const ListAddressModal: React.FC<ListAddressModalProps> = ({
@@ -44,6 +45,7 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
   customer,
   close,
   setAddresses: setViewAddress,
+  form,
 }) => {
   const t = useTranslate();
   const breakpoint = Grid.useBreakpoint();
@@ -52,7 +54,6 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
   const [addresses, setAddresses] = useState<IAddressResponse[]>([]);
 
   const { mutate: setDefault } = useCustomMutation<IAddressResponse>();
-  const dispatch = useDispatch();
   const { order } = useSelector((state: RootState) => state.order);
 
   function handleAddressSetDefault(id: string) {
@@ -137,7 +138,16 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
                   },
                 });
                 if (!setViewAddress) {
-                  dispatch(setOrder(newOrder));
+                  form?.setFieldsValue({
+                    phoneNumber: phoneNumber,
+                    provinceName: provinceName,
+                    districtName: districtName,
+                    wardName: wardName,
+                    provinceId: provinceId,
+                    districtId: districtId,
+                    wardCode: wardCode,
+                    line: more,
+                  });
                   open?.({
                     type: "success",
                     message: "Chọn địa chỉ thành công",
