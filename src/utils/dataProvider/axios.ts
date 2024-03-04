@@ -10,8 +10,11 @@ axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
 axiosInstance.interceptors.request.use(
   async (config) => {
     const token = localStorage.getItem(TOKEN_KEY);
-    if (token && config?.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (config?.headers) {
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      config.headers["Accept-Language"] = "vi";
     }
     return config;
   },

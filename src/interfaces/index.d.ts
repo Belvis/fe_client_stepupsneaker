@@ -115,6 +115,7 @@ export interface IOrderResponse {
   voucher?: IVoucherResponse;
   address: IAddressResponse;
   phoneNumber: string;
+  email: string;
   fullName: string;
   shippingMoney: number;
   totalMoney: number;

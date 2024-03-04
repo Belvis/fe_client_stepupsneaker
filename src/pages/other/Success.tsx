@@ -37,7 +37,7 @@ const Success = () => {
     id: id,
   });
 
-  const order = data?.data ? data?.data : ({} as IOrderResponse);
+  const order = data?.data;
 
   const currency = useSelector((state: RootState) => state.currency);
 
@@ -52,7 +52,7 @@ const Success = () => {
       />
 
       <Spin spinning={isLoading}>
-        {order && !isLoading && (
+        {order ? (
           <div
             className="success-area pb-80 bg-white"
             style={{ padding: "80px 30px 100px 30px" }}
@@ -370,6 +370,8 @@ const Success = () => {
               </div>
             </div>
           </div>
+        ) : (
+          <div></div>
         )}
       </Spin>
     </Fragment>

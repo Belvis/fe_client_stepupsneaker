@@ -130,15 +130,25 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
           selectedProductColor: selectedProductColor,
           selectedProductSize: selectedProductSize,
         })
-      );
-      resolve(); // Resolve the promise once dispatch is done.
+      )
+        .then(() => {
+          resolve();
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   };
 
   const handleDBShopNowButtonClick = async () => {
-    await handleDispatchAddToDB();
-    navigate("/pages/checkout");
+    try {
+      await handleDispatchAddToDB();
+      navigate("/pages/checkout");
+    } catch (error) {
+      console.error("Error adding to DB:", error);
+    }
   };
+
   const handleShopNowButtonClick = () => {
     handleDispatchAddToCart();
     navigate("/pages/checkout");

@@ -61,7 +61,7 @@ const TrackingPage = () => {
                 <Form
                   form={form}
                   name="shipping-address"
-                  layout="vertical"
+                  layout="horizontal"
                   onFinish={(values) => trackOrder(values.code)}
                   // onFinishFailed={onFinishFailed}
                   autoComplete="off"
@@ -85,11 +85,13 @@ const TrackingPage = () => {
                       className="searchform__input"
                     />
                   </Form.Item>
-                  <div>
-                    <button type="submit" className="searchform__submit">
-                      <i className="fa fa-search" />
-                    </button>
-                  </div>
+                  <Form.Item noStyle>
+                    <div>
+                      <button type="submit" className="searchform__submit">
+                        <i className="fa fa-search" />
+                      </button>
+                    </div>
+                  </Form.Item>
                 </Form>
                 <Link to={"/"} className="error-btn">
                   Trở lại trang chủ

@@ -610,7 +610,7 @@ const CheckOut = () => {
                               },
                             ]}
                           >
-                            {provinces.length > 0 ? (
+                            {provinces && provinces.length > 0 ? (
                               <select onChange={handleProvinceChange}>
                                 <option value="">
                                   --Chọn tỉnh/thành phố--
@@ -648,7 +648,7 @@ const CheckOut = () => {
                               },
                             ]}
                           >
-                            {districts.length > 0 ? (
+                            {districts && districts.length > 0 ? (
                               <select onChange={handleDistrictChange}>
                                 <option value="">--Chọn quận/huyện--</option>
                                 {districts.map((district, index) => (
@@ -682,7 +682,7 @@ const CheckOut = () => {
                               },
                             ]}
                           >
-                            {wards.length > 0 ? (
+                            {wards && wards.length > 0 ? (
                               <select onChange={handleWardChange}>
                                 <option value="">--Chọn phường/xã--</option>
                                 {wards.map((ward, index) => (
