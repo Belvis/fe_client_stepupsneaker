@@ -139,7 +139,7 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
                 });
                 if (!setViewAddress) {
                   form?.setFieldsValue({
-                    phoneNumber: phoneNumber,
+                    phone_number: phoneNumber,
                     provinceName: provinceName,
                     districtName: districtName,
                     wardName: wardName,
