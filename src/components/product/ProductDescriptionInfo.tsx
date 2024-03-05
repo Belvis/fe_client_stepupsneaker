@@ -459,8 +459,8 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
             disabled={wishlistItem !== undefined}
             title={
               wishlistItem !== undefined
-                ? "Added to wishlist"
-                : "Add to wishlist"
+                ? "Đã thêm vào danh sách yêu thích"
+                : "Thêm vào danh sách yêu thích"
             }
             onClick={() => dispatch(addToWishlist(product))}
           >
@@ -472,7 +472,9 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
             className={compareItem !== undefined ? "active" : ""}
             disabled={compareItem !== undefined}
             title={
-              compareItem !== undefined ? "Added to compare" : "Add to compare"
+              compareItem !== undefined
+                ? "Đã thêm vào danh sách so sánh"
+                : "Thêm vào danh sách so sánh"
             }
             onClick={() => dispatch(addToCompare(product))}
           >

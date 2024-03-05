@@ -52,6 +52,7 @@ import { getBase64Image } from "../../helpers/image";
 import { CreateAddressModal } from "../../components/address/CreateAddressModal";
 import { EditAddressModal } from "../../components/address/EditAddressModal";
 import Voucher from "../../components/voucher/Voucher";
+import { validateEmail, validateFullName } from "../../helpers/validate";
 
 type updatePasswordVariables = {
   password: string;
@@ -456,10 +457,7 @@ const MyAccount = () => {
                                     name="fullName"
                                     rules={[
                                       {
-                                        required: true,
-                                        whitespace: true,
-                                        message:
-                                          "Họ và tên không được để trống!",
+                                        validator: validateFullName,
                                       },
                                     ]}
                                   >
@@ -492,10 +490,7 @@ const MyAccount = () => {
                                     name="email"
                                     rules={[
                                       {
-                                        required: true,
-                                        whitespace: true,
-                                        message: "Email không được để trống!",
-                                        type: "email",
+                                        validator: validateEmail,
                                       },
                                     ]}
                                   >

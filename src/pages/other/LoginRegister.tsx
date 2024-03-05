@@ -17,6 +17,11 @@ import { Form, FormProps } from "antd";
 import { ICustomerRequest } from "../../interfaces";
 import clsx from "clsx";
 import { toTimeStamp } from "../../helpers/date";
+import {
+  validateCommon,
+  validateEmail,
+  validateFullName,
+} from "../../helpers/validate";
 
 type LoginRegisterProps = {
   type: "login" | "register";
@@ -179,18 +184,7 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                               name="email"
                               rules={[
                                 {
-                                  required: true,
-                                  whitespace: true,
-                                  message: "Vui lòng nhập vào địa chỉ email",
-                                },
-                                {
-                                  type: "email",
-                                  message: (
-                                    <span>
-                                      Địa chỉ email không hợp lệ. Vui lòng nhập
-                                      vào địa chỉ email có định dạng hợp lệ.
-                                    </span>
-                                  ),
+                                  validator: validateEmail,
                                 },
                               ]}
                             >
@@ -269,9 +263,7 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                               name="fullName"
                               rules={[
                                 {
-                                  required: true,
-                                  message: "Vui lòng nhập vào họ và tên!",
-                                  whitespace: true,
+                                  validator: validateFullName,
                                 },
                               ]}
                             >
@@ -281,8 +273,8 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                               name="dateOfBirth"
                               rules={[
                                 {
-                                  required: true,
-                                  message: "Vui lòng chọn ngày sinh!",
+                                  validator: (_, value) =>
+                                    validateCommon(_, value, t, "dateOfBirth"),
                                 },
                               ]}
                             >
@@ -292,8 +284,8 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                               name="gender"
                               rules={[
                                 {
-                                  required: true,
-                                  message: "Vui lòng chọn giới tính!",
+                                  validator: (_, value) =>
+                                    validateCommon(_, value, t, "gender"),
                                 },
                               ]}
                             >

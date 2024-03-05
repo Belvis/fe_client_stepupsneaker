@@ -10,7 +10,7 @@
             font-size: 15px;
             color: #262626;
             margin: 0;
-            background-color: #e6e6e6;
+            background-color: #fff2e8;
             font-weight: 500;
             padding: 10px 30px;
             border: none;
@@ -66,6 +66,7 @@
               margin: 14px 0 7px;
               display: block;
               img {
+                min-width: 250px;
                 width: auto;
               }
             }

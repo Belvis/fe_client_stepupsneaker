@@ -514,8 +514,8 @@ const ProductModal: React.FC<ProductModalProps> = ({
                     disabled={wishlistItem !== undefined}
                     title={
                       wishlistItem !== undefined
-                        ? "Added to wishlist"
-                        : "Add to wishlist"
+                        ? "Đã thêm vào danh sách yêu thích"
+                        : "Thêm vào danh sách yêu thích"
                     }
                     onClick={() => dispatch(addToWishlist(product))}
                   >
@@ -528,8 +528,8 @@ const ProductModal: React.FC<ProductModalProps> = ({
                     disabled={compareItem !== undefined}
                     title={
                       compareItem !== undefined
-                        ? "Added to compare"
-                        : "Add to compare"
+                        ? "Đã thêm vào danh sách so sánh"
+                        : "Thêm vào danh sách so sánh"
                     }
                     onClick={() => dispatch(addToCompare(product))}
                   >

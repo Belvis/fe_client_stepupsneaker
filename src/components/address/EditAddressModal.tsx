@@ -4,6 +4,7 @@ import { Form, FormProps, Grid, Modal, ModalProps } from "antd";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { IDistrict, IProvince, IWard } from "../../interfaces";
+import { validateCommon, validatePhoneNumber } from "../../helpers/validate";
 
 type EditAddressModalProps = {
   modalProps: ModalProps;
@@ -189,8 +190,7 @@ export const EditAddressModal: React.FC<EditAddressModalProps> = ({
                   name="phoneNumber"
                   rules={[
                     {
-                      required: true,
-                      whitespace: true,
+                      validator: validatePhoneNumber,
                     },
                   ]}
                 >
@@ -205,7 +205,8 @@ export const EditAddressModal: React.FC<EditAddressModalProps> = ({
                   name="provinceId"
                   rules={[
                     {
-                      required: true,
+                      validator: (_, value) =>
+                        validateCommon(_, value, t, "provinceId"),
                     },
                   ]}
                 >
@@ -233,7 +234,8 @@ export const EditAddressModal: React.FC<EditAddressModalProps> = ({
                   name="districtId"
                   rules={[
                     {
-                      required: true,
+                      validator: (_, value) =>
+                        validateCommon(_, value, t, "districtId"),
                     },
                   ]}
                 >
@@ -261,7 +263,8 @@ export const EditAddressModal: React.FC<EditAddressModalProps> = ({
                   name="wardCode"
                   rules={[
                     {
-                      required: true,
+                      validator: (_, value) =>
+                        validateCommon(_, value, t, "wardCode"),
                     },
                   ]}
                 >
@@ -289,7 +292,8 @@ export const EditAddressModal: React.FC<EditAddressModalProps> = ({
                   name="more"
                   rules={[
                     {
-                      required: true,
+                      validator: (_, value) =>
+                        validateCommon(_, value, t, "more"),
                     },
                   ]}
                 >

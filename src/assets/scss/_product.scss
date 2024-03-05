@@ -946,7 +946,7 @@
         padding: 23px 38px 23px;
         text-transform: uppercase;
         color: #343538; /* Text color for the white button */
-        border: 2px solid #343538; /* Border color for the white button */
+        border: 2px solid #343538; 
         background: #fff;
         @media #{$xs-layout} {
           padding: 23px 12px 23px;
@@ -957,13 +957,13 @@
         &:hover {
           color: #fff; 
           border: 2px solid transparent; 
+          &:disabled {
+            color: #ccc; 
+            border-color: #ccc; 
+          }
         }
         &:disabled {
           cursor: not-allowed;
-          &:before,
-          &:after {
-            display: none;
-          }
         }
       }
 
@@ -980,7 +980,7 @@
         padding: 23px 38px 23px;
         text-transform: uppercase;
         color: #fff; /* Text color for the black button */
-        border: 2px solid #343538; /* Border color for the white button */
+        border: 2px solid #343538; 
         background: #343538;
         @media #{$xs-layout} {
           padding: 23px 12px 23px;
@@ -989,7 +989,11 @@
           padding: 22px 22px 22px;
         }
         &:hover {
-          border: 2px solid $theme-color; /* Border color for the white button */
+          border: 2px solid $theme-color;
+          &:disabled {
+            color: #ccc; 
+            border-color: #ccc; 
+          }
         }
         &:disabled {
           cursor: not-allowed;

@@ -17,19 +17,23 @@ const wishlistSlice = createSlice({
         (item) => item.id === action.payload.id
       );
       if (isInWishlist > -1) {
-        cogoToast.info("Product already in wishlist", {
+        cogoToast.info("Sản phẩm đã có trong danh sách yêu thích", {
           position: "top-center",
         });
       } else {
         state.wishlistItems.push(action.payload);
-        cogoToast.success("Added To wishlist", { position: "top-center" });
+        cogoToast.success("Đã thêm vào danh sách yêu thích", {
+          position: "top-center",
+        });
       }
     },
     deleteFromWishlist(state, action: PayloadAction<string>) {
       state.wishlistItems = state.wishlistItems.filter(
         (item) => item.id !== action.payload
       );
-      cogoToast.error("Removed From Wishlist", { position: "top-center" });
+      cogoToast.error("Đã xoá khỏi danh sách yêu thích", {
+        position: "top-center",
+      });
     },
     deleteAllFromWishlist(state) {
       state.wishlistItems = [];

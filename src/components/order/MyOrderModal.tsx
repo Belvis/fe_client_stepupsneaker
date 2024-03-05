@@ -50,6 +50,12 @@ import { useModal } from "@refinedev/antd";
 import VoucherModal from "../voucher/VoucherModal";
 import { ListAddressModal } from "../address/ListAddressModal";
 import Voucher from "../voucher/Voucher";
+import {
+  validateCommon,
+  validateEmail,
+  validateFullName,
+  validatePhoneNumber,
+} from "../../helpers/validate";
 
 const { Text } = Typography;
 
@@ -930,13 +936,37 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
             <Form.Item label="Mã hoá đơn">
               <Input value={viewOrder.code} disabled />
             </Form.Item>
-            <Form.Item label="Tên đầy đủ" name="fullName">
+            <Form.Item
+              label="Tên đầy đủ"
+              name="fullName"
+              rules={[
+                {
+                  validator: validateFullName,
+                },
+              ]}
+            >
               <Input />
             </Form.Item>
-            <Form.Item label="Email" name="email">
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[
+                {
+                  validator: validateEmail,
+                },
+              ]}
+            >
               <Input />
             </Form.Item>
-            <Form.Item label="Số điện thoại" name="phoneNumber">
+            <Form.Item
+              label="Số điện thoại"
+              name="phoneNumber"
+              rules={[
+                {
+                  validator: validatePhoneNumber,
+                },
+              ]}
+            >
               <Input />
             </Form.Item>
             <Form.Item
@@ -953,8 +983,8 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               name="provinceId"
               rules={[
                 {
-                  required: true,
-                  message: "Hãy chọn tỉnh/thành phố trước!",
+                  validator: (_, value) =>
+                    validateCommon(_, value, t, "provinceId"),
                 },
               ]}
             >
@@ -976,8 +1006,8 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               name="districtId"
               rules={[
                 {
-                  required: true,
-                  message: "Vui lòng chọn quận/huyện!",
+                  validator: (_, value) =>
+                    validateCommon(_, value, t, "districtId"),
                 },
               ]}
             >
@@ -999,8 +1029,8 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               name="wardCode"
               rules={[
                 {
-                  required: true,
-                  message: "Vui lòng chọn phường/xã!",
+                  validator: (_, value) =>
+                    validateCommon(_, value, t, "wardCode"),
                 },
               ]}
             >
@@ -1022,7 +1052,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               name="line"
               rules={[
                 {
-                  required: true,
+                  validator: (_, value) => validateCommon(_, value, t, "line"),
                 },
               ]}
             >

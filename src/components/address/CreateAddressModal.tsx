@@ -9,6 +9,7 @@ import {
   IProvince,
   IWard,
 } from "../../interfaces";
+import { validateCommon, validatePhoneNumber } from "../../helpers/validate";
 
 type CreateAddressModalProps = {
   modalProps: ModalProps;
@@ -190,8 +191,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                   name="phoneNumber"
                   rules={[
                     {
-                      required: true,
-                      whitespace: true,
+                      validator: validatePhoneNumber,
                     },
                   ]}
                 >
@@ -206,7 +206,8 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                   name="provinceId"
                   rules={[
                     {
-                      required: true,
+                      validator: (_, value) =>
+                        validateCommon(_, value, t, "provinceId"),
                     },
                   ]}
                 >
@@ -237,7 +238,8 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                   name="districtId"
                   rules={[
                     {
-                      required: true,
+                      validator: (_, value) =>
+                        validateCommon(_, value, t, "districtId"),
                     },
                   ]}
                 >
@@ -268,7 +270,8 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                   name="wardCode"
                   rules={[
                     {
-                      required: true,
+                      validator: (_, value) =>
+                        validateCommon(_, value, t, "wardCode"),
                     },
                   ]}
                 >
@@ -296,7 +299,8 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                   name="more"
                   rules={[
                     {
-                      required: true,
+                      validator: (_, value) =>
+                        validateCommon(_, value, t, "more"),
                     },
                   ]}
                 >

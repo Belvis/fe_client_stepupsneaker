@@ -59,6 +59,11 @@ const DiscountCodeAccordion: React.FC<DiscountCodeAccordionProps> = ({
     try {
       event.preventDefault();
 
+      if (!voucherCode.trim()) {
+        showErrorToast("Vui lòng nhập mã giảm giá");
+        return;
+      }
+
       const { data } = await getOne<IVoucherResponse>({
         resource: "vouchers/code",
         id: voucherCode,

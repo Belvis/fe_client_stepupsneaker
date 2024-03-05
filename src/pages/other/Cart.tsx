@@ -32,6 +32,7 @@ import {
   ICartItem,
   ICustomerResponse,
   IDistrict,
+  IOrderResponse,
   IProvince,
   IVoucherList,
   IVoucherResponse,
@@ -58,6 +59,7 @@ import { showWarningConfirmDialog } from "../../helpers/confirm";
 import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
 import _ from "lodash";
+import { validateCommon } from "../../helpers/validate";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -94,6 +96,12 @@ const Cart = () => {
 
   const totalCartQty = getTotalCartQuantity(cartItems);
   const { order } = useSelector((state: RootState) => state.order);
+
+  const [shippingMoney, setShippingMoney] = useState(order.shippingMoney ?? 0);
+
+  useEffect(() => {
+    if (cartTotalPrice >= FREE_SHIPPING_THRESHOLD) setShippingMoney(0);
+  }, [cartTotalPrice]);
 
   const [form] = Form.useForm<{
     provinceId: number;
@@ -253,6 +261,8 @@ const Cart = () => {
           console.log("An error occurred! ", +error);
         },
         onSuccess: (data: any, variables, context) => {
+          const shippingMoney = data?.response.data.total as number;
+          setShippingMoney(shippingMoney);
           dispatch(
             setOrder({
               ...order,
@@ -265,7 +275,7 @@ const Cart = () => {
                 districtId: districtId,
                 wardCode: form.getFieldValue("wardCode"),
               },
-              shippingMoney: data?.response.data.total as number,
+              shippingMoney: shippingMoney as number,
             })
           );
         },
@@ -305,6 +315,11 @@ const Cart = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     try {
       event.preventDefault();
+
+      if (!voucherCode.trim()) {
+        showErrorToast("Vui lòng nhập mã giảm giá");
+        return;
+      }
 
       const { data } = await getOne<IVoucherResponse>({
         resource: "vouchers/code",
@@ -744,6 +759,7 @@ const Cart = () => {
                     <div className="tax-wrapper">
                       <p>{t(`cart.shipping.subtitle`)}</p>
                       <Form
+                        className="shipping-address-form mt-2"
                         form={form}
                         name="shipping-address"
                         layout="vertical"
@@ -752,96 +768,90 @@ const Cart = () => {
                         autoComplete="off"
                       >
                         <div className="tax-select-wrapper">
-                          <div className="">
-                            <Form.Item
-                              label={t(`cart.shipping.address.province.title`)}
-                              name="provinceId"
-                              rules={[
-                                {
-                                  required: true,
-                                  message: "Hãy chọn tỉnh/thành phố trước!",
-                                },
-                              ]}
-                              initialValue={
-                                order.address
-                                  ? Number(order.address.provinceId)
-                                  : ""
-                              }
-                            >
-                              <Select
-                                className="email s-email s-wid"
-                                showSearch
-                                placeholder={"Chọn tỉnh/thành phố"}
-                                loading={isLoadingProvince}
-                                onChange={handleProvinceChange}
-                                filterOption={filterOption}
-                                options={provinces.map((province) => ({
-                                  label: province.ProvinceName,
-                                  value: province.ProvinceID,
-                                }))}
-                              />
-                            </Form.Item>
-                          </div>
-                          <div className="">
-                            <Form.Item
-                              label={t(`cart.shipping.address.district.title`)}
-                              name="districtId"
-                              rules={[
-                                {
-                                  required: true,
-                                  message: "Vui lòng chọn quận/huyện!",
-                                },
-                              ]}
-                              initialValue={
-                                order.address
-                                  ? Number(order.address.districtId)
-                                  : ""
-                              }
-                            >
-                              <Select
-                                className="email s-email s-wid"
-                                showSearch
-                                placeholder={"Chọn quận/huyện"}
-                                loading={isLoadingDistrict}
-                                onChange={handleDistrictChange}
-                                filterOption={filterOption}
-                                options={districts.map((district) => ({
-                                  label: district.DistrictName,
-                                  value: district.DistrictID,
-                                }))}
-                              />
-                            </Form.Item>
-                          </div>
-                          <div className="">
-                            <Form.Item
-                              label={t(`cart.shipping.address.ward.title`)}
-                              name="wardCode"
-                              rules={[
-                                {
-                                  required: true,
-                                  message: "Vui lòng chọn phường/xã!",
-                                },
-                              ]}
-                              initialValue={
-                                order.address ? order.address.wardCode : ""
-                              }
-                            >
-                              <Select
-                                className="email s-email s-wid"
-                                showSearch
-                                placeholder={"Chọn phường/xã phố"}
-                                loading={isLoadingWard}
-                                onChange={handleWardChange}
-                                filterOption={filterOption}
-                                options={wards.map((ward) => ({
-                                  label: ward.WardName,
-                                  value: ward.WardCode,
-                                }))}
-                              />
-                            </Form.Item>
-                          </div>
+                          <Form.Item
+                            label={t(`cart.shipping.address.province.title`)}
+                            name="provinceId"
+                            rules={[
+                              {
+                                validator: (_, value) =>
+                                  validateCommon(_, value, t, "provinceId"),
+                              },
+                            ]}
+                            initialValue={
+                              order.address
+                                ? Number(order.address.provinceId)
+                                : ""
+                            }
+                          >
+                            <Select
+                              className="email s-email s-wid"
+                              showSearch
+                              placeholder="Chọn tỉnh/thành phố"
+                              loading={isLoadingProvince}
+                              onChange={handleProvinceChange}
+                              filterOption={filterOption}
+                              options={provinces.map((province) => ({
+                                label: province.ProvinceName,
+                                value: province.ProvinceID,
+                              }))}
+                            />
+                          </Form.Item>
+                          <Form.Item
+                            label={t(`cart.shipping.address.district.title`)}
+                            name="districtId"
+                            rules={[
+                              {
+                                validator: (_, value) =>
+                                  validateCommon(_, value, t, "districtId"),
+                              },
+                            ]}
+                            initialValue={
+                              order.address
+                                ? Number(order.address.districtId)
+                                : ""
+                            }
+                          >
+                            <Select
+                              className="email s-email s-wid"
+                              showSearch
+                              placeholder={"Chọn quận/huyện"}
+                              loading={isLoadingDistrict}
+                              onChange={handleDistrictChange}
+                              filterOption={filterOption}
+                              options={districts.map((district) => ({
+                                label: district.DistrictName,
+                                value: district.DistrictID,
+                              }))}
+                            />
+                          </Form.Item>
+                          <Form.Item
+                            label={t(`cart.shipping.address.ward.title`)}
+                            name="wardCode"
+                            rules={[
+                              {
+                                validator: (_, value) =>
+                                  validateCommon(_, value, t, "wardCode"),
+                              },
+                            ]}
+                            initialValue={
+                              order.address ? order.address.wardCode : ""
+                            }
+                          >
+                            <Select
+                              className="email s-email s-wid"
+                              showSearch
+                              placeholder={"Chọn phường/xã phố"}
+                              loading={isLoadingWard}
+                              onChange={handleWardChange}
+                              filterOption={filterOption}
+                              options={wards.map((ward) => ({
+                                label: ward.WardName,
+                                value: ward.WardCode,
+                              }))}
+                            />
+                          </Form.Item>
                           <button
-                            className="cart-btn-2"
+                            className="cart-btn-2 mt-2"
                             disabled={isLoadingFee}
                           >
                             {isLoadingFee && (
@@ -870,7 +880,6 @@ const Cart = () => {
                         <form onSubmit={handleSubmit}>
                           <input
                             type="text"
-                            required
                             name="voucher_code"
                             value={voucherCode}
                             onChange={handleChange}
@@ -916,10 +925,18 @@ const Cart = () => {
                           Miễn phí vận chuyển
                         </span>
                       ) : (
-                        <CurrencyFormatter
-                          value={order.shippingMoney ?? 0}
-                          currency={currency}
-                        />
+                        <>
+                          {order.address ? (
+                            <CurrencyFormatter
+                              value={shippingMoney}
+                              currency={currency}
+                            />
+                          ) : (
+                            <span className="free-shipping">
+                              Vui lòng chọn địa chỉ
+                            </span>
+                          )}
+                        </>
                       )}
                     </h5>
                     <h5>
@@ -940,7 +957,9 @@ const Cart = () => {
                       <CurrencyFormatter
                         value={
                           cartTotalPrice +
-                          order.shippingMoney -
+                          (cartTotalPrice < FREE_SHIPPING_THRESHOLD
+                            ? shippingMoney
+                            : 0) -
                           (order.voucher
                             ? order.voucher.type == "PERCENTAGE"
                               ? (order.voucher.value / 100) * cartTotalPrice

@@ -30,7 +30,7 @@ import { useNavigate } from "react-router-dom";
 import { ListAddressModal } from "../../components/address/ListAddressModal";
 import PaymentMethodAccordion from "../../components/payment-methods/PaymentMethodAccordion";
 import DiscountCodeAccordion from "../../components/voucher/DiscountCodeAccordion";
-import { FREE_SHIPPING_THRESHOLD } from "../../constants";
+import { FREE_SHIPPING_THRESHOLD, MAX_TEXT_AREA_LENGTH } from "../../constants";
 import { CurrencyFormatter, formatCurrency } from "../../helpers/currency";
 import {
   deleteAllFromCart,
@@ -43,6 +43,12 @@ import {
 } from "../../redux/slices/order-slice";
 import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
 import { TOKEN_KEY } from "../../utils";
+import {
+  validateCommon,
+  validateEmail,
+  validateFullName,
+  validatePhoneNumber,
+} from "../../helpers/validate";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -71,6 +77,12 @@ const CheckOut = () => {
 
   let cartTotalPrice = 0;
   let discount = 0;
+
+  const [textAreaCount, setTextAreaCount] = useState(0);
+
+  const recalculate = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTextAreaCount(e.target.value.length);
+  };
 
   const [shippingMoney, setShippingMoney] = useState(order.shippingMoney ?? 0);
 
@@ -550,9 +562,7 @@ const CheckOut = () => {
                             name="full_name"
                             rules={[
                               {
-                                required: true,
-                                whitespace: true,
-                                message: "Họ và tên không được để trống!",
+                                validator: validateFullName,
                               },
                             ]}
                           >
@@ -567,13 +577,7 @@ const CheckOut = () => {
                           </label>
                           <Form.Item
                             name="phone_number"
-                            rules={[
-                              {
-                                required: true,
-                                whitespace: true,
-                                message: "Số điện thoại không được để trống!",
-                              },
-                            ]}
+                            rules={[{ validator: validatePhoneNumber }]}
                           >
                             <input type="text" />
                           </Form.Item>
@@ -586,9 +590,7 @@ const CheckOut = () => {
                             name="email"
                             rules={[
                               {
-                                required: true,
-                                whitespace: true,
-                                message: "Email không được để trống!",
+                                validator: validateEmail,
                               },
                             ]}
                           >
@@ -605,8 +607,8 @@ const CheckOut = () => {
                             name="provinceId"
                             rules={[
                               {
-                                required: true,
-                                message: "Tỉnh/thành phố không được để trống!",
+                                validator: (_, value) =>
+                                  validateCommon(_, value, t, "provinceId"),
                               },
                             ]}
                           >
@@ -643,8 +645,8 @@ const CheckOut = () => {
                             name="districtId"
                             rules={[
                               {
-                                required: true,
-                                message: "Quận/huyện không được để trống!",
+                                validator: (_, value) =>
+                                  validateCommon(_, value, t, "districtId"),
                               },
                             ]}
                           >
@@ -677,8 +679,8 @@ const CheckOut = () => {
                             name="wardCode"
                             rules={[
                               {
-                                required: true,
-                                message: "Phường/xã không được để trống!",
+                                validator: (_, value) =>
+                                  validateCommon(_, value, t, "wardCode"),
                               },
                             ]}
                           >
@@ -706,10 +708,8 @@ const CheckOut = () => {
                             name="line"
                             rules={[
                               {
-                                required: true,
-                                whitespace: true,
-                                message:
-                                  "Chi tiết địa chỉ không được để trống!",
+                                validator: (_, value) =>
+                                  validateCommon(_, value, t, "line"),
                               },
                             ]}
                           >
@@ -726,19 +726,25 @@ const CheckOut = () => {
                         )}
                       </h4>
                       <div className="additional-info">
-                        <label>
-                          {t(
-                            "checkout.billing_details.additional_information.order_note.title"
-                          )}
-                        </label>
+                        <Form.Item>
+                          <div className="d-flex justify-content-between">
+                            <label>
+                              {t(
+                                "checkout.billing_details.additional_information.order_note.title"
+                              )}
+                            </label>
+                            <label>{`${textAreaCount} / ${MAX_TEXT_AREA_LENGTH}`}</label>
+                          </div>
+                        </Form.Item>
                         <Form.Item name="order_note">
                           <textarea
                             placeholder={
                               t(
-                                "checkout.billing_details.additional_information.order_note.place_holder"
+                                "checkout.billing_details.additional_information.order_note.place_holder",
+                                { textAreaCount: MAX_TEXT_AREA_LENGTH }
                               ) ?? ""
                             }
-                            name="message"
+                            onChange={recalculate}
                           />
                         </Form.Item>
                       </div>
@@ -822,10 +828,18 @@ const CheckOut = () => {
                                   Miễn phí vận chuyển
                                 </span>
                               ) : (
-                                <CurrencyFormatter
-                                  value={shippingMoney}
-                                  currency={currency}
-                                />
+                                <>
+                                  {order.address ? (
+                                    <CurrencyFormatter
+                                      value={shippingMoney}
+                                      currency={currency}
+                                    />
+                                  ) : (
+                                    <span className="free-shipping">
+                                      Vui lòng chọn địa chỉ
+                                    </span>
+                                  )}
+                                </>
                               )}
                             </li>
                           </ul>
@@ -917,7 +931,11 @@ const CheckOut = () => {
                             <li>
                               <CurrencyFormatter
                                 value={
-                                  cartTotalPrice + shippingMoney - discount
+                                  cartTotalPrice +
+                                  (cartTotalPrice < FREE_SHIPPING_THRESHOLD
+                                    ? shippingMoney
+                                    : 0) -
+                                  discount
                                 }
                                 currency={currency}
                               />

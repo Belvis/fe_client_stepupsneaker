@@ -21,6 +21,7 @@
     "cogo-toast": "^4.2.3",
     "dayjs": "^1.11.10",
     "framer-motion": "^10.16.4",
+    "google-libphonenumber": "^3.2.34",
     "google-map-react": "^2.2.1",
     "i18next": "^22.5.1",
     "i18next-browser-languagedetector": "^7.2.0",
@@ -51,6 +52,7 @@
     "yet-another-react-lightbox": "^2.6.2"
   },
   "devDependencies": {
+    "@types/google-libphonenumber": "^7.4.30",
     "@types/google-map-react": "^2.1.10",
     "@types/lodash": "^4.14.200",
     "@types/node": "^18.16.2",

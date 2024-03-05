@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { useTranslation } from "react-i18next";
@@ -6,6 +6,7 @@ import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { useApiUrl } from "@refinedev/core";
 import { dataProvider } from "../../api/dataProvider";
 import { Form, notification } from "antd";
+import { showErrorToast } from "../../helpers/toast";
 
 const TrackingPage = () => {
   let { pathname } = useLocation();
@@ -39,9 +40,26 @@ const TrackingPage = () => {
     }
   };
 
-  const [form] = Form.useForm<{
-    code: string;
-  }>();
+  const [code, setCode] = useState("");
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!code.trim()) {
+      showErrorToast("Vui lòng nhập mã đơn hàng");
+      return;
+    }
+
+    try {
+      await trackOrder(code);
+    } catch (error) {
+      console.error("Lỗi khi tra cứu đơn hàng:", error);
+    }
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCode(event.target.value);
+  };
 
   return (
     <Fragment>
@@ -58,41 +76,20 @@ const TrackingPage = () => {
               <div className="">
                 <h2>Tra cứu đơn hàng</h2>
                 <p>Nhập mã đơn hàng để thực hiện tra cứu</p>
-                <Form
-                  form={form}
-                  name="shipping-address"
-                  layout="horizontal"
-                  onFinish={(values) => trackOrder(values.code)}
-                  // onFinishFailed={onFinishFailed}
-                  autoComplete="off"
-                  className="searchform mb-50"
-                >
-                  <Form.Item
-                    name="code"
-                    rules={[
-                      {
-                        required: true,
-                        whitespace: true,
-                        message: "Mã hoá đơn không được để trống!",
-                      },
-                    ]}
-                  >
-                    <input
-                      type="text"
-                      name="code"
-                      id="error_search"
-                      placeholder="Nhập mã đơn hàng... Ví dụ: SUS-HGDKA"
-                      className="searchform__input"
-                    />
-                  </Form.Item>
-                  <Form.Item noStyle>
-                    <div>
-                      <button type="submit" className="searchform__submit">
-                        <i className="fa fa-search" />
-                      </button>
-                    </div>
-                  </Form.Item>
-                </Form>
+                <form className="searchform mb-50" onSubmit={handleSubmit}>
+                  <input
+                    type="text"
+                    name="search"
+                    id="error_search"
+                    placeholder="Nhập mã đơn hàng... Ví dụ: SUS-HGDKA"
+                    className="searchform__input"
+                    value={code}
+                    onChange={handleChange}
+                  />
+                  <button type="submit" className="searchform__submit">
+                    <i className="fa fa-search" />
+                  </button>
+                </form>
                 <Link to={"/"} className="error-btn">
                   Trở lại trang chủ
                 </Link>

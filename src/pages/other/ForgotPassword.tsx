@@ -5,6 +5,7 @@ import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
+import { validateEmail } from "../../helpers/validate";
 
 type ForgotPasswordProps = {
   formProps?: FormProps<any> | undefined;
@@ -64,9 +65,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ formProps }) => {
                         name="email"
                         rules={[
                           {
-                            required: true,
-                            whitespace: true,
-                            message: "Địa chỉ email không được để trống",
+                            validator: validateEmail,
                           },
                         ]}
                       >
