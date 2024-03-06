@@ -9,6 +9,11 @@ export const validatePhoneNumber = (_: RuleObject, value: string) => {
     return Promise.reject("Số điện thoại không được để trống!");
   }
 
+  const regex = /(0[3|5|7|8|9])+([0-9]{8})\b/;
+  if (!regex.test(value)) {
+    return Promise.reject("Số điện thoại không hợp lệ!");
+  }
+
   const phoneUtil = PhoneNumberUtil.getInstance();
 
   try {
@@ -57,7 +62,11 @@ export const validateCommon = (
   t: TranslateFunction,
   fieldName: string
 ) => {
-  if (!value || value.trim() === "") {
+  if (
+    value === null ||
+    value === undefined ||
+    (typeof value === "string" && value.trim() === "")
+  ) {
     return Promise.reject(t(`validator.message.${fieldName}`));
   }
 
