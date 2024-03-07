@@ -217,7 +217,7 @@ const OrderTracking = () => {
       <Breadcrumb
         pages={[
           { label: "home", path: "/" },
-          { label: "pages.orders", path: "/orders" },
+          { label: "pages.orders", path: "/pages/my-account/orders" },
           { label: "pages.orders_tracking", path: pathname },
         ]}
       />

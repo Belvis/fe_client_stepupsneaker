@@ -9,6 +9,7 @@ import { IProductResponse } from "../../interfaces";
 import { mapProductsToClients } from "../../helpers/product";
 import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { Spin } from "antd";
 
 const ProductTabLeft = () => {
   const { t } = useTranslation();
@@ -28,14 +29,6 @@ const ProductTabLeft = () => {
   const products = data?.data ? mapProductsToClients([data?.data]) : [];
   const product = products[0];
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError) {
-    return <div>Something went wrong!</div>;
-  }
-
   return (
     <Fragment>
       <Breadcrumb
@@ -45,25 +38,31 @@ const ProductTabLeft = () => {
         ]}
       />
 
-      {/* product description with image */}
-      <ProductImageDescription
-        spaceTopClass="pt-100"
-        spaceBottomClass="pb-100"
-        product={product}
-        galleryType="leftThumb"
-      />
+      <Spin spinning={isLoading}>
+        {!isLoading && !isError && (
+          <>
+            {/* product description with image */}
+            <ProductImageDescription
+              spaceTopClass="pt-100"
+              spaceBottomClass="pb-100"
+              product={product}
+              galleryType="leftThumb"
+            />
 
-      {/* product description tab */}
-      <ProductDescriptionTab
-        spaceBottomClass="pb-90"
-        productFullDesc={product.description}
-      />
+            {/* product description tab */}
+            <ProductDescriptionTab
+              spaceBottomClass="pb-90"
+              productFullDesc={product.description}
+            />
 
-      {/* related product slider */}
-      <RelatedProductSlider
-        spaceBottomClass="pb-95"
-        style={"6d61449e-0ff9-4ab0-80bd-7ee6aa3335e9"}
-      />
+            {/* related product slider */}
+            <RelatedProductSlider
+              spaceBottomClass="pb-95"
+              style={"6d61449e-0ff9-4ab0-80bd-7ee6aa3335e9"}
+            />
+          </>
+        )}
+      </Spin>
     </Fragment>
   );
 };

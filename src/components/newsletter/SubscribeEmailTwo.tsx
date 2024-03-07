@@ -41,12 +41,14 @@ const CustomForm: React.FC<CustomFormProps> = ({
             className="email"
             ref={(node) => (email = node)}
             type="email"
-            placeholder={t(`newsletter.buttons.subscribe.place_holder`)}
+            placeholder={
+              t(`newsletter.buttons.subscribe.place_holder`) || undefined
+            }
             required
           />
         </div>
         {status === "sending" && (
-          <div style={{ color: "#3498db", fontSize: "12px" }}>sending...</div>
+          <div style={{ color: "#3498db", fontSize: "12px" }}>đang gửi...</div>
         )}
         {status === "error" && (
           <div
