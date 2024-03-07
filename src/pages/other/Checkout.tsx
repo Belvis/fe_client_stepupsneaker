@@ -251,36 +251,71 @@ const CheckOut = () => {
 
   useEffect(() => {
     if (user) {
-      if (!order.address) {
-        const defaultAddress = user.addressList.find(
-          (add) => add.isDefault === true
-        );
+      let updatedOrder = _.cloneDeep(order);
+      const defaultAddress = user.addressList.find(
+        (add) => add.isDefault === true
+      );
+      const hasDefaultAddress = !!defaultAddress;
 
-        if (defaultAddress) {
-          form.setFieldsValue({
-            phone_number: defaultAddress.phoneNumber,
-            provinceId: Number(defaultAddress.provinceId),
-            districtId: Number(defaultAddress.districtId),
-            wardCode: defaultAddress.wardCode,
-            line: defaultAddress.more,
-          });
-          setDistrictName(defaultAddress.districtName);
-          setProvinceName(defaultAddress.provinceName);
-          setWardName(defaultAddress.wardName);
-        }
+      if (!order.address && hasDefaultAddress) {
+        const {
+          phoneNumber,
+          provinceId,
+          districtId,
+          wardCode,
+          districtName,
+          provinceName,
+          wardName,
+          more,
+        } = defaultAddress;
+
+        form.setFieldsValue({
+          phone_number: phoneNumber,
+          provinceId: Number(provinceId),
+          districtId: Number(districtId),
+          wardCode: wardCode,
+          line: more,
+        });
+
+        setDistrictName(districtName);
+        setProvinceName(provinceName);
+        setWardName(wardName);
+
+        updatedOrder.address = {
+          phoneNumber,
+          provinceName: districtName,
+          districtName: provinceName,
+          wardName,
+          provinceId: Number(provinceId),
+          districtId: Number(districtId),
+          wardCode,
+          more,
+        };
       }
 
       if (!order.fullName && !order.email) {
         const dob = dayjs(new Date(user.dateOfBirth)).format("YYYY-MM-DD");
+        const { fullName, email, gender } = user;
+
         form.setFieldsValue({
-          full_name: user.fullName,
-          email: user.email,
-          gender: user.gender,
+          full_name: fullName,
+          email,
+          gender,
           date_of_birth: dob,
         });
+
+        updatedOrder = {
+          ...updatedOrder,
+          fullName,
+          email,
+        };
+      }
+
+      if (!_.isEqual(order, updatedOrder)) {
+        dispatch(setOrder(updatedOrder));
       }
     }
-  }, [user]);
+  }, [user, order]);
 
   useEffect(() => {
     setProvinces([]);
@@ -326,17 +361,29 @@ const CheckOut = () => {
             },
           },
           successNotification: false,
-          errorNotification: (data, values) => {
-            return {
-              message: `Đã xảy ra lỗi`,
-              description: "Lỗi tính tiền ship",
-              type: "error",
-            };
-          },
+          errorNotification: false,
         },
         {
           onError: (error, variables, context) => {
             console.log("An error occurred! ", +error);
+
+            const shippingMoney = 36500;
+            setShippingMoney(shippingMoney);
+            dispatch(
+              setOrder({
+                ...order,
+                address: {
+                  ...order.address,
+                  provinceName: provinceName,
+                  districtName: districtName,
+                  wardName: wardName,
+                  provinceId: provinceId,
+                  districtId: districtId,
+                  wardCode: form.getFieldValue("wardCode"),
+                },
+                shippingMoney: shippingMoney as number,
+              })
+            );
           },
           onSuccess: (data: any, variables, context) => {
             const shippingMoney = data?.response.data.total;
@@ -373,6 +420,8 @@ const CheckOut = () => {
     if (selectedProvince) {
       const provinceName = selectedProvince.ProvinceName;
       setProvinceName(provinceName);
+      form.setFieldValue("districtId", null);
+      form.setFieldValue("wardCode", "");
     }
   };
 
@@ -931,11 +980,10 @@ const CheckOut = () => {
                             <li>
                               <CurrencyFormatter
                                 value={
-                                  cartTotalPrice +
+                                  Math.max(cartTotalPrice - discount, 0) +
                                   (cartTotalPrice < FREE_SHIPPING_THRESHOLD
                                     ? shippingMoney
-                                    : 0) -
-                                  discount
+                                    : 0)
                                 }
                                 currency={currency}
                               />

@@ -321,20 +321,19 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
             },
           },
           successNotification: false,
-          errorNotification: (data, values) => {
-            return {
-              message: `Đã xảy ra lỗi`,
-              description: "Lỗi tính tiền ship",
-              type: "error",
-            };
-          },
+          errorNotification: false,
         },
         {
           onError: (error, variables, context) => {
             console.log("An error occurred! ", +error);
+
+            const shippingMoney = 36500;
+            setShippingMoney(shippingMoney);
           },
           onSuccess: (data: any, variables, context) => {
-            setShippingMoney(data?.response.data.total as number);
+            const shippingMoney = data?.response.data.total as number;
+
+            setShippingMoney(shippingMoney);
           },
         }
       );
@@ -343,6 +342,8 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
 
   const handleProvinceChange = (value: number, option: any) => {
     setProvinceName(option.label);
+    form.setFieldValue("districtId", null);
+    form.setFieldValue("wardCode", "");
   };
 
   const handleDistrictChange = (value: number, option: any) => {

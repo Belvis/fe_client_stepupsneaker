@@ -500,7 +500,7 @@ h3.cart-page-title {
     font-size: 14px;
 
     margin: 36px 0 27px;
-    span {
+    span:not(.remove-voucher) {
       font-size: 18px;
       font-weight: 500;
 

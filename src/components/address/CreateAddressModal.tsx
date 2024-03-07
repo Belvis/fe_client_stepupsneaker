@@ -50,6 +50,8 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
     if (selectedProvince) {
       const provinceName = selectedProvince.ProvinceName;
       setProvinceName(provinceName);
+      formProps.form?.setFieldValue("districtId", null);
+      formProps.form?.setFieldValue("wardCode", "");
     }
   };
 

@@ -2,6 +2,7 @@ import {
   ContainerOutlined,
   LoadingOutlined,
   GiftOutlined,
+  MinusCircleOutlined,
 } from "@ant-design/icons";
 import { useModal } from "@refinedev/antd";
 import {
@@ -50,7 +51,7 @@ import {
   updateCartItemQuantity,
   updateFromDB,
 } from "../../redux/slices/cart-slice";
-import { setOrder } from "../../redux/slices/order-slice";
+import { clearVoucher, setOrder } from "../../redux/slices/order-slice";
 import { AppDispatch, RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { debounce } from "lodash";
@@ -84,6 +85,7 @@ const Cart = () => {
     useCustomMutation<any>();
 
   let cartTotalPrice = 0;
+  let discount = 0;
 
   const [quantityCount] = useState(1);
   let { pathname } = useLocation();
@@ -199,6 +201,8 @@ const Cart = () => {
 
   const handleProvinceChange = (value: number, option: any) => {
     setProvinceName(option.label);
+    form.setFieldValue("districtId", null);
+    form.setFieldValue("wardCode", null);
   };
 
   const handleDistrictChange = (value: number, option: any) => {
@@ -249,16 +253,37 @@ const Cart = () => {
           };
         },
         errorNotification: (data, values) => {
+          const shippingMoney = formatCurrency(36500 ?? 0, currency);
+
           return {
-            message: `Đã xảy ra lỗi`,
-            description: "Lỗi",
-            type: "error",
+            message:
+              "Chi phí vận chuyển của bạn được ước tính là " + shippingMoney,
+            description: "Thành công",
+            type: "success",
           };
         },
       },
       {
         onError: (error, variables, context) => {
           console.log("An error occurred! ", +error);
+
+          const shippingMoney = 36500;
+          setShippingMoney(shippingMoney);
+          dispatch(
+            setOrder({
+              ...order,
+              address: {
+                ...order.address,
+                provinceName: provinceName,
+                districtName: districtName,
+                wardName: wardName,
+                provinceId: provinceId,
+                districtId: districtId,
+                wardCode: form.getFieldValue("wardCode"),
+              },
+              shippingMoney: shippingMoney as number,
+            })
+          );
         },
         onSuccess: (data: any, variables, context) => {
           const shippingMoney = data?.response.data.total as number;
@@ -416,6 +441,12 @@ const Cart = () => {
                                 finalDiscountedPrice * cartItem.quantity)
                             : (cartTotalPrice +=
                                 finalProductPrice * cartItem.quantity);
+
+                          discount = order.voucher
+                            ? order.voucher.type == "PERCENTAGE"
+                              ? (order.voucher.value * cartTotalPrice) / 100
+                              : order.voucher.value
+                            : 0;
 
                           return (
                             <tr key={key}>
@@ -940,30 +971,24 @@ const Cart = () => {
                       )}
                     </h5>
                     <h5>
-                      {"Giảm giá"}{" "}
-                      <CurrencyFormatter
-                        value={
-                          order.voucher
-                            ? order.voucher.type == "PERCENTAGE"
-                              ? (order.voucher.value / 100) * cartTotalPrice
-                              : order.voucher.value
-                            : 0
-                        }
-                        currency={currency}
-                      />
+                      <span className="remove-voucher">
+                        Giảm giá{" "}
+                        {order.voucher && (
+                          <MinusCircleOutlined
+                            className="remove-voucher"
+                            onClick={() => dispatch(clearVoucher())}
+                          />
+                        )}
+                      </span>{" "}
+                      <CurrencyFormatter value={discount} currency={currency} />
                     </h5>
                     <h4 className="grand-total-title">
                       {t(`cart.cart_total.grand_total`)}{" "}
                       <CurrencyFormatter
                         value={
-                          cartTotalPrice +
+                          Math.max(cartTotalPrice - discount, 0) +
                           (cartTotalPrice < FREE_SHIPPING_THRESHOLD
                             ? shippingMoney
-                            : 0) -
-                          (order.voucher
-                            ? order.voucher.type == "PERCENTAGE"
-                              ? (order.voucher.value / 100) * cartTotalPrice
-                              : order.voucher.value
                             : 0)
                         }
                         currency={currency}
