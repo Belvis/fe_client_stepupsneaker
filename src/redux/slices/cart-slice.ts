@@ -288,6 +288,29 @@ const cartSlice = createSlice({
         }
       }
     },
+    updateCartItemsOrder(state, action: PayloadAction<string | null>) {
+      const orderId = action.payload;
+
+      state.cartItems = state.cartItems.map((item) => ({
+        ...item,
+        order: orderId !== null ? orderId : item.order,
+      }));
+
+      console.log(
+        "Cập nhật thành công order cho tất cả các sản phẩm trong giỏ hàng"
+      );
+    },
+    deleteCartItemsByOrder(state, action: PayloadAction<string | null>) {
+      const orderId = action.payload;
+
+      state.cartItems = state.cartItems.filter(
+        (item) => item.order !== orderId
+      );
+
+      console.log(
+        "Xoá tất cả các sản phẩm trong giỏ hàng thuộc đơn hàng thành công"
+      );
+    },
     deleteFromCart(state, action: PayloadAction<string | undefined>) {
       state.cartItems = state.cartItems.filter(
         (item) => item.id !== action.payload
@@ -369,6 +392,8 @@ const cartSlice = createSlice({
 export const {
   addToCart,
   updateCartItemQuantity,
+  updateCartItemsOrder,
+  deleteCartItemsByOrder,
   deleteFromCart,
   decreaseQuantity,
   deleteAllFromCart,

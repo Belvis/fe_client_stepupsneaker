@@ -143,6 +143,7 @@ export interface ICartItem {
   selectedProductColor: IColorResponse;
   selectedProductSize: ISizeClient;
   createdAt?: number;
+  order?: string;
 }
 export interface ICartDetailResponse {
   id: string;

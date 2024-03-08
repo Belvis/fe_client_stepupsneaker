@@ -35,6 +35,7 @@ import { CurrencyFormatter, formatCurrency } from "../../helpers/currency";
 import {
   deleteAllFromCart,
   deleteAllFromDB,
+  updateCartItemsOrder,
 } from "../../redux/slices/cart-slice";
 import {
   clearOrder,
@@ -510,20 +511,26 @@ const CheckOut = () => {
           console.log("An error occurred! " + error.message);
         },
         onSuccess: (data, variables, context) => {
-          dispatch(clearOrder());
-
-          const token = localStorage.getItem(TOKEN_KEY);
-
-          if (token) {
-            dispatch(deleteAllFromDB());
-          } else {
-            dispatch(deleteAllFromCart());
-          }
-
           if (selectedPaymentMethod === "Cash") {
             navigate("/success/" + data.data.id);
+
+            dispatch(clearOrder());
+
+            const token = localStorage.getItem(TOKEN_KEY);
+
+            if (token) {
+              dispatch(deleteAllFromDB());
+            } else {
+              dispatch(deleteAllFromCart());
+            }
           } else {
-            window.location.href = data.data + "";
+            const url = data.data;
+
+            const urlParams = new URLSearchParams(url.split("?")[1]);
+            const orderInfo = urlParams.get("vnp_OrderInfo");
+
+            dispatch(updateCartItemsOrder(orderInfo));
+            window.location.href = url + "";
           }
         },
       }

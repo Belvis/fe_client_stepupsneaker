@@ -8,6 +8,7 @@ import { CurrencyState } from "../../redux/slices/currency-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { setOrder } from "../../redux/slices/order-slice";
 import { RootState } from "../../redux/store";
+import { calculateTotalPrice } from "../../helpers/cart";
 
 interface VoucherProps {
   item: IVoucherResponse;
@@ -26,6 +27,7 @@ const Voucher: React.FC<VoucherProps> = ({
 }) => {
   const dispatch = useDispatch();
   const { order } = useSelector((state: RootState) => state.order);
+  const { cartItems } = useSelector((state: RootState) => state.cart);
   const { image, endDate, value, type: voucherType, constraint, code } = item;
 
   const [message, setMessage] = useState<string>("Dùng ngay");
@@ -70,12 +72,18 @@ const Voucher: React.FC<VoucherProps> = ({
           }
         });
       } else {
-        dispatch(
-          setOrder({
-            ...order,
-            voucher: item,
-          })
-        );
+        if (calculateTotalPrice(cartItems) >= item.constraint) {
+          dispatch(
+            setOrder({
+              ...order,
+              voucher: item,
+            })
+          );
+        } else {
+          return showErrorToast(
+            "Đơn hàng chưa đủ điều kiện để được áp dụng giảm giá"
+          );
+        }
       }
 
       close();

@@ -11,21 +11,28 @@ import { Result, Spin } from "antd";
 import dayjs from "dayjs";
 import { Fragment, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 import { CurrencyFormatter } from "../../helpers/currency";
 import { IOrderResponse } from "../../interfaces";
-import { RootState } from "../../redux/store";
+import { AppDispatch, RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
+import { deleteCartItemsByOrder } from "../../redux/slices/cart-slice";
 
 const Success = () => {
   const { t } = useTranslation();
+  const { cartItems } = useSelector((state: RootState) => state.cart);
+  const dispatch: AppDispatch = useDispatch();
 
   const setTitle = useDocumentTitle();
 
   useEffect(() => {
     setTitle(t("nav.pages.success") + " | SUNS");
+
+    if (cartItems && cartItems.length > 0 && order?.id) {
+      dispatch(deleteCartItemsByOrder(order.id));
+    }
   }, [t]);
 
   let { pathname } = useLocation();
