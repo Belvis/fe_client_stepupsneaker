@@ -99,6 +99,10 @@ const deleteAllCartFromDB = async () => {
   const url = `${API_BASE_URL}/cart-details`;
   return makeApiRequest<ICartDetailResponse[]>(url, "delete");
 };
+const deleteAllCartByOrderFromDB = async (id: string) => {
+  const url = `${API_BASE_URL}/cart-details/order/${id}`;
+  return makeApiRequest<ICartDetailResponse[]>(url, "delete");
+};
 
 const updateCartQtyFromDB = async (cartItem: ICartItem) => {
   const url = `${API_BASE_URL}/cart-details/update/${cartItem.id}`;
@@ -177,6 +181,20 @@ export const deleteAllFromDB = createAsyncThunk(
       return res.data.map(toCartItem);
     } catch (error: any) {
       console.error("Error delete all cart from database:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const deleteAllByOrderFromDB = createAsyncThunk(
+  "cart/deleteAllByOrderFromDB",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const res = await deleteAllCartByOrderFromDB(id);
+
+      return res.data.map(toCartItem);
+    } catch (error: any) {
+      console.error("Error delete all cart by order from database:", error);
       return rejectWithValue(error.message);
     }
   }
@@ -301,10 +319,8 @@ const cartSlice = createSlice({
       );
     },
     deleteCartItemsByOrder(state, action: PayloadAction<string | null>) {
-      const orderId = action.payload;
-
       state.cartItems = state.cartItems.filter(
-        (item) => item.order !== orderId
+        (item) => item.order !== action.payload
       );
 
       console.log(
@@ -312,9 +328,11 @@ const cartSlice = createSlice({
       );
     },
     deleteFromCart(state, action: PayloadAction<string | undefined>) {
-      state.cartItems = state.cartItems.filter(
-        (item) => item.id !== action.payload
-      );
+      state.cartItems = state.cartItems.filter((item) => {
+        console.log("item", item);
+
+        return item.id !== action.payload;
+      });
       showWarningToast("Loại bỏ sản phẩm khỏi giỏ hàng thành công");
     },
     decreaseQuantity(state, action: PayloadAction<ICartItem>) {
@@ -347,6 +365,7 @@ const cartSlice = createSlice({
         addToDB.fulfilled,
         deleteFromDB.fulfilled,
         deleteAllFromDB.fulfilled,
+        deleteAllByOrderFromDB.fulfilled,
         decreaseFromDB.fulfilled,
         updateFromDB.fulfilled
       ),
@@ -361,6 +380,8 @@ const cartSlice = createSlice({
           case "cart/deleteFromDB/fulfilled":
           case "cart/decreaseFromDB/fulfilled":
             showWarningToast(successMessages[action.type]);
+            break;
+          case "cart/deleteAllByOrderFromDB/fulfilled":
             break;
           default:
             showSuccessToast(successMessages[action.type]);

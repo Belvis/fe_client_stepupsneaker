@@ -2,11 +2,6 @@ import cogoToast from "cogo-toast";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IProductClient } from "../../interfaces";
 
-interface CompareItem {
-  id: string;
-  // Add other properties as needed
-}
-
 export interface CompareState {
   compareItems: IProductClient[];
 }

@@ -5,7 +5,7 @@ import {
   HomeFilled,
   PrinterOutlined,
 } from "@ant-design/icons";
-import { HttpError, useOne } from "@refinedev/core";
+import { HttpError, useGetIdentity, useOne } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Result, Spin } from "antd";
 import dayjs from "dayjs";
@@ -15,24 +15,24 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 import { CurrencyFormatter } from "../../helpers/currency";
-import { IOrderResponse } from "../../interfaces";
+import { ICustomerResponse, IOrderResponse } from "../../interfaces";
 import { AppDispatch, RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { deleteCartItemsByOrder } from "../../redux/slices/cart-slice";
+import {
+  deleteAllByOrderFromDB,
+  deleteCartItemsByOrder,
+} from "../../redux/slices/cart-slice";
 
 const Success = () => {
   const { t } = useTranslation();
-  const { cartItems } = useSelector((state: RootState) => state.cart);
   const dispatch: AppDispatch = useDispatch();
+  const { cartItems } = useSelector((state: RootState) => state.cart);
+  const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
 
   const setTitle = useDocumentTitle();
 
   useEffect(() => {
     setTitle(t("nav.pages.success") + " | SUNS");
-
-    if (cartItems && cartItems.length > 0 && order?.id) {
-      dispatch(deleteCartItemsByOrder(order.id));
-    }
   }, [t]);
 
   let { pathname } = useLocation();
@@ -45,6 +45,17 @@ const Success = () => {
   });
 
   const order = data?.data;
+
+  useEffect(() => {
+    if (cartItems && cartItems.length > 0 && order?.id) {
+      if (user) {
+        dispatch(deleteAllByOrderFromDB(order.id));
+        dispatch(deleteCartItemsByOrder(order.id));
+      } else {
+        dispatch(deleteCartItemsByOrder(order.id));
+      }
+    }
+  }, [order, user]);
 
   const currency = useSelector((state: RootState) => state.currency);
 
