@@ -134,7 +134,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
     quantityCount + productCartQty > 5 ||
     totalCartQty >= 5;
 
-  const handleButtonClick = () => {
+  const handleDispatchAddToCart = () => {
     dispatch(
       addToCart({
         id: "",
@@ -148,18 +148,40 @@ const ProductModal: React.FC<ProductModalProps> = ({
     );
   };
 
-  const handleDBButtonClick = () => {
-    dispatch(
-      addToDB({
-        id: "",
-        cartItemId: product.id,
-        quantity: quantityCount,
-        image: selectedVariant.image[0],
-        name: product.name,
-        selectedProductColor: selectedProductColor,
-        selectedProductSize: selectedProductSize,
-      })
-    );
+  const handleDispatchAddToDB = () => {
+    return new Promise<void>((resolve, reject) => {
+      dispatch(
+        addToDB({
+          id: "",
+          cartItemId: product.id,
+          quantity: quantityCount,
+          image: selectedVariant.image[0],
+          name: product.name,
+          selectedProductColor: selectedProductColor,
+          selectedProductSize: selectedProductSize,
+        })
+      )
+        .then(() => {
+          resolve();
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  };
+
+  const handleDBShopNowButtonClick = async () => {
+    try {
+      await handleDispatchAddToDB();
+      navigate("/pages/checkout");
+    } catch (error) {
+      console.error("Error adding to DB:", error);
+    }
+  };
+
+  const handleShopNowButtonClick = () => {
+    handleDispatchAddToCart();
+    navigate("/pages/checkout");
   };
 
   return (
@@ -427,7 +449,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                         >
                           <button
                             className="mw-250 button-white"
-                            onClick={handleButtonClick}
+                            onClick={handleDispatchAddToCart}
                             disabled={isButtonDisabled}
                           >
                             {t(`products.buttons.add_to_cart`)}
@@ -446,7 +468,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                       >
                         <button
                           className="mw-250 button-white"
-                          onClick={handleDBButtonClick}
+                          onClick={handleDispatchAddToDB}
                           disabled={isButtonDisabled}
                         >
                           {t(`products.buttons.add_to_cart`)}
@@ -474,10 +496,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                         >
                           <button
                             className="button-black"
-                            onClick={() => {
-                              handleButtonClick();
-                              navigate("/pages/checkout");
-                            }}
+                            onClick={handleShopNowButtonClick}
                             disabled={isButtonDisabled}
                           >
                             Mua ngay
@@ -496,10 +515,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                       >
                         <button
                           className="button-black"
-                          onClick={() => {
-                            handleDBButtonClick();
-                            navigate("/pages/checkout");
-                          }}
+                          onClick={handleDBShopNowButtonClick}
                           disabled={isButtonDisabled}
                         >
                           Mua ngay
