@@ -21,7 +21,9 @@ import {
 import { axiosInstance } from "../../utils";
 
 const httpClient: AxiosInstance = axiosInstance;
-const API_BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
+const API_BASE_URL = `${window.location.protocol}//${
+  window.location.hostname
+}:${import.meta.env.VITE_BACKEND_API_BASE_PATH}`;
 
 export interface CartState {
   cartItems: ICartItem[];

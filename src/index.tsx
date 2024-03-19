@@ -27,8 +27,6 @@ dayjs.extend(WeekDay);
 dayjs.extend(LocaleData);
 dayjs.extend(LocalizedFormat);
 
-// store.dispatch(setProducts(products));
-
 const container = document.getElementById("root") as HTMLElement;
 const root = createRoot(container);
 

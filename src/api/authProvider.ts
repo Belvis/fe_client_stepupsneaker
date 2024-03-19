@@ -111,14 +111,11 @@ export const authProvider = (url: string): AuthBindings => ({
 
   updatePassword: async ({ password, confirm, oldPassword }) => {
     try {
-      const response = await httpClient.put(
-        `http://localhost:8080/client/customers/change-password`,
-        {
-          currentPassword: oldPassword,
-          newPassword: password,
-          enterThePassword: confirm,
-        }
-      );
+      const response = await httpClient.put(`${url}/change-password`, {
+        currentPassword: oldPassword,
+        newPassword: password,
+        enterThePassword: confirm,
+      });
       if (response.status == 200) {
         notification.success({
           message: "Thành công",
@@ -143,7 +140,7 @@ export const authProvider = (url: string): AuthBindings => ({
 
   resetPassword: async ({ password, confirm, token }) => {
     try {
-      const response = await httpClient
+      await httpClient
         .post(`${url}/reset-password?token=${token}`, {
           newPassword: password,
           confirmPassword: confirm,
@@ -205,7 +202,17 @@ export const authProvider = (url: string): AuthBindings => ({
   },
 
   onError: async (error) => {
-    return { error };
+    if (error.status === 401 || error.status === 403) {
+      localStorage.removeItem(TOKEN_KEY);
+
+      return {
+        logout: true,
+        redirectTo: "/login",
+        error,
+      };
+    }
+
+    return {};
   },
   check: async () => {
     const token = localStorage.getItem(TOKEN_KEY);
@@ -235,11 +242,9 @@ export const authProvider = (url: string): AuthBindings => ({
     }
 
     try {
-      const response = await httpClient
-        .get("http://localhost:8080/client/customers/me")
-        .then((res) => {
-          return res.data.content;
-        });
+      const response = await httpClient.get(`${url}/client/me`).then((res) => {
+        return res.data.content;
+      });
 
       return response;
     } catch (error: any) {

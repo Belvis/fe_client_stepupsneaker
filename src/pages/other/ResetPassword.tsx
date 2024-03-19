@@ -23,7 +23,9 @@ type resetPasswordVariables = {
   token: string;
 };
 
-const AUTH_API_URL = import.meta.env.VITE_BACKEND_API_AUTH_URL;
+const AUTH_API_URL = `${window.location.protocol}//${
+  window.location.hostname
+}:${import.meta.env.VITE_BACKEND_API_AUTH_PATH}`;
 
 const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
   const { t } = useTranslation();

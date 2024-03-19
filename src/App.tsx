@@ -51,8 +51,13 @@ import ForgotPassword from "./pages/other/ForgotPassword";
 
 // Pages
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
-const AUTH_API_URL = import.meta.env.VITE_BACKEND_API_AUTH_URL;
+const API_BASE_URL = `${window.location.protocol}//${
+  window.location.hostname
+}:${import.meta.env.VITE_BACKEND_API_BASE_PATH}`;
+
+const AUTH_API_URL = `${window.location.protocol}//${
+  window.location.hostname
+}:${import.meta.env.VITE_BACKEND_API_AUTH_PATH}`;
 
 function App() {
   const { t, i18n } = useTranslation();
