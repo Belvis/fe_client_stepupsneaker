@@ -50,6 +50,7 @@ import {
   validateFullName,
   validatePhoneNumber,
 } from "../../helpers/validate";
+import { motion } from "framer-motion";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -1024,8 +1025,18 @@ const CheckOut = () => {
               </Form>
             </div>
           ) : (
-            <div className="row">
-              <div className="col-lg-12">
+            <motion.div
+              className="row"
+              initial={{ x: "50%" }}
+              animate={{ x: "0%" }}
+              exit={{ x: "50%" }}
+            >
+              <motion.div
+                className="col-lg-12"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+              >
                 <div className="item-empty-area text-center">
                   <div className="item-empty-area__icon mb-30">
                     <i className="pe-7s-cash"></i>
@@ -1035,8 +1046,8 @@ const CheckOut = () => {
                     <Link to={"/shop"}>{t("checkout.buttons.shop_now")}</Link>
                   </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           )}
         </div>
       </div>

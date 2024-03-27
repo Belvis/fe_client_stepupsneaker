@@ -74,7 +74,7 @@ export const Footer: React.FC<FooterProps> = ({
                     <Link to={"/contact"}>{t("footer.about_us.contact")}</Link>
                   </li>
                   <li>
-                    <Link to={"/orders/tracking"}>
+                    <Link to={"/tracking"}>
                       {t("footer.about_us.orders_tracking")}
                     </Link>
                   </li>

@@ -11,6 +11,8 @@ import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { CurrencyFormatter } from "../../helpers/currency";
+import { motion } from "framer-motion";
+import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../constants/motions";
 
 const Wishlist = () => {
   const { t } = useTranslation();
@@ -43,17 +45,23 @@ const Wishlist = () => {
               <div className="row">
                 <div className="col-12">
                   <div className="table-content table-responsive cart-table-content">
-                    <table>
-                      <thead>
-                        <tr>
+                    <motion.table layout style={{ overflow: "hidden" }}>
+                      <motion.thead layout>
+                        <motion.tr>
                           <th>{t(`wish_list.table.head.image`)}</th>
                           <th>{t(`wish_list.table.head.product_name`)}</th>
                           <th>{t(`wish_list.table.head.unit_price`)}</th>
                           <th>{t(`wish_list.table.head.add_to_cart`)}</th>
                           <th>{t(`wish_list.table.head.action`)}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
+                        </motion.tr>
+                      </motion.thead>
+                      <motion.tbody
+                        layout
+                        variants={PARENT_VARIANT}
+                        initial="hidden"
+                        animate="show"
+                        className="container"
+                      >
                         {wishlistItems.map((wishlistItem, key) => {
                           const discountedPrice = getDiscountPrice(
                             wishlistItem.price.max,
@@ -67,7 +75,11 @@ const Wishlist = () => {
                           );
 
                           return (
-                            <tr key={key}>
+                            <motion.tr
+                              key={key}
+                              layout
+                              variants={CHILDREN_VARIANT}
+                            >
                               <td className="product-thumbnail">
                                 <Link to={"/product/" + wishlistItem.id}>
                                   <img
@@ -131,11 +143,11 @@ const Wishlist = () => {
                                   <i className="fa fa-times"></i>
                                 </button>
                               </td>
-                            </tr>
+                            </motion.tr>
                           );
                         })}
-                      </tbody>
-                    </table>
+                      </motion.tbody>
+                    </motion.table>
                   </div>
                 </div>
               </div>
@@ -158,8 +170,18 @@ const Wishlist = () => {
               </div>
             </Fragment>
           ) : (
-            <div className="row">
-              <div className="col-lg-12">
+            <motion.div
+              className="row"
+              initial={{ x: "50%" }}
+              animate={{ x: "0%" }}
+              exit={{ x: "50%" }}
+            >
+              <motion.div
+                className="col-lg-12"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+              >
                 <div className="item-empty-area text-center">
                   <div className="item-empty-area__icon mb-30">
                     <i className="pe-7s-like"></i>
@@ -170,8 +192,8 @@ const Wishlist = () => {
                     <Link to={"/shop"}>{t(`wish_list.buttons.add_items`)}</Link>
                   </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           )}
         </div>
       </div>

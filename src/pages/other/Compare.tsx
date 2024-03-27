@@ -9,6 +9,8 @@ import { deleteFromCompare } from "../../redux/slices/compare-slice";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { CurrencyFormatter } from "../../helpers/currency";
+import { motion } from "framer-motion";
+import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../constants/motions";
 
 const Compare = () => {
   const { t } = useTranslation();
@@ -33,20 +35,37 @@ const Compare = () => {
           { label: "pages.compare", path: pathname },
         ]}
       />
-      <div className="compare-main-area pt-90 pb-100 bg-white">
+      <div className="cart-main-area pt-90 pb-100 bg-white">
         <div className="container">
           {compareItems && compareItems.length >= 1 ? (
             <div className="row">
               <div className="col-lg-12">
                 <div className="compare-page-content">
                   <div className="compare-table table-responsive">
-                    <table className="table table-bordered mb-0">
-                      <tbody>
-                        <tr>
-                          <th className="title-column">{t(`compare.title`)}</th>
+                    <motion.table
+                      layout
+                      style={{ overflow: "hidden" }}
+                      className="table table-bordered mb-0"
+                    >
+                      <motion.tbody
+                        layout
+                        variants={PARENT_VARIANT}
+                        initial="hidden"
+                        animate="show"
+                        className="container"
+                      >
+                        <motion.tr>
+                          <motion.th layout className="title-column">
+                            {t(`compare.title`)}
+                          </motion.th>
                           {compareItems.map((compareItem, key) => {
                             return (
-                              <td className="product-image-title" key={key}>
+                              <motion.td
+                                layout
+                                variants={CHILDREN_VARIANT}
+                                className="product-image-title"
+                                key={key}
+                              >
                                 <div className="compare-remove">
                                   <button
                                     onClick={() =>
@@ -86,14 +105,14 @@ const Compare = () => {
                                     </button>
                                   )}
                                 </div>
-                              </td>
+                              </motion.td>
                             );
                           })}
-                        </tr>
-                        <tr>
-                          <th className="title-column">
+                        </motion.tr>
+                        <motion.tr layout>
+                          <motion.th layout className="title-column">
                             {t(`compare.items.price`)}
-                          </th>
+                          </motion.th>
                           {compareItems.map((compareItem, key) => {
                             const discountedPrice = getDiscountPrice(
                               compareItem.price.min,
@@ -107,7 +126,12 @@ const Compare = () => {
                                 ? discountedPrice * currency.currencyRate
                                 : 0.0;
                             return (
-                              <td className="product-price" key={key}>
+                              <motion.td
+                                layout
+                                variants={CHILDREN_VARIANT}
+                                className="product-price"
+                                key={key}
+                              >
                                 {discountedPrice !== null ? (
                                   <Fragment>
                                     <CurrencyFormatter
@@ -128,49 +152,69 @@ const Compare = () => {
                                     currency={currency}
                                   />
                                 )}
-                              </td>
+                              </motion.td>
                             );
                           })}
-                        </tr>
+                        </motion.tr>
 
-                        <tr>
-                          <th className="title-column">
+                        <motion.tr layout>
+                          <motion.th layout className="title-column">
                             {t(`compare.items.description`)}
-                          </th>
+                          </motion.th>
                           {compareItems.map((compareItem, key) => {
                             return (
-                              <td className="product-desc" key={key}>
+                              <motion.td
+                                layout
+                                variants={CHILDREN_VARIANT}
+                                className="product-desc"
+                                key={key}
+                              >
                                 <p>
                                   {compareItem.description
                                     ? compareItem.description
                                     : "N/A"}
                                 </p>
-                              </td>
+                              </motion.td>
                             );
                           })}
-                        </tr>
+                        </motion.tr>
 
-                        <tr>
-                          <th className="title-column">
+                        <motion.tr layout>
+                          <motion.th layout className="title-column">
                             {t(`compare.items.rating`)}
-                          </th>
+                          </motion.th>
                           {compareItems.map((compareItem, key) => {
                             return (
-                              <td className="product-rating" key={key}>
+                              <motion.td
+                                layout
+                                variants={CHILDREN_VARIANT}
+                                className="product-rating"
+                                key={key}
+                              >
                                 <Rating ratingValue={5} />
-                              </td>
+                              </motion.td>
                             );
                           })}
-                        </tr>
-                      </tbody>
-                    </table>
+                        </motion.tr>
+                      </motion.tbody>
+                    </motion.table>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="row">
-              <div className="col-lg-12">
+            <motion.div
+              className="row"
+              initial={{ x: "50%" }}
+              animate={{ x: "0%" }}
+              exit={{ x: "50%" }}
+            >
+              <motion.div
+                className="col-lg-12"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+              >
                 <div className="item-empty-area text-center">
                   <div className="item-empty-area__icon mb-30">
                     <i className="pe-7s-shuffle"></i>
@@ -181,8 +225,8 @@ const Compare = () => {
                     <Link to={"/shop"}> {t(`compare.buttons.add_items`)}</Link>
                   </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           )}
         </div>
       </div>{" "}

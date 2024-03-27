@@ -14,6 +14,10 @@ import { deleteFromCart, deleteFromDB } from "../../../redux/slices/cart-slice";
 import { AppDispatch, RootState } from "../../../redux/store";
 import { DiscountMessage, DiscountMoney } from "../../../styled/CartStyled";
 import _ from "lodash";
+import { AnimatePresence, Variants, motion } from "framer-motion";
+import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../../constants/motions";
+import { FaShoppingCart } from "react-icons/fa";
+import styled from "styled-components";
 
 const { Title } = Typography;
 
@@ -42,7 +46,8 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
       convertedLegitVoucher.map((single) => {
         const updatedVoucher = { ...single };
         if (single.voucher.type === "PERCENTAGE") {
-          updatedVoucher.voucher.value = (single.voucher.value * cartTotalPrice) / 100;
+          updatedVoucher.voucher.value =
+            (single.voucher.value * cartTotalPrice) / 100;
         }
         return updatedVoucher;
       });
@@ -53,73 +58,110 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
   }, [user]);
 
   return (
-    <div className={clsx("shopping-cart-content", { active: activeIndex === 2 })}>
+    <div
+      className={clsx("shopping-cart-content", { active: activeIndex === 2 })}
+    >
       {cartItems && cartItems.length > 0 ? (
         <Fragment>
-          <ul>
-            {cartItems.map((item) => {
-              const discountValue = item.selectedProductSize?.discount ?? 0;
-              const discountedPrice = getDiscountPrice(item.selectedProductSize?.price ?? 0, discountValue);
-              const finalProductPrice = (item.selectedProductSize?.price ?? 0) * currency.currencyRate;
+          <AnimatePresence mode="wait">
+            <motion.ul
+              layout
+              variants={PARENT_VARIANT}
+              initial="hidden"
+              animate="show"
+            >
+              {cartItems.map((item) => {
+                const discountValue = item.selectedProductSize?.discount ?? 0;
+                const discountedPrice = getDiscountPrice(
+                  item.selectedProductSize?.price ?? 0,
+                  discountValue
+                );
+                const finalProductPrice =
+                  (item.selectedProductSize?.price ?? 0) *
+                  currency.currencyRate;
 
-              const finalDiscountedPrice = discountedPrice !== null ? discountedPrice * currency.currencyRate : 0.0;
+                const finalDiscountedPrice =
+                  discountedPrice !== null
+                    ? discountedPrice * currency.currencyRate
+                    : 0.0;
 
-              discountedPrice !== null
-                ? (cartTotalPrice += finalDiscountedPrice * item.quantity)
-                : (cartTotalPrice += finalProductPrice * item.quantity);
+                discountedPrice !== null
+                  ? (cartTotalPrice += finalDiscountedPrice * item.quantity)
+                  : (cartTotalPrice += finalProductPrice * item.quantity);
 
-              return (
-                <li className="single-shopping-cart" key={item.id}>
-                  <div className="shopping-cart-img">
-                    <Link to={"/product/" + item.cartItemId}>
-                      <img alt="" src={item.image} className="img-fluid" />
-                    </Link>
-                  </div>
-                  <div className="shopping-cart-title">
-                    <h4>
-                      <Link to={"/product/" + item.cartItemId}> {item.name} </Link>
-                    </h4>
-                    <h6>
-                      {t("header.menu_cart.qty")}: {item.quantity}
-                    </h6>
-                    <CurrencyFormatter
-                      value={discountedPrice !== null ? finalDiscountedPrice : finalProductPrice}
-                      currency={currency}
-                    />
-                    {item.selectedProductColor && item.selectedProductSize ? (
-                      <div className="cart-item-variation">
-                        <span>
-                          {t("header.menu_cart.color")}: {item.selectedProductColor.name}
-                        </span>
-                        <span>
-                          {t("header.menu_cart.size")}: {item.selectedProductSize.name}
-                        </span>
-                      </div>
-                    ) : (
-                      ""
-                    )}
-                  </div>
-                  <div className="shopping-cart-delete">
-                    <Authenticated
-                      fallback={
-                        <button onClick={() => dispatch(deleteFromCart(item?.id))}>
+                return (
+                  <motion.li
+                    layout
+                    variants={CHILDREN_VARIANT}
+                    key={item.id}
+                    className="single-shopping-cart"
+                  >
+                    <div className="shopping-cart-img">
+                      <Link to={"/product/" + item.cartItemId}>
+                        <img alt="" src={item.image} className="img-fluid" />
+                      </Link>
+                    </div>
+                    <div className="shopping-cart-title">
+                      <h4>
+                        <Link to={"/product/" + item.cartItemId}>
+                          {" "}
+                          {item.name}{" "}
+                        </Link>
+                      </h4>
+                      <h6>
+                        {t("header.menu_cart.qty")}: {item.quantity}
+                      </h6>
+                      <CurrencyFormatter
+                        value={
+                          discountedPrice !== null
+                            ? finalDiscountedPrice
+                            : finalProductPrice
+                        }
+                        currency={currency}
+                      />
+                      {item.selectedProductColor && item.selectedProductSize ? (
+                        <div className="cart-item-variation">
+                          <span>
+                            {t("header.menu_cart.color")}:{" "}
+                            {item.selectedProductColor.name}
+                          </span>
+                          <span>
+                            {t("header.menu_cart.size")}:{" "}
+                            {item.selectedProductSize.name}
+                          </span>
+                        </div>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                    <div className="shopping-cart-delete">
+                      <Authenticated
+                        fallback={
+                          <button
+                            onClick={() => dispatch(deleteFromCart(item?.id))}
+                          >
+                            <i className="fa fa-times-circle" />
+                          </button>
+                        }
+                      >
+                        <button
+                          onClick={() => dispatch(deleteFromDB(item?.id))}
+                        >
                           <i className="fa fa-times-circle" />
                         </button>
-                      }
-                    >
-                      <button onClick={() => dispatch(deleteFromDB(item?.id))}>
-                        <i className="fa fa-times-circle" />
-                      </button>
-                    </Authenticated>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                      </Authenticated>
+                    </div>
+                  </motion.li>
+                );
+              })}
+            </motion.ul>
+          </AnimatePresence>
           <div className="shopping-cart-total mt-2">
             {(() => {
               const freeShippingDifference =
-                cartTotalPrice < FREE_SHIPPING_THRESHOLD ? FREE_SHIPPING_THRESHOLD - cartTotalPrice : Infinity;
+                cartTotalPrice < FREE_SHIPPING_THRESHOLD
+                  ? FREE_SHIPPING_THRESHOLD - cartTotalPrice
+                  : Infinity;
 
               const voucherDifference =
                 legitVouchers && legitVouchers.length > 0
@@ -133,22 +175,31 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
                 freeShippingDifference !== Infinity &&
                 freeShippingDifference <= voucherDifference;
               const shouldDisplayVoucher =
-                voucherDifference > 0 && voucherDifference !== Infinity && voucherDifference < freeShippingDifference;
+                voucherDifference > 0 &&
+                voucherDifference !== Infinity &&
+                voucherDifference < freeShippingDifference;
 
               if (shouldDisplayFreeShipping) {
                 return (
                   <DiscountMessage>
                     <GiftOutlined /> Mua thêm{" "}
-                    <DiscountMoney>{formatCurrency(freeShippingDifference, currency)}</DiscountMoney> để được miễn phí
-                    vận chuyển
+                    <DiscountMoney>
+                      {formatCurrency(freeShippingDifference, currency)}
+                    </DiscountMoney>{" "}
+                    để được miễn phí vận chuyển
                   </DiscountMessage>
                 );
               } else if (shouldDisplayVoucher) {
                 return (
                   <DiscountMessage>
                     <GiftOutlined /> Mua thêm{" "}
-                    <DiscountMoney>{formatCurrency(voucherDifference, currency)}</DiscountMoney> để được giảm tới{" "}
-                    <DiscountMoney>{formatCurrency(legitVouchers[0].voucher.value, currency)}</DiscountMoney>
+                    <DiscountMoney>
+                      {formatCurrency(voucherDifference, currency)}
+                    </DiscountMoney>{" "}
+                    để được giảm tới{" "}
+                    <DiscountMoney>
+                      {formatCurrency(legitVouchers[0].voucher.value, currency)}
+                    </DiscountMoney>
                   </DiscountMessage>
                 );
               } else {
@@ -158,7 +209,11 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
 
             <Title level={4}>
               {t("header.menu_cart.total")} :{" "}
-              <CurrencyFormatter className="shop-total" value={cartTotalPrice} currency={currency} />
+              <CurrencyFormatter
+                className="shop-total"
+                value={cartTotalPrice}
+                currency={currency}
+              />
             </Title>
           </div>
           <div className="shopping-cart-btn btn-hover text-center">
@@ -171,7 +226,19 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
           </div>
         </Fragment>
       ) : (
-        <p className="text-center">{t("header.menu_cart.no_items")}</p>
+        <motion.div
+          initial={{ x: "50%" }}
+          animate={{ x: "0%" }}
+          exit={{ x: "50%" }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <p className="text-center">{t("header.menu_cart.no_items")}</p>
+          </motion.div>
+        </motion.div>
       )}
     </div>
   );

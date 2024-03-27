@@ -1,39 +1,43 @@
 import {
   ContainerOutlined,
-  LoadingOutlined,
   GiftOutlined,
+  LoadingOutlined,
   MinusCircleOutlined,
 } from "@ant-design/icons";
 import { useModal } from "@refinedev/antd";
 import {
   Authenticated,
-  HttpError,
   useApiUrl,
   useCustom,
   useCustomMutation,
   useGetIdentity,
-  useList,
   useNotification,
 } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Form, Select, Space, Tooltip } from "antd";
+import { motion } from "framer-motion";
+import _, { debounce } from "lodash";
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { dataProvider } from "../../api/dataProvider";
 import VoucherModal from "../../components/voucher/VoucherModal";
+import { FREE_SHIPPING_THRESHOLD } from "../../constants";
+import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../constants/motions";
+import { showWarningConfirmDialog } from "../../helpers/confirm";
 import { CurrencyFormatter, formatCurrency } from "../../helpers/currency";
 import {
   cartItemStock,
   getDiscountPrice,
   getTotalCartQuantity,
 } from "../../helpers/product";
+import { showErrorToast } from "../../helpers/toast";
+import { validateCommon } from "../../helpers/validate";
 import {
   ICartItem,
   ICustomerResponse,
   IDistrict,
-  IOrderResponse,
   IProvince,
   IVoucherList,
   IVoucherResponse,
@@ -53,14 +57,8 @@ import {
 } from "../../redux/slices/cart-slice";
 import { clearVoucher, setOrder } from "../../redux/slices/order-slice";
 import { AppDispatch, RootState } from "../../redux/store";
-import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { debounce } from "lodash";
-import { showErrorToast } from "../../helpers/toast";
-import { showWarningConfirmDialog } from "../../helpers/confirm";
-import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
-import _ from "lodash";
-import { validateCommon } from "../../helpers/validate";
+import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
@@ -409,18 +407,23 @@ const Cart = () => {
               <div className="row">
                 <div className="col-12">
                   <div className="table-content table-responsive cart-table-content">
-                    <table>
-                      <thead>
-                        <tr>
+                    <motion.table layout style={{ overflow: "hidden" }}>
+                      <motion.thead layout>
+                        <motion.tr>
                           <th>{t(`cart.table.head.image`)}</th>
                           <th>{t(`cart.table.head.product_name`)}</th>
                           <th>{t(`cart.table.head.unit_price`)}</th>
                           <th>{t(`cart.table.head.qty`)}</th>
                           <th>{t(`cart.table.head.subtotal`)}</th>
                           <th>{t(`cart.table.head.action`)}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
+                        </motion.tr>
+                      </motion.thead>
+                      <motion.tbody
+                        layout
+                        variants={PARENT_VARIANT}
+                        initial="hidden"
+                        animate="show"
+                      >
                         {sortedCartItems.map((cartItem, key) => {
                           const discountValue =
                             cartItem.selectedProductSize?.discount ?? 0;
@@ -449,7 +452,11 @@ const Cart = () => {
                             : 0;
 
                           return (
-                            <tr key={key}>
+                            <motion.tr
+                              key={key}
+                              layout
+                              variants={CHILDREN_VARIANT}
+                            >
                               <td className="product-thumbnail">
                                 <Link to={"/product/" + cartItem.cartItemId}>
                                   <img
@@ -746,11 +753,11 @@ const Cart = () => {
                                   </button>
                                 </Authenticated>
                               </td>
-                            </tr>
+                            </motion.tr>
                           );
                         })}
-                      </tbody>
-                    </table>
+                      </motion.tbody>
+                    </motion.table>
                   </div>
                 </div>
               </div>
@@ -1062,8 +1069,18 @@ const Cart = () => {
               </div>
             </Fragment>
           ) : (
-            <div className="row">
-              <div className="col-lg-12">
+            <motion.div
+              className="row"
+              initial={{ x: "50%" }}
+              animate={{ x: "0%" }}
+              exit={{ x: "50%" }}
+            >
+              <motion.div
+                className="col-lg-12"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+              >
                 <div className="item-empty-area text-center">
                   <div className="item-empty-area__icon mb-30">
                     <i className="pe-7s-cart"></i>
@@ -1074,8 +1091,8 @@ const Cart = () => {
                     <Link to={"/shop"}>{t(`cart.buttons.add_items`)}</Link>
                   </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           )}
         </div>
       </div>

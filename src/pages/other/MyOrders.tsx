@@ -1,22 +1,17 @@
+import { HttpError, useGetIdentity, useList } from "@refinedev/core";
+import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { Pagination, PaginationProps, Popover, Segmented, Spin } from "antd";
+import { SegmentedValue } from "antd/es/segmented";
+import { SegmentedProps } from "antd/lib";
+import dayjs from "dayjs";
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
-import { getDiscountPrice } from "../../helpers/product";
-import {
-  deleteAllFromWishlist,
-  deleteFromWishlist,
-} from "../../redux/slices/wishlist-slice";
+import { useSelector } from "react-redux";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { CurrencyFormatter } from "../../helpers/currency";
+import { ICustomerResponse, IOrderResponse } from "../../interfaces";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { HttpError, useGetIdentity, useList } from "@refinedev/core";
-import { ICustomerResponse, IOrderResponse } from "../../interfaces";
-import { Popover, Segmented } from "antd";
-import dayjs from "dayjs";
-import { SegmentedProps } from "antd/lib";
-import { SegmentedValue } from "antd/es/segmented";
-import { CurrencyFormatter } from "../../helpers/currency";
 
 const MyOrders = () => {
   const { t } = useTranslation();
@@ -26,6 +21,33 @@ const MyOrders = () => {
   useEffect(() => {
     setTitle(t("nav.pages.wishlist") + " | SUNS");
   }, [t]);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const setDefaultParam = (param: string, defaultValue: string) => {
+    if (!searchParams.get(param)) {
+      setSearchParams((prev) => {
+        prev.set(param, defaultValue);
+        return prev;
+      });
+    }
+  };
+
+  useEffect(() => {
+    setDefaultParam("page", "1");
+    setDefaultParam("layout", "grid three-column");
+  }, []);
+
+  const [totalElements, setTotalElements] = useState<number>(0);
+  const pageLimit: number = 5;
+  const currentPage = Number(searchParams.get("page")) || 1;
+
+  const onChange: PaginationProps["onChange"] = (page) => {
+    setSearchParams((prev: URLSearchParams) => {
+      prev.set("page", page.toString());
+      return prev;
+    });
+  };
 
   let { pathname } = useLocation();
 
@@ -65,7 +87,8 @@ const MyOrders = () => {
   const { data, isLoading, isError } = useList<IOrderResponse, HttpError>({
     resource: "orders",
     pagination: {
-      pageSize: 1000,
+      pageSize: pageLimit,
+      current: currentPage,
     },
     filters: [
       {
@@ -81,6 +104,12 @@ const MyOrders = () => {
     ],
   });
 
+  useEffect(() => {
+    if (data?.data) {
+      setTotalElements(data.total);
+    }
+  }, [data]);
+
   const orders = data?.data ?? [];
 
   return (
@@ -93,7 +122,6 @@ const MyOrders = () => {
       />
       <div className="cart-main-area pt-90 pb-100 bg-white">
         <div className="container">
-          {/* {orders && orders.length >= 1 ? ( */}
           <Fragment>
             <div className="row mb-2">
               <div className="col-md-3">
@@ -110,73 +138,100 @@ const MyOrders = () => {
             <div className="row">
               <div className="col-12">
                 <div className="table-content table-responsive cart-table-content">
-                  <table className="w-100">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Mã</th>
-                        <th>Tổng cộng</th>
-                        <th>Sản phẩm</th>
-                        <th>Tạo lúc</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map((item, index) => {
-                        const orderDetails = item?.orderDetails || [];
-                        const totalQuantity = orderDetails.reduce(
-                          (total, orderDetail) => {
-                            return total + orderDetail.quantity;
-                          },
-                          0
-                        );
+                  <Spin spinning={isLoading}>
+                    <table className="w-100">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Mã</th>
+                          <th>Tổng cộng</th>
+                          <th>Sản phẩm</th>
+                          <th>Tạo lúc</th>
+                        </tr>
+                      </thead>
+                      {orders && orders.length >= 1 && (
+                        <tbody>
+                          {orders.map((item, index) => {
+                            const orderDetails = item?.orderDetails || [];
+                            const totalQuantity = orderDetails.reduce(
+                              (total, orderDetail) => {
+                                return total + orderDetail.quantity;
+                              },
+                              0
+                            );
 
-                        return (
-                          <tr key={index}>
-                            <td>{index + 1}</td>
+                            return (
+                              <tr key={index}>
+                                <td>{index + 1}</td>
 
-                            <td className="text-center fw-bold">
-                              <Link to={item.id}>{item.code}</Link>
-                            </td>
+                                <td className="text-center fw-bold">
+                                  <Link to={item.id}>{item.code}</Link>
+                                </td>
 
-                            <td className="product-price-cart">
-                              <CurrencyFormatter
-                                className="amount"
-                                value={item.totalMoney}
-                                currency={currency}
-                              />
-                            </td>
+                                <td className="product-price-cart">
+                                  <CurrencyFormatter
+                                    className="amount"
+                                    value={item.totalMoney}
+                                    currency={currency}
+                                  />
+                                </td>
 
-                            <td className="product-wishlist-cart">
-                              <Popover
-                                content={
-                                  <ul>
-                                    {item.orderDetails.map((orderDetail) => (
-                                      <li key={orderDetail.id}>
-                                        {orderDetail.productDetail.product.name}{" "}
-                                        - {orderDetail.productDetail.color.name}{" "}
-                                        - {orderDetail.productDetail.size.name}{" "}
-                                        - x{orderDetail.quantity}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                }
-                                title="Sản phẩm"
-                                trigger="hover"
-                              >
-                                {totalQuantity} sản phẩm
-                              </Popover>
-                            </td>
+                                <td className="product-wishlist-cart">
+                                  <Popover
+                                    content={
+                                      <ul>
+                                        {item.orderDetails.map(
+                                          (orderDetail) => (
+                                            <li key={orderDetail.id}>
+                                              {
+                                                orderDetail.productDetail
+                                                  .product.name
+                                              }{" "}
+                                              -{" "}
+                                              {
+                                                orderDetail.productDetail.color
+                                                  .name
+                                              }{" "}
+                                              -{" "}
+                                              {
+                                                orderDetail.productDetail.size
+                                                  .name
+                                              }{" "}
+                                              - x{orderDetail.quantity}
+                                            </li>
+                                          )
+                                        )}
+                                      </ul>
+                                    }
+                                    title="Sản phẩm"
+                                    trigger="hover"
+                                  >
+                                    {totalQuantity} sản phẩm
+                                  </Popover>
+                                </td>
 
-                            <td className="product-remove">
-                              {dayjs(new Date(item.createdAt)).format(
-                                "DD/MM/YYYY hh:mm"
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                                <td className="product-remove">
+                                  {dayjs(new Date(item.createdAt)).format(
+                                    "DD/MM/YYYY hh:mm"
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      )}
+                      <tfoot></tfoot>
+                    </table>
+                    <div className="pro-pagination-style text-center mt-30 mb-3q">
+                      {/* Pagination */}
+                      <Pagination
+                        current={currentPage}
+                        total={totalElements}
+                        showSizeChanger={false}
+                        onChange={onChange}
+                      />
+                    </div>
+                  </Spin>
                 </div>
               </div>
             </div>
@@ -190,28 +245,12 @@ const MyOrders = () => {
                     </Link>
                   </div>
                   <div className="cart-clear">
-                    <Link to={"/orders/tracking"}>Tra cứu đơn hàng</Link>
+                    <Link to={"/tracking"}>Tra cứu đơn hàng</Link>
                   </div>
                 </div>
               </div>
             </div>
           </Fragment>
-          {/* ) : (
-            <div className="row">
-              <div className="col-lg-12">
-                <div className="item-empty-area text-center">
-                  <div className="item-empty-area__icon mb-30">
-                    <i className="pe-7s-like"></i>
-                  </div>
-                  <div className="item-empty-area__text">
-                    {t(`wish_list.no_items_found`)}
-                    <br />{" "}
-                    <Link to={"/shop"}>{t(`wish_list.buttons.add_items`)}</Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )} */}
         </div>
       </div>
     </Fragment>
