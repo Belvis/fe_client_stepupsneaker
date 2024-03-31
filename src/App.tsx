@@ -20,8 +20,8 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
-import { authProvider } from "./api/authProvider";
-import { dataProvider } from "./api/dataProvider";
+import { authProvider } from "./providers/authProvider";
+import { dataProvider } from "./providers/dataProvider";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import ScrollToTop from "./helpers/scroll-top";
 import { ThemedLayoutV2 } from "./layouts/themedLayoutV2";

@@ -1,18 +1,134 @@
+import { PlusOutlined } from "@ant-design/icons";
+import { useForm } from "@refinedev/antd";
+import { Form, Modal, Rate, Spin, Upload, UploadFile } from "antd";
+import { RcFile, UploadChangeParam, UploadProps } from "antd/es/upload";
 import clsx from "clsx";
-import Tab from "react-bootstrap/Tab";
+import { useState } from "react";
 import Nav from "react-bootstrap/Nav";
+import Tab from "react-bootstrap/Tab";
 import { useTranslation } from "react-i18next";
+import { getBase64, getBase64Image } from "../../helpers/image";
+import { showErrorToast } from "../../helpers/toast";
+import {
+  IProductResponse,
+  IReviewRequest,
+  IReviewResponse,
+} from "../../interfaces";
+import { HttpError, useList, useTranslate } from "@refinedev/core";
+import { useParams } from "react-router-dom";
+import Reviews from "../../components/review/Reviews";
+import { validateCommon } from "../../helpers/validate";
 
 interface ProductDescriptionTabProps {
   spaceBottomClass: string;
   productFullDesc: string;
+  product: IProductResponse;
 }
 
 const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
   spaceBottomClass,
   productFullDesc,
+  product,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslate();
+  let { id } = useParams();
+
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [previewTitle, setPreviewTitle] = useState("");
+
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [loadingImage, setLoadingImage] = useState(false);
+
+  const { onFinish, formProps, saveButtonProps, formLoading } =
+    useForm<IReviewRequest>({
+      resource: "product/reviews",
+      action: "create",
+      onMutationSuccess(data, variables, context, isAutoSave) {
+        formProps.form?.resetFields();
+        refetch();
+      },
+      successNotification: (data, values, resource) => {
+        return {
+          message: `Gửi đánh giá thành công`,
+          description: "Thành công",
+          type: "success",
+        };
+      },
+      errorNotification: (error, values, resource) => {
+        return {
+          message: `${error?.message}`,
+          description: "Đã có lỗi xảy ra",
+          type: "error",
+        };
+      },
+    });
+
+  const { data, isLoading, isError, refetch } = useList<
+    IReviewResponse,
+    HttpError
+  >({
+    resource: "product/reviews",
+    filters: [
+      {
+        field: "product",
+        operator: "eq",
+        value: id,
+      },
+    ],
+  });
+
+  const reviews = data?.data ? data?.data : [];
+
+  const onFinishHandler = (values: any) => {
+    const updatedValues = {
+      ...values,
+    };
+
+    onFinish(updatedValues);
+  };
+
+  const handleCancel = () => setPreviewOpen(false);
+  const handlePreview = async (file: UploadFile) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj as RcFile);
+    }
+
+    setPreviewImage(file.url || (file.preview as string));
+    setPreviewOpen(true);
+    setPreviewTitle(
+      file.name || file.url!.substring(file.url!.lastIndexOf("/") + 1)
+    );
+  };
+
+  const beforeUpload = (file: RcFile) => {
+    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+    if (!isJpgOrPng) {
+      showErrorToast(t("image.error.invalid"));
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      showErrorToast(t("image.error.exceed"));
+    }
+    return isJpgOrPng && isLt2M;
+  };
+
+  const handleChange: UploadProps["onChange"] = (
+    info: UploadChangeParam<UploadFile>
+  ) => {
+    setFileList(info.fileList);
+
+    if (info.file.status === "uploading") {
+      setLoadingImage(true);
+      return;
+    }
+    if (info.file.status === "done") {
+      getBase64Image(info.file.originFileObj as RcFile, (url) => {
+        setLoadingImage(false);
+        formProps.form?.setFieldValue("urlImage", url);
+      });
+    }
+  };
 
   return (
     <div
@@ -34,7 +150,7 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="productReviews">
-                  {t(`products.desc_tab.reviews`)}(2)
+                  {t(`products.desc_tab.reviews`)} ({reviews.length})
                 </Nav.Link>
               </Nav.Item>
             </Nav>
@@ -66,147 +182,158 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
                 <div className="row">
                   <div className="col-lg-7">
                     <div className="review-wrapper">
-                      <div className="single-review">
-                        <div className="review-img">
-                          <img src={"/images/testimonial/1.jpg"} alt="" />
-                        </div>
-                        <div className="review-content">
-                          <div className="review-top-wrap">
-                            <div className="review-left">
-                              <div className="review-name">
-                                <h4>White Lewis</h4>
-                              </div>
-                              <div className="review-rating">
-                                <i className="fa fa-star" />
-                                <i className="fa fa-star" />
-                                <i className="fa fa-star" />
-                                <i className="fa fa-star" />
-                                <i className="fa fa-star" />
-                              </div>
-                            </div>
-                            <div className="review-left">
-                              <button>
-                                {t(`products.desc_tab.buttons.reply`)}
-                              </button>
-                            </div>
-                          </div>
-                          <div className="review-bottom">
-                            <p>
-                              Đôi Sneaker này thực sự làm cho trải nghiệm của
-                              tôi trở nên hoàn hảo hơn. Chất liệu vải thoáng khí
-                              giúp đôi chân của tôi luôn khô ráo và thoải mái,
-                              đặc biệt là trong những ngày nắng nóng. Đế giữa
-                              với công nghệ chống sốc thực sự là một điểm cộng,
-                              giảm mệt mỏi khi di chuyển. Thiết kế hiện đại và
-                              màu sắc phối hợp tinh tế, làm cho tôi luôn tự tin
-                              mỗi khi mang giày này ra khỏi nhà. Ngoài ra, dịch
-                              vụ khách hàng cũng rất tốt, giao hàng nhanh chóng
-                              và đóng gói cẩn thận. Tôi rất hài lòng với sự mua
-                              sắm của mình.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="single-review child-review">
-                        <div className="review-img">
-                          <img src={"/images/testimonial/2.jpg"} alt="" />
-                        </div>
-                        <div className="review-content">
-                          <div className="review-top-wrap">
-                            <div className="review-left">
-                              <div className="review-name">
-                                <h4>White Lewis</h4>
-                              </div>
-                              <div className="review-rating">
-                                <i className="fa fa-star" />
-                                <i className="fa fa-star" />
-                                <i className="fa fa-star" />
-                                <i className="fa fa-star" />
-                                <i className="fa fa-star" />
-                              </div>
-                            </div>
-                            <div className="review-left">
-                              <button>
-                                {t(`products.desc_tab.buttons.reply`)}
-                              </button>
-                            </div>
-                          </div>
-                          <div className="review-bottom">
-                            <p>
-                              Giày Sneaker này thực sự làm cho tôi ấn tượng từ
-                              lần đầu tiên đeo. Chất liệu vải cao cấp và đường
-                              may tỉ mỉ tạo nên sự bền bỉ và chất lượng đỉnh
-                              cao. Đặc biệt, kết hợp màu sắc tinh tế tạo nên
-                              phong cách riêng biệt cho tôi. Đế giữa có độ êm và
-                              co giãn, giúp tôi dễ dàng di chuyển mà không gặp
-                              khó khăn. Điều mà tôi đánh giá cao nhất chính là
-                              sự thoải mái khi đi dài. Đôi Sneaker này không chỉ
-                              là một sản phẩm thời trang mà còn là người bạn
-                              đồng hành đáng tin cậy trong mọi hoạt động của
-                              tôi. Một lựa chọn xuất sắc!
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                      <Spin spinning={isLoading}>
+                        <Reviews reviews={reviews} />
+                      </Spin>
                     </div>
                   </div>
                   <div className="col-lg-5">
                     <div className="ratting-form-wrapper pl-50">
                       <h3>{t(`products.desc_tab.buttons.add_review`)}</h3>
                       <div className="ratting-form">
-                        <form action="#">
-                          <div className="star-box">
-                            <span>
-                              {t(`products.desc_tab.fields.your_rating`)}:
-                            </span>
-                            <div className="ratting-star">
-                              <i className="fa fa-star" />
-                              <i className="fa fa-star" />
-                              <i className="fa fa-star" />
-                              <i className="fa fa-star" />
-                              <i className="fa fa-star" />
+                        <Spin spinning={formLoading}>
+                          <Form
+                            {...formProps}
+                            onFinish={onFinishHandler}
+                            layout="horizontal"
+                          >
+                            <div className="mt-3">
+                              <Form.Item
+                                label={t(
+                                  `products.desc_tab.fields.your_rating`
+                                )}
+                                required
+                                name="rating"
+                                rules={[
+                                  {
+                                    validator: (_, value) =>
+                                      validateCommon(_, value, t, "rating"),
+                                  },
+                                ]}
+                              >
+                                <Rate allowHalf />
+                              </Form.Item>
                             </div>
-                          </div>
-                          <div className="row">
-                            <div className="col-md-6">
-                              <div className="rating-form-style mb-10">
-                                <input
-                                  placeholder={
-                                    t(`products.desc_tab.fields.name`) || ""
-                                  }
-                                  type="text"
-                                />
+                            <div className="row">
+                              <div className="col-md-12 rating-select">
+                                <Form.Item
+                                  name="productDetail"
+                                  required
+                                  rules={[
+                                    {
+                                      validator: (_, value) =>
+                                        validateCommon(
+                                          _,
+                                          value,
+                                          t,
+                                          "productDetails"
+                                        ),
+                                    },
+                                  ]}
+                                >
+                                  {product.productDetails.length > 0 ? (
+                                    <select>
+                                      <option value="">
+                                        --Chọn sản phẩm của bạn--
+                                      </option>
+                                      {product.productDetails.map(
+                                        (productDetail, index) => (
+                                          <option
+                                            key={productDetail.id}
+                                            value={productDetail.id}
+                                          >
+                                            {productDetail.product.name} |{" "}
+                                            {productDetail.color.name} -{" "}
+                                            {productDetail.size.name}
+                                          </option>
+                                        )
+                                      )}
+                                    </select>
+                                  ) : (
+                                    <select>
+                                      <option value="">
+                                        Đang tải sản phẩm...
+                                      </option>
+                                    </select>
+                                  )}
+                                </Form.Item>
+                              </div>
+                              <div className="col-md-12">
+                                <div className="rating-form-style form-submit">
+                                  <Form.Item
+                                    name="comment"
+                                    required
+                                    rules={[
+                                      {
+                                        validator: (_, value) =>
+                                          validateCommon(
+                                            _,
+                                            value,
+                                            t,
+                                            "comment"
+                                          ),
+                                      },
+                                    ]}
+                                  >
+                                    <textarea
+                                      placeholder={
+                                        t(`products.desc_tab.fields.message`) ||
+                                        ""
+                                      }
+                                    />
+                                  </Form.Item>
+                                  <div className="col-md-12">
+                                    <Form.Item name="urlImage">
+                                      <Upload
+                                        listType="picture-card"
+                                        onPreview={handlePreview}
+                                        fileList={fileList}
+                                        beforeUpload={beforeUpload}
+                                        maxCount={1}
+                                        onChange={handleChange}
+                                        customRequest={({
+                                          onSuccess,
+                                          onError,
+                                          file,
+                                        }) => {
+                                          if (onSuccess) {
+                                            try {
+                                              onSuccess("ok");
+                                            } catch (error) {
+                                              console.error(error);
+                                            }
+                                          }
+                                        }}
+                                        multiple
+                                        style={{
+                                          border: "none",
+                                          width: "100%",
+                                          background: "none",
+                                        }}
+                                      >
+                                        {fileList.length >= 1 ? null : (
+                                          <div>
+                                            <PlusOutlined />
+                                            <div style={{ marginTop: 8 }}>
+                                              Tải lên
+                                            </div>
+                                          </div>
+                                        )}
+                                      </Upload>
+                                    </Form.Item>
+                                  </div>
+                                  <input
+                                    type="submit"
+                                    value={
+                                      t(`products.desc_tab.buttons.submit`) ||
+                                      ""
+                                    }
+                                  />
+                                </div>
                               </div>
                             </div>
-                            <div className="col-md-6">
-                              <div className="rating-form-style mb-10">
-                                <input
-                                  placeholder={
-                                    t("products.desc_tab.fields.email") || ""
-                                  }
-                                  type="email"
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-12">
-                              <div className="rating-form-style form-submit">
-                                <textarea
-                                  name="message"
-                                  placeholder={
-                                    t(`products.desc_tab.fields.message`) || ""
-                                  }
-                                  defaultValue={""}
-                                />
-                                <input
-                                  type="submit"
-                                  value={
-                                    t(`products.desc_tab.buttons.submit`) || ""
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </form>
+                          </Form>
+                        </Spin>
                       </div>
                     </div>
                   </div>
@@ -216,6 +343,14 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
           </Tab.Container>
         </div>
       </div>
+      <Modal
+        open={previewOpen}
+        title={previewTitle}
+        footer={null}
+        onCancel={handleCancel}
+      >
+        <img className="w-100" alt="image-preview" src={previewImage} />
+      </Modal>
     </div>
   );
 };

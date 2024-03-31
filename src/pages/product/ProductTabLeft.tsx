@@ -52,6 +52,7 @@ const ProductTabLeft = () => {
             {/* product description tab */}
             <ProductDescriptionTab
               spaceBottomClass="pb-90"
+              product={data?.data}
               productFullDesc={product.description}
             />
 

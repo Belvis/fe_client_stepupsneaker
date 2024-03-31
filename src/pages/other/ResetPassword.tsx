@@ -9,7 +9,7 @@ import {
   useParams,
   useSearchParams,
 } from "react-router-dom";
-import { authProvider } from "../../api/authProvider";
+import { authProvider } from "../../providers/authProvider";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import clsx from "clsx";
 

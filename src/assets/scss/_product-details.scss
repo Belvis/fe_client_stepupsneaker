@@ -270,6 +270,28 @@
 }
 
 .ratting-form-wrapper {
+  .rating-select {
+    label {
+      margin: 0 0 7px;
+
+      color: #000;
+    }
+    select {
+      font-size: 14px;
+
+      height: 40px;
+      padding: 0 15px;
+
+      cursor: pointer;
+
+      color: #333;
+      border: 1px solid #e6e6e6;
+
+      -webkit-appearance: none;
+         -moz-appearance: none;
+              appearance: none;
+    }
+  }
   @media #{$md-layout} {
     &.pl-50 {
       margin-top: 50px;

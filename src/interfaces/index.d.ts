@@ -37,7 +37,7 @@ export interface IProductDetailResponse {
   id: string;
   tradeMark: ITradeMark;
   style: IStyle;
-  size: ISize;
+  size: ISizeResponse;
   product: IProductResponse;
   material: IMaterial;
   color: IColorResponse;
@@ -218,6 +218,15 @@ export interface IPaymentMethodResponse {
   id: string;
   name: string;
 }
+export interface IReviewResponse {
+  id: string;
+  customer: ICustomerResponse;
+  productDetail: IProductDetailResponse;
+  comment: string;
+  rating: number;
+  urlImage: string;
+}
+
 // Request
 
 export interface ICustomerRequest {
@@ -284,7 +293,12 @@ export interface IOrderRequest {
   cartItems: ICartItem[];
   note: string;
 }
-
+export interface IReviewRequest {
+  productDetail: string;
+  comment: string;
+  rating: number;
+  urlImage: string;
+}
 // GHN
 export interface IProvince {
   ProvinceName: any;

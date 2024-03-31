@@ -7,7 +7,7 @@ import React, { Fragment, useState } from "react";
 import { Accordion } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import { dataProvider } from "../../api/dataProvider";
+import { dataProvider } from "../../providers/dataProvider";
 import { calculateTotalPrice } from "../../helpers/cart";
 import { showErrorToast, showSuccessToast } from "../../helpers/toast";
 import { IVoucherList, IVoucherResponse } from "../../interfaces";

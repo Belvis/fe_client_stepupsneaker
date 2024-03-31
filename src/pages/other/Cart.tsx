@@ -21,7 +21,7 @@ import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-import { dataProvider } from "../../api/dataProvider";
+import { dataProvider } from "../../providers/dataProvider";
 import VoucherModal from "../../components/voucher/VoucherModal";
 import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../constants/motions";

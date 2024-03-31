@@ -4,7 +4,7 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { useApiUrl } from "@refinedev/core";
-import { dataProvider } from "../../api/dataProvider";
+import { dataProvider } from "../../providers/dataProvider";
 import { Form, notification } from "antd";
 import { showErrorToast } from "../../helpers/toast";
 

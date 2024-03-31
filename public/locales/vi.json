@@ -1,42 +1,181 @@
 {
-    "nav": {
-      "home": "Trang chủ",
-      "shop": "Cửa hàng",
-      "product": "Sản phẩm",
-      "collection": "Bộ sưu tập",
-      "pages": {
-        "title": "Trang",
-        "cart": "Giỏ hàng",
-        "checkout": "Thanh toán",
-        "wishlist": "Danh sách mong muốn",
-        "compare": "So sánh",
-        "my_account": "Tài khoản của tôi",
-        "login_register": "Đăng nhập - Đăng ký",
-        "/login": "Đăng nhập",
-        "/register": "Đăng ký",
-        "orders": "Đơn hàng của tôi",
-        "orders_tracking": "Theo dõi đơn hàng",
-        "404_page": "404",
-        "success": "Thành công",
-        "submission_failed": "Giao dịch không thành công",
-        "failed": "Thất bại",
-        "order": "Đơn hàng",
-        "tracking_page": "Tra cứu đơn hàng",
-        "my_orders": "Đơn hàng của tôi",
-        "reset_password": "Đặt lại mật khẩu",
-        "forgot_password": "Quên mật khẩu"
-      },
-      "contact_us": "Liên hệ",
-      "about_us": "Về chúng tôi"
+  "nav": {
+    "home": "Trang chủ",
+    "shop": "Cửa hàng",
+    "product": "Sản phẩm",
+    "collection": "Bộ sưu tập",
+    "pages": {
+      "title": "Trang",
+      "cart": "Giỏ hàng",
+      "checkout": "Thanh toán",
+      "wishlist": "Danh sách mong muốn",
+      "compare": "So sánh",
+      "my_account": "Tài khoản của tôi",
+      "login_register": "Đăng nhập - Đăng ký",
+      "/login": "Đăng nhập",
+      "/register": "Đăng ký",
+      "orders": "Đơn hàng của tôi",
+      "orders_tracking": "Theo dõi đơn hàng",
+      "404_page": "404",
+      "success": "Thành công",
+      "submission_failed": "Giao dịch không thành công",
+      "failed": "Thất bại",
+      "order": "Đơn hàng",
+      "tracking_page": "Tra cứu đơn hàng",
+      "my_orders": "Đơn hàng của tôi",
+      "reset_password": "Đặt lại mật khẩu",
+      "forgot_password": "Quên mật khẩu"
     },
-    "checkout": {
-      "billing_details": {
-        "title": "Thông tin thanh toán",
-        "full_name": "Họ và tên",
-        "email": "Email",
-        "date_of_birth": "Ngày sinh",
-        "gender": "Giới tính",
-        "phone_number": "Số điện thoại",
+    "contact_us": "Liên hệ",
+    "about_us": "Về chúng tôi"
+  },
+  "checkout": {
+    "billing_details": {
+      "title": "Thông tin thanh toán",
+      "full_name": "Họ và tên",
+      "email": "Email",
+      "date_of_birth": "Ngày sinh",
+      "gender": "Giới tính",
+      "phone_number": "Số điện thoại",
+      "province": {
+        "title": "Tỉnh/Thành phố",
+        "place_holder": "Chọn Tỉnh/Thành phố"
+      },
+      "district": {
+        "title": "Quận/Huyện",
+        "place_holder": "Chọn Quận/Huyện"
+      },
+      "ward": {
+        "title": "Phường/Xã",
+        "place_holder": "Chọn Phường/Xã"
+      },
+      "line": "Chi tiết địa chỉ",
+      "additional_information": {
+        "title": "Thông tin thêm",
+        "order_note": {
+          "title": "Ghi chú đơn hàng",
+          "place_holder": "Ghi chú về đơn hàng của bạn, vd: ghi chú đặc biệt cho giao hàng. (tối đa {{textAreaCount}} ký tự)"
+        }
+      }
+    },
+    "your_order": {
+      "title": "Đơn hàng của bạn",
+      "product": "Sản phẩm",
+      "total": "Thành tiền",
+      "shipping": "Vận chuyển",
+      "total_money": "Tổng cộng"
+    },
+    "no_items_found": "Không tìm thấy sản phẩm nào trong giỏ hàng.",
+    "payment_methods": {
+      "title": "Phương thức thanh toán",
+      "options": {
+        "cod": {
+          "title": "Thanh toán khi nhận hàng (Ship COD)",
+          "description": "Hình thức giao hàng thu hộ tiền hoặc giao hàng thu tiền. Người mua thanh toán khi nhận hàng"
+        },
+        "bank_transfer": {
+          "title": "Thanh toán bằng chuyển khoản (VNPAY)",
+          "description": "Chuyển khoản vào tài khoản của chúng tôi. Đơn hàng sẽ được xác nhận ngay sau khi chuyển khoản"
+        }
+      }
+    },
+    "buttons": {
+      "place_order": "Đặt hàng",
+      "shop_now": "Mua ngay"
+    }
+  },
+  "success": {
+    "payment": {
+      "methods": {
+        "options": {
+          "Cash": "Tiền mặt",
+          "Transfer": "Chuyển khoản",
+          "Card": "Thẻ ngân hàng"
+        }
+      },
+      "transaction_code": "Mã giao dịch"
+    }
+  },
+  "order_tracking": {
+    "steps": {
+      "PLACE_ORDER": {
+        "title": "Đặt hàng",
+        "description": "Khách đặt hàng online."
+      },
+      "WAIT_FOR_CONFIRMATION": {
+        "title": "Chờ xác nhận",
+        "description": "Khách hàng xác nhận đơn hàng."
+      },
+      "WAIT_FOR_DELIVERY": {
+        "title": "Sẵn sàng",
+        "description": "Đơn hàng đã sẵn sàng, đợi được giao."
+      },
+      "DELIVERING": {
+        "title": "Đang giao",
+        "description": "Đơn hàng đang được giao."
+      },
+      "COMPLETED": {
+        "title": "Hoàn tất",
+        "description": "Đơn hàng đã được hoàn thành."
+      },
+      "CANCELED": {
+        "title": "Đã huỷ",
+        "description": "Đơn hàng đã bị huỷ."
+      }
+    }
+  },
+  "wish_list": {
+    "title": "Danh sách yêu thích của bạn",
+    "table": {
+      "head": {
+        "image": "Ảnh",
+        "product_name": "Tên sản phẩm",
+        "unit_price": "Đơn giá",
+        "add_to_cart": "Thêm vào giỏ",
+        "action": "Hành động"
+      }
+    },
+    "no_items_found": "Không tìm thấy sản phẩm nào trong danh sách mong muốn.",
+    "buttons": {
+      "out_of_stock": "Hết hàng",
+      "select_option": "Chọn tùy chọn",
+      "continue_shopping": "Tiếp tục mua hàng",
+      "clear_wishlist": "Xóa danh sách yêu thích",
+      "add_items": "Mua ngay"
+    }
+  },
+  "compare": {
+    "title": "Thông tin sản phẩm",
+    "items": {
+      "price": "Đơn giá",
+      "description": "Mô tả",
+      "rating": "Đánh giá"
+    },
+    "buttons": {
+      "select_option": "Chọn tùy chọn",
+      "out_of_stock": "Hết hàng",
+      "add_items": "Mua ngay"
+    },
+    "no_items_found": "Không tìm thấy sản phẩm nào trong danh sách so sánh."
+  },
+  "cart": {
+    "title": "Giỏ hàng của bạn",
+    "table": {
+      "head": {
+        "image": "Ảnh",
+        "product_name": "Tên sản phẩm",
+        "color": "Màu sắc",
+        "size": "Kích cỡ",
+        "unit_price": "Đơn giá",
+        "qty": "Số lượng",
+        "subtotal": "Thành tiền",
+        "action": "Hành động"
+      }
+    },
+    "shipping": {
+      "title": "Ước tính chi phí vận chuyển.",
+      "subtitle": "Nhập địa chỉ đích của bạn để nhận ước tính chi phí vận chuyển.",
+      "address": {
         "province": {
           "title": "Tỉnh/Thành phố",
           "place_holder": "Chọn Tỉnh/Thành phố"
@@ -48,323 +187,184 @@
         "ward": {
           "title": "Phường/Xã",
           "place_holder": "Chọn Phường/Xã"
-        },
-        "line": "Chi tiết địa chỉ",
-        "additional_information": {
-          "title": "Thông tin thêm",
-          "order_note": {
-            "title": "Ghi chú đơn hàng",
-            "place_holder": "Ghi chú về đơn hàng của bạn, vd: ghi chú đặc biệt cho giao hàng. (tối đa {{textAreaCount}} ký tự)"
-          }
-        }
-      },
-      "your_order": {
-        "title": "Đơn hàng của bạn",
-        "product": "Sản phẩm",
-        "total": "Thành tiền",
-        "shipping": "Vận chuyển",
-        "total_money": "Tổng cộng"
-      },
-      "no_items_found": "Không tìm thấy sản phẩm nào trong giỏ hàng.",
-      "payment_methods": {
-        "title": "Phương thức thanh toán",
-        "options": {
-          "cod": {
-            "title": "Thanh toán khi nhận hàng (Ship COD)",
-            "description": "Hình thức giao hàng thu hộ tiền hoặc giao hàng thu tiền. Người mua thanh toán khi nhận hàng"
-          },
-          "bank_transfer" :{
-            "title": "Thanh toán bằng chuyển khoản (VNPAY)",
-            "description": "Chuyển khoản vào tài khoản của chúng tôi. Đơn hàng sẽ được xác nhận ngay sau khi chuyển khoản"
-          }
-        }
-      },
-      "buttons": {
-        "place_order": "Đặt hàng",
-        "shop_now": "Mua ngay"
-      }
-    },
-    "success": {
-
-      "payment": {
-
-        "methods": {
-          "options": {
-            "Cash": "Tiền mặt",
-            "Transfer": "Chuyển khoản",
-            "Card": "Thẻ ngân hàng"
-          }
-        },
-        "transaction_code": "Mã giao dịch"
-      }
-    },
-    "order_tracking": {
-      "steps": {
-        "PLACE_ORDER": {
-          "title": "Đặt hàng",
-          "description": "Khách đặt hàng online."
-        },
-        "WAIT_FOR_CONFIRMATION": {
-          "title": "Chờ xác nhận",
-          "description": "Khách hàng xác nhận đơn hàng."
-        },
-        "WAIT_FOR_DELIVERY": {
-          "title": "Sẵn sàng",
-          "description": "Đơn hàng đã sẵn sàng, đợi được giao."
-        },
-        "DELIVERING": {
-          "title": "Đang giao",
-          "description": "Đơn hàng đang được giao."
-        },
-        "COMPLETED": {
-          "title": "Hoàn tất",
-          "description": "Đơn hàng đã được hoàn thành."
-        },
-        "CANCELED": {
-          "title": "Đã huỷ",
-          "description": "Đơn hàng đã bị huỷ."
         }
       }
     },
-    "wish_list": {
-      "title": "Danh sách yêu thích của bạn",
-      "table": {
-        "head": {
-          "image": "Ảnh",
-          "product_name": "Tên sản phẩm",
-          "unit_price": "Đơn giá",
-          "add_to_cart": "Thêm vào giỏ",
-          "action": "Hành động"
-        }
-      },
-      "no_items_found": "Không tìm thấy sản phẩm nào trong danh sách mong muốn.",
-      "buttons": {
-        "out_of_stock": "Hết hàng",
-        "select_option": "Chọn tùy chọn",
-        "continue_shopping": "Tiếp tục mua hàng",
-        "clear_wishlist": "Xóa danh sách yêu thích",
-        "add_items": "Mua ngay"
+    "voucher": {
+      "title": "Sử dụng phiếu giảm giá",
+      "subtitle": "Nhập mã giảm giá của bạn."
+    },
+    "cart_total": {
+      "title": "Tổng giỏ hàng",
+      "total": "Thành tiền",
+      "shipping": "Phí ship",
+      "grand_total": "Tổng cộng"
+    },
+    "no_items_found": "Không tìm thấy sản phẩm nào trong giỏ hàng.",
+    "buttons": {
+      "out_of_stock": "Hết hàng",
+      "select_option": "Chọn tùy chọn",
+      "continue_shopping": "Tiếp tục mua hàng",
+      "clear_cart": "Xóa giỏ hàng",
+      "add_items": "Mua ngay",
+      "get_a_quote": "Nhận báo giá",
+      "apply_voucher": "Áp dụng giảm giá",
+      "proceed_to_checkout": "Tiến hành thanh toán"
+    }
+  },
+  "home_page": {
+    "buttons": {
+      "shop_now": "Mua ngay"
+    }
+  },
+  "feature_icon": {
+    "1": {
+      "title": "Miễn Phí Vận Chuyển",
+      "subtitle": "Tận hưởng mua sắm, vận chuyển miễn phí cho tất cả đơn đặt hàng của bạn."
+    },
+    "2": {
+      "title": "Hỗ Trợ 24/7",
+      "subtitle": "Chúng tôi luôn ở đây để hỗ trợ bạn xuyên suốt mọi lúc."
+    },
+    "3": {
+      "title": "Hoàn Tiền",
+      "subtitle": "Mua sắm một cách tự tin khi biết rằng sự hài lòng của bạn được đảm bảo."
+    }
+  },
+  "video-popup": {
+    "content": {
+      "title": "Chinh phục tốc độ ngoài sức tưởng tượng của bạn",
+      "subtitle": "Đưa phong cách của bạn lên một tầm cao mới. Từ những sản phẩm len hàng ngày với những gam màu nhẹ nhàng đến những kiểu dáng ngoại cổ điển và quần thiết thực, những mẫu cơ bản này luôn mang đến sự phóng khoáng và lịch lãm."
+    },
+    "buttons": {
+      "more": "Tìm hiểu thêm"
+    }
+  },
+  "product_slider": {
+    "new_products": {
+      "title": "Sản phẩm mới",
+      "subtitle": "Khám phá những sản phẩm mới nhất, hãy để chúng tôi mang lại trải nghiệm tuyệt vời cho bạn."
+    },
+    "best_products": {
+      "title": "Sản phẩm bán chạy",
+      "subtitle": "Khám phá danh sách sản phẩm được ưa chuộng nhất, chúng tôi tự tin mang đến cho bạn trải nghiệm mua sắm tốt nhất."
+    }
+  },
+  "brand_logo": {
+    "our_clients": "Đối tác của chúng tôi"
+  },
+  "newsletter": {
+    "title": "Kết nối với chúng tôi",
+    "subtitle": "Đăng ký nhận bản tin của chúng tôi để cập nhật thông tin mới nhất.",
+    "buttons": {
+      "subscribe": {
+        "title": "Đăng ký",
+        "place_holder": "Địa chỉ email của bạn."
       }
+    }
+  },
+  "footer": {
+    "about_us": {
+      "title": "VỀ CHÚNG TÔI",
+      "about_us": "Về chúng tôi",
+      "store_location": "Địa chỉ cửa hàng",
+      "contact": "Liên lạc",
+      "orders_tracking": "Theo dõi đơn hàng"
     },
-    "compare": {
-      "title": "Thông tin sản phẩm",
-      "items": {
-        "price": "Đơn giá",
-        "description": "Mô tả",
-        "rating": "Đánh giá"
-      },
-      "buttons": {
-        "select_option": "Chọn tùy chọn",
-        "out_of_stock": "Hết hàng",
-        "add_items": "Mua ngay"
-      },
-      "no_items_found": "Không tìm thấy sản phẩm nào trong danh sách so sánh."
+    "usefull_links": {
+      "title": "LIÊN KẾT HỮU ÍCH",
+      "returns": "Chính sách đổi trả",
+      "support_policy": "Chính sách hỗ trợ",
+      "size_guide": "Hướng dẫn chọn size",
+      "faqs": "Câu hỏi thường gặp"
     },
-    "cart": {
-      "title": "Giỏ hàng của bạn",
-      "table": {
-        "head": {
-          "image": "Ảnh",
-          "product_name": "Tên sản phẩm",
-          "color": "Màu sắc",
-          "size": "Kích cỡ",
-          "unit_price": "Đơn giá",
-          "qty": "Số lượng",
-          "subtotal": "Thành tiền",
-          "action":"Hành động"
-        }
-      },
-      "shipping": {
-        "title": "Ước tính chi phí vận chuyển.",
-        "subtitle": "Nhập địa chỉ đích của bạn để nhận ước tính chi phí vận chuyển.",
-        "address": {
-          "province": {
-            "title": "Tỉnh/Thành phố",
-            "place_holder": "Chọn Tỉnh/Thành phố"
-          },
-          "district": {
-            "title": "Quận/Huyện",
-            "place_holder": "Chọn Quận/Huyện"
-          },
-          "ward": {
-            "title": "Phường/Xã",
-            "place_holder": "Chọn Phường/Xã"
-          }
-        }
-      },
-      "voucher": {
-        "title": "Sử dụng phiếu giảm giá",
-        "subtitle": "Nhập mã giảm giá của bạn."
-      },
-      "cart_total": {
-        "title": "Tổng giỏ hàng",
-        "total": "Thành tiền",
-        "shipping": "Phí ship",
-        "grand_total": "Tổng cộng"
-      },
-      "no_items_found": "Không tìm thấy sản phẩm nào trong giỏ hàng.",
-      "buttons": {
-        "out_of_stock": "Hết hàng",
-        "select_option": "Chọn tùy chọn",
-        "continue_shopping": "Tiếp tục mua hàng",
-        "clear_cart": "Xóa giỏ hàng",
-        "add_items": "Mua ngay",
-        "get_a_quote": "Nhận báo giá",
-        "apply_voucher": "Áp dụng giảm giá",
-        "proceed_to_checkout" : "Tiến hành thanh toán"
-      }
-    },
-    "home_page": {
-      "buttons": {
-        "shop_now": "Mua ngay"
-      }
-    },
-    "feature_icon": {
-      "1": {
-        "title": "Miễn Phí Vận Chuyển",
-        "subtitle": "Tận hưởng mua sắm, vận chuyển miễn phí cho tất cả đơn đặt hàng của bạn."
-      },
-      "2": {
-        "title": "Hỗ Trợ 24/7",
-        "subtitle": "Chúng tôi luôn ở đây để hỗ trợ bạn xuyên suốt mọi lúc."
-      },
-      "3": {
-        "title": "Hoàn Tiền",
-        "subtitle": "Mua sắm một cách tự tin khi biết rằng sự hài lòng của bạn được đảm bảo."
-      }
-    },
-    "video-popup": {
-      "content": {
-        "title": "Chinh phục tốc độ ngoài sức tưởng tượng của bạn",
-        "subtitle": "Đưa phong cách của bạn lên một tầm cao mới. Từ những sản phẩm len hàng ngày với những gam màu nhẹ nhàng đến những kiểu dáng ngoại cổ điển và quần thiết thực, những mẫu cơ bản này luôn mang đến sự phóng khoáng và lịch lãm."
-      },
-      "buttons": {
-        "more": "Tìm hiểu thêm"
-      }
-    },
-    "product_slider": {
-      "new_products": {
-        "title": "Sản phẩm mới",
-        "subtitle": "Khám phá những sản phẩm mới nhất, hãy để chúng tôi mang lại trải nghiệm tuyệt vời cho bạn."
-      },
-      "best_products": {
-        "title": "Sản phẩm bán chạy",
-        "subtitle": "Khám phá danh sách sản phẩm được ưa chuộng nhất, chúng tôi tự tin mang đến cho bạn trải nghiệm mua sắm tốt nhất."
-      }
-    },
-    "brand_logo": {
-      "our_clients": "Đối tác của chúng tôi"
+    "follow_us": {
+      "title": "MẠNG XÃ HỘI"
     },
     "newsletter": {
-      "title": "Kết nối với chúng tôi",
-      "subtitle" : "Đăng ký nhận bản tin của chúng tôi để cập nhật thông tin mới nhất.",
+      "title": "ĐĂNG KÝ",
+      "subtitle": "Nhận thông tin cập nhật mới nhất qua email về cửa hàng của chúng tôi và các ưu đãi đặc biệt.",
       "buttons": {
         "subscribe": {
           "title": "Đăng ký",
-          "place_holder": "Địa chỉ email của bạn."
+          "place_holder": "Địa chỉ email của bạn..."
         }
-      }
-    },
-    "footer": {
-      "about_us": {
-        "title": "VỀ CHÚNG TÔI",
-        "about_us": "Về chúng tôi",
-        "store_location": "Địa chỉ cửa hàng",
-        "contact": "Liên lạc",
-        "orders_tracking": "Theo dõi đơn hàng"
-      },
-      "usefull_links": {
-        "title": "LIÊN KẾT HỮU ÍCH",
-        "returns": "Chính sách đổi trả",
-        "support_policy": "Chính sách hỗ trợ",
-        "size_guide": "Hướng dẫn chọn size",
-        "faqs": "Câu hỏi thường gặp"
-      },
-      "follow_us": {
-        "title": "MẠNG XÃ HỘI"
-      },
-      "newsletter": {
-        "title": "ĐĂNG KÝ",
-        "subtitle" : "Nhận thông tin cập nhật mới nhất qua email về cửa hàng của chúng tôi và các ưu đãi đặc biệt.",
-        "buttons": {
-          "subscribe": {
-            "title": "Đăng ký",
-            "place_holder": "Địa chỉ email của bạn..."
-          }
-        }
-      }
-    },
-    "header": {
-      "menu_cart": {
-        "qty": "Số lượng",
-        "total": "Tổng",
-        "color": "Màu sắc",
-        "size": "Kích cỡ",
-        "buttons": {
-          "view_cart": "Xem giỏ hàng",
-          "checkout": "Thanh toán"
-        },
-        "no_items": "Không có sản phẩm nào trong giỏ hàng"
-      }
-    },
-    "products": {
-      "sale": "Giảm tới",
-      "new": "Mới",
-      "fields": {
-        "colors": "Màu sắc",
-        "sizes":"Kích cỡ",
-        "styles": "Kiểu dáng",
-        "tags": "Thẻ",
-        "descriptions":"Mô tả"
-      },
-      "desc_tab": {
-        "additional_information": "Thông tin thêm",
-        "description": "Mô tả",
-        "reviews": "Đánh giá",
-        "fields": {
-          "name": "Tên",
-          "email": "Email",
-          "message": "Nội dung",
-          "your_rating": "Đánh giá của bạn"
-        },
-        "buttons": {
-          "reply": "Phản hồi",
-          "add_review": "Tạo đánh giá",
-          "submit": "Gửi",
-          "out_of_stock":"Hết hàng"
-        }
-      },
-      "related_products": "Sản phẩm liên quan",
-      "buttons": {
-        "add_to_cart":"Thêm vào giỏ hàng"
-      }
-    },
-    "confirmDialog": {
-      "delete": {
-        "message": "Bạn có chắc không?",
-        "header": "Xác nhận xóa!",
-        "acceptLabel": "Đồng ý",
-        "rejectLabel": "Huỷ"
-      },
-      "edit": {
-        "message": "Bạn có chắc muốn tiếp tục?",
-        "header": "Xác nhận!",
-        "acceptLabel": "Đồng ý",
-        "rejectLabel": "Huỷ"
-      }
-    },
-    "validator": {
-      "message": {
-        "fullName": "Họ và tên không được để trống!",
-        "full_name": "Họ và tên không được để trống!",
-        "dateOfBirth": "Ngày sinh không được để trống!",
-        "gender": "Giới tính được để trống!",
-        "provinceId": "Tỉnh/Thành phố không được để trống!",
-        "districtId": "Quận/Huyện không được để trống!",
-        "wardCode": "Phường/Xã không được để trống!",
-        "more": "Chi tiết địa chỉ không được để trống!",
-        "line": "Chi tiết địa chỉ không được để trống"
       }
     }
+  },
+  "header": {
+    "menu_cart": {
+      "qty": "Số lượng",
+      "total": "Tổng",
+      "color": "Màu sắc",
+      "size": "Kích cỡ",
+      "buttons": {
+        "view_cart": "Xem giỏ hàng",
+        "checkout": "Thanh toán"
+      },
+      "no_items": "Không có sản phẩm nào trong giỏ hàng"
+    }
+  },
+  "products": {
+    "sale": "Giảm tới",
+    "new": "Mới",
+    "fields": {
+      "colors": "Màu sắc",
+      "sizes": "Kích cỡ",
+      "styles": "Kiểu dáng",
+      "tags": "Thẻ",
+      "descriptions": "Mô tả"
+    },
+    "desc_tab": {
+      "additional_information": "Thông tin thêm",
+      "description": "Mô tả",
+      "reviews": "Đánh giá",
+      "fields": {
+        "name": "Tên",
+        "email": "Email",
+        "message": "Nội dung",
+        "your_rating": "Đánh giá của bạn"
+      },
+      "buttons": {
+        "reply": "Phản hồi",
+        "add_review": "Tạo đánh giá",
+        "submit": "Gửi",
+        "out_of_stock": "Hết hàng"
+      }
+    },
+    "related_products": "Sản phẩm liên quan",
+    "buttons": {
+      "add_to_cart": "Thêm vào giỏ hàng"
+    }
+  },
+  "confirmDialog": {
+    "delete": {
+      "message": "Bạn có chắc không?",
+      "header": "Xác nhận xóa!",
+      "acceptLabel": "Đồng ý",
+      "rejectLabel": "Huỷ"
+    },
+    "edit": {
+      "message": "Bạn có chắc muốn tiếp tục?",
+      "header": "Xác nhận!",
+      "acceptLabel": "Đồng ý",
+      "rejectLabel": "Huỷ"
+    }
+  },
+  "validator": {
+    "message": {
+      "fullName": "Họ và tên không được để trống!",
+      "full_name": "Họ và tên không được để trống!",
+      "dateOfBirth": "Ngày sinh không được để trống!",
+      "gender": "Giới tính được để trống!",
+      "provinceId": "Tỉnh/Thành phố không được để trống!",
+      "districtId": "Quận/Huyện không được để trống!",
+      "wardCode": "Phường/Xã không được để trống!",
+      "more": "Chi tiết địa chỉ không được để trống!",
+      "line": "Chi tiết địa chỉ không được để trống",
+      "rating": "Đánh giá không được để trống",
+      "productDetails": "Vui lòng chọn sản phẩm",
+      "comment": "Nội dung đánh giá không được để trống"
+    }
   }
-  
+}
