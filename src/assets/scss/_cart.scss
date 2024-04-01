@@ -44,7 +44,7 @@ h3.cart-page-title {
     }
     tbody > tr {
       border-bottom: 1px solid #ebebeb;
-      td.product-thumbnail {
+      td.product-thumbnail {      
         width: 150px;
         padding-left: 10px;
         padding-right: 10px;
@@ -150,6 +150,19 @@ h3.cart-page-title {
             padding: 0;
 
             text-align: center;
+
+            color: #333;
+            border: 1px solid #e1e1e1;
+            background: transparent none repeat scroll 0 0;
+          }
+          textarea.cart-plus-minus-box {
+            font-size: 14px;
+
+            float: left;
+
+            height: 40px;
+            margin: 0;
+            padding: 0;
 
             color: #333;
             border: 1px solid #e1e1e1;

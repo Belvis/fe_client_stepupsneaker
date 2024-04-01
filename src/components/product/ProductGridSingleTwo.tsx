@@ -89,13 +89,11 @@ const ProductGridSingleTwo: React.FC<ProductGridSingleTwoProps> = ({
             )}
           </div>
 
-          {/* {product.rating && product.rating > 0 ? ( */}
-          <div className="product-rating">
-            <Rating ratingValue={5} />
-          </div>
-          {/* ) : (
-            ""
-          )} */}
+          {product.averageRating >= 0 && (
+            <div className="product-rating">
+              <Rating ratingValue={product.averageRating} />
+            </div>
+          )}
 
           <div className="product-action">
             <div className="pro-same-action pro-wishlist">

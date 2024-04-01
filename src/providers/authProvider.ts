@@ -202,7 +202,7 @@ export const authProvider = (url: string): AuthBindings => ({
   },
 
   onError: async (error) => {
-    if (error.status === 401 || error.status === 403) {
+    if (error.statusCode === 401 || error.statusCode === 403) {
       localStorage.removeItem(TOKEN_KEY);
 
       return {

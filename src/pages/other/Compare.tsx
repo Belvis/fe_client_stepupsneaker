@@ -191,7 +191,9 @@ const Compare = () => {
                                 className="product-rating"
                                 key={key}
                               >
-                                <Rating ratingValue={5} />
+                                <Rating
+                                  ratingValue={compareItem.averageRating}
+                                />
                               </motion.td>
                             );
                           })}

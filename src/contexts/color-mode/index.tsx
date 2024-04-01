@@ -15,13 +15,13 @@ export const ColorModeContextProvider: React.FC<PropsWithChildren> = ({
       // you can change the theme colors here. example: ...RefineThemes.Magenta,
       theme={{
         ...RefineThemes.Orange,
-        // token: {
-        //   // Seed Token
-        //   // colorPrimary: '#00b96b',
-        //   // borderRadius: 2,
-        //   // // Alias Token
-        //   // colorBgContainer: '#f6ffed',
-        // },
+        token: {
+          // Seed Token
+          colorPrimary: "#fb5231",
+          // borderRadius: 2,
+          // // Alias Token
+          // colorBgContainer: '#f6ffed',
+        },
         components: {
           Steps: {
             iconSize: 48,
@@ -43,6 +43,9 @@ export const ColorModeContextProvider: React.FC<PropsWithChildren> = ({
             headerSplitColor: "#ffffff",
             rowHoverBg: "#fff2e8",
             headerSortActiveBg: "#bfbfbf",
+          },
+          Button: {
+            fontFamily: "Josefin Sans",
           },
         },
       }}

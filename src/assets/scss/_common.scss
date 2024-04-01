@@ -2055,3 +2055,45 @@ button:disabled {
 .swiper-wrap {
   position: relative;
 }
+
+.app-select {
+  select {
+    font-size: 14px;
+
+    height: 45px;
+    padding: 2px 20px;
+
+    cursor: pointer;
+
+    color: #333;
+    border: 1px solid #e6e6e6;
+
+    -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
+  }
+}
+
+.app-info {
+  margin-bottom: 20px;
+  label {
+    color: #000;
+    font-size: 14px;
+    text-transform: capitalize;
+    margin-bottom: 10px;
+  }
+  input {
+    background: transparent none repeat scroll 0 0;
+    border: 1px solid #ebebeb;
+    color: #000;
+    height: 40px;
+    padding: 0 15px;
+  }
+  input[type="checkbox"] {
+    height: 15px;
+    margin: 0;
+    position: relative;
+    top: 1px;
+    width: 17px;
+  }
+}

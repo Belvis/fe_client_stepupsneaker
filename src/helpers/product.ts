@@ -94,6 +94,7 @@ const mapProductResponseToClient = (
     },
     discount: discountInfo.value,
     saleCount: productResponse.saleCount,
+    averageRating: productResponse.averageRating,
     offerEnd: discountInfo.endDate,
     new: isNew,
     variation: variations,

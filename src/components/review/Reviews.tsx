@@ -1,38 +1,85 @@
+import {
+  Authenticated,
+  useDelete,
+  useGetIdentity,
+  useTranslate,
+} from "@refinedev/core";
+import { Avatar, Image, Rate } from "antd";
 import React from "react";
-import { IReviewResponse } from "../../interfaces";
-import { useTranslate } from "@refinedev/core";
-import { Avatar, Image } from "antd";
+import { ICustomerResponse, IReviewResponse } from "../../interfaces";
+import { showWarningConfirmDialog } from "../../helpers/confirm";
 
 type ReviewProps = {
   review: IReviewResponse;
+  calback: any;
 };
 type ReviewsProps = {
   reviews: IReviewResponse[];
+  calback: any;
 };
-const Review: React.FC<ReviewProps> = ({ review }) => {
+const Review: React.FC<ReviewProps> = ({ review, calback }) => {
   const t = useTranslate();
+  const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
 
+  const { mutate } = useDelete();
+
+  const removeReview = (id: string) => {
+    showWarningConfirmDialog({
+      options: {
+        accept: () => {
+          mutate(
+            {
+              resource: "product/reviews",
+              id,
+              successNotification: (data, id, resource) => {
+                return {
+                  message: `Xoá đánh giá thành công`,
+                  description: t("common.success"),
+                  type: "success",
+                };
+              },
+            },
+            {
+              onError: (error, variables, context) => {},
+              onSuccess: (data, variables, context) => {
+                calback();
+              },
+            }
+          );
+        },
+        reject: () => {},
+      },
+      t: t,
+    });
+  };
   return (
     <div className="single-review" key={review.id}>
       <div className="review-img">
         <Avatar shape="square" size={100} src={review.customer.image} />
-        {/* <img src={review.urlImage} alt="" /> */}
       </div>
-      <div className="review-content">
+      <div className="review-content w-100">
         <div className="review-top-wrap">
           <div className="review-left">
             <div className="review-name">
               <h4>
-                {review.customer.fullName} - {review.productDetail.product.name}
+                {review.customer.fullName} - {review.productDetail.product.name}{" "}
+                | {review.productDetail.color.name} -{" "}
+                {review.productDetail.size.name}
               </h4>
             </div>
             <div className="review-rating">
-              {/* Render số sao dựa trên rating */}
-              {Array.from({ length: review.rating }, (_, index) => (
-                <i key={index} className="fa fa-star" />
-              ))}
+              <Rate allowHalf disabled value={review.rating} />
             </div>
           </div>
+          <Authenticated fallback={false}>
+            {user && user.id === review.customer.id && (
+              <div className="review-left">
+                <button onClick={() => removeReview(review.id)}>
+                  {t("buttons.delete")}
+                </button>
+              </div>
+            )}
+          </Authenticated>
         </div>
         <div className="review-bottom">
           <p>{review.comment}</p>
@@ -43,11 +90,11 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
   );
 };
 
-const Reviews: React.FC<ReviewsProps> = ({ reviews }) => {
+const Reviews: React.FC<ReviewsProps> = ({ reviews, calback }) => {
   return (
     <div className="reviews">
       {reviews.map((review) => (
-        <Review key={review.id} review={review} />
+        <Review key={review.id} review={review} calback={calback} />
       ))}
     </div>
   );

@@ -183,7 +183,7 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
                   <div className="col-lg-7">
                     <div className="review-wrapper">
                       <Spin spinning={isLoading}>
-                        <Reviews reviews={reviews} />
+                        <Reviews reviews={reviews} calback={refetch} />
                       </Spin>
                     </div>
                   </div>

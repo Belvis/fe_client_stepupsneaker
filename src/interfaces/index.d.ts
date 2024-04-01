@@ -31,6 +31,7 @@ export interface IProductResponse {
   image: string;
   productDetails: IProductDetailResponse[];
   saleCount: number;
+  averageRating: number;
   createdAt: number;
 }
 export interface IProductDetailResponse {
@@ -226,7 +227,31 @@ export interface IReviewResponse {
   rating: number;
   urlImage: string;
 }
-
+export interface IReviewResponse {
+  id: string;
+  customer: ICustomerResponse;
+  productDetail: IProductDetailResponse;
+  comment: string;
+  rating: number;
+  urlImage: string;
+}
+export interface IReturnFormResponse {
+  id: string;
+  order: IOrderResponse;
+  code: string;
+  employee: IEmployeeResponse;
+  address: IAddressResponse;
+  returnDetails: IReturnFormDetailResponse[];
+  amountToBePaid: number;
+  type: ReturnType;
+  returnDeliveryStatus: DeliveryStatus;
+  paymentType: PaymentType;
+  paymentInfo: string;
+  refundStatus: RefundStatus;
+  createdBy: string;
+  createdAt: number;
+  returnFormHistories: IReturnFormHistoryResponse[];
+}
 // Request
 
 export interface ICustomerRequest {
@@ -260,6 +285,7 @@ export interface IProductClient {
   };
   discount: number;
   saleCount: number;
+  averageRating: number;
   offerEnd: number;
   new: boolean;
   variation: IVariation[];
@@ -298,6 +324,18 @@ export interface IReviewRequest {
   comment: string;
   rating: number;
   urlImage: string;
+}
+export interface IReturnFormDetailRequest {
+  id?: string;
+  orderCode: string;
+  orderDetail: IOrderDetailResponse;
+  quantity: number;
+  returnQuantity: number;
+  name: string;
+  reason: string;
+  feedback: string;
+  unitPrice: number;
+  selected: boolean;
 }
 // GHN
 export interface IProvince {

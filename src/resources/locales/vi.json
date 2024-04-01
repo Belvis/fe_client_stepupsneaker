@@ -4,6 +4,7 @@
     "shop": "Cửa hàng",
     "product": "Sản phẩm",
     "collection": "Bộ sưu tập",
+    "return": "Trả hàng",
     "pages": {
       "title": "Trang",
       "cart": "Giỏ hàng",
@@ -24,7 +25,8 @@
       "tracking_page": "Tra cứu đơn hàng",
       "my_orders": "Đơn hàng của tôi",
       "reset_password": "Đặt lại mật khẩu",
-      "forgot_password": "Quên mật khẩu"
+      "forgot_password": "Quên mật khẩu",
+      "return": "Trả hàng"
     },
     "contact_us": "Liên hệ",
     "about_us": "Về chúng tôi"
@@ -355,6 +357,79 @@
       "rejectLabel": "Huỷ"
     }
   },
+  "return-forms": {
+    "return-forms": "Trả hàng",
+    "titles": {
+      "list": "Trả hàng",
+      "create": "Tạo phiếu trả hàng",
+      "show": "Chi tiết phiếu trả hàng",
+      "form": "Thông tin chung",
+      "return-details": "Thông tin hàng hoá trả lại",
+      "return-address": "Thông tin địa chỉ",
+      "steps": {
+        "selectOrder": "Chọn đơn hoàn trả",
+        "selectProduct": "Chọn sản phẩm hoàn trả",
+        "fillInformation": "Điền thông tin hoàn trả"
+      }
+    },
+    "fields": {
+      "code": "Mã trả hàng",
+      "orderCode": "Mã đơn hàng",
+      "customer": {
+        "label": "Khách hàng",
+        "placeholder": "Không chọn"
+      },
+      "employee": {
+        "label": "NV Phụ trách",
+        "placeholder": "Không chọn"
+      },
+      "shippingMoney": "Phí vận chuyển ước tính",
+      "returnProducts": "Sản phẩm hoàn trả",
+      "phoneNumber": "Số điện thoại",
+      "amountToBePaid": "Số tiền cần trả",
+      "createdAt": "Tạo lúc",
+      "createdBy": "Tạo bởi",
+      "paymentInfo": {
+        "label": "Thông tin thanh toán",
+        "placeholder": "VCB XXXBANK XXXXXXXXXXXXXXXXX"
+      },
+      "type": {
+        "label": "Hình thức",
+        "placeholder": "Chọn hình thức hoàn trả",
+        "OFFLINE": "Tại quầy",
+        "ONLINE": "Trực tuyến"
+      },
+      "paymentType": {
+        "label": "Phương thức hoàn trả",
+        "placeholder": "Chọn phương thức hoàn trả",
+        "tooltip": "Phương thức hoàn trả là phương thức thanh toán cho khách khi thực hiện hoàn trả",
+        "Cash": "Tiền mặt",
+        "Transfer": "Chuyển khoản"
+      },
+      "returnDeliveryStatus": {
+        "label": "Trạng thái giao hàng",
+        "placeholder": "Chọn trạng thái giao hàng hoàn trả",
+        "tooltip": "Trạng thái giao hàng hoàn trả là trạng thái xử lý của đơn hàng trong phiếu trả hàng. Ví dụ: khi tạo phiếu trả hàng tại quầy thì trạng thái sẽ là \"Đã Nhận\", còn khi khách hàng tạo phiếu online thì trạng thái sẽ là \"Chờ giải quyết\"",
+        "PENDING": "Chờ giải quyết",
+        "RETURNING": "Đang hoàn trả",
+        "RECEIVED": "Đã nhận",
+        "COMPLETED": "Hoàn thành"
+      },
+      "refundStatus": {
+        "label": "Trạng thái hoàn tiền",
+        "placeholder": "Chọn trạng thái hoàn tiền",
+        "PENDING": "Chờ giải quyết",
+        "COMPLETED": "Hoàn thành"
+      }
+    },
+    "message": {
+      "emptySelected": "Vui lòng chọn sản phẩm hoàn trả",
+      "emptyReturnDetails": "Vui lòng kiểm tra sản phẩm hoàn trả trước",
+      "invalidReturnQuantity": "Số lượng hoàn trả không được phép lớn hơn số lượng ban đầu",
+      "emptyReturnQuantity": "Vui lòng nhập số lượng hoàn trả",
+      "notAgree": "Vui lòng chắc chắn rằng bạn đã đọc và đồng ý với chính sách của cửa hàng"
+    }
+  },
   "validator": {
     "message": {
       "fullName": "Họ và tên không được để trống!",
@@ -368,7 +443,24 @@
       "line": "Chi tiết địa chỉ không được để trống",
       "rating": "Đánh giá không được để trống",
       "productDetails": "Vui lòng chọn sản phẩm",
-      "comment": "Nội dung đánh giá không được để trống"
+      "comment": "Nội dung đánh giá không được để trống",
+      "paymentInfo": "Thông tin thanh toán không được để trống"
     }
+  },
+  "common": {
+    "maxLength": "Tối đa {{length}} ký tự",
+    "rowSelection": "{{count}} mục đã được chọn",
+    "copied": "Đã copy vào bộ nhớ đệm",
+    "update": {
+      "success": "Cập nhật hoàn tất"
+    },
+    "checkout": {
+      "success": "Đơn hàng đã được thanh toán thành công!"
+    },
+    "success": "Thành công",
+    "error": "Đã có lỗi xảy ra: "
+  },
+  "buttons": {
+    "delete": "Xoá"
   }
 }

@@ -250,15 +250,13 @@ const ProductModal: React.FC<ProductModalProps> = ({
                   />
                 )}
               </div>
-              {/* {product.rating && product.rating > 0 ? ( */}
-              <div className="pro-details-rating-wrap">
-                <div className="pro-details-rating">
-                  <Rating ratingValue={5} />
+              {product.averageRating >= 0 && (
+                <div className="pro-details-rating-wrap">
+                  <div className="pro-details-rating">
+                    <Rating ratingValue={product.averageRating} />
+                  </div>
                 </div>
-              </div>
-              {/* ) : (
-                ""
-              )} */}
+              )}
               <div className="pro-details-list">
                 <p>{product.description}</p>
               </div>

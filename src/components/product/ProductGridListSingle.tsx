@@ -1,18 +1,17 @@
-import { NumberField } from "@refinedev/antd";
 import { Badge } from "antd";
 import clsx from "clsx";
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { CurrencyFormatter } from "../../helpers/currency";
 import { getDiscountPrice } from "../../helpers/product";
-import { ICartItem, IProductClient } from "../../interfaces";
+import { IProductClient } from "../../interfaces";
 import { addToCompare } from "../../redux/slices/compare-slice";
 import { CurrencyState } from "../../redux/slices/currency-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
 import ProductModal from "./ProductModal";
 import Rating from "./sub-components/ProductRating";
-import { CurrencyFormatter } from "../../helpers/currency";
 
 interface ProductGridListSingleProps {
   product: IProductClient;
@@ -107,13 +106,11 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
           <h3>
             <Link to={"/product/" + product.id}>{product.name}</Link>
           </h3>
-          {/* {product.rating && product.rating > 0 ? ( */}
-          <div className="product-rating">
-            <Rating ratingValue={5} />
-          </div>
-          {/* ) : (
-            ""
-          )} */}
+          {product.averageRating >= 0 && (
+            <div className="product-rating">
+              <Rating ratingValue={product.averageRating} />
+            </div>
+          )}
           <div className="product-price">
             {discountedPrice !== null ? (
               <Fragment>
@@ -206,23 +203,13 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
                   />
                 )}
               </div>
-              {/* {product.rating && product.rating > 0 ? ( */}
-              <div className="rating-review">
-                <div className="product-list-rating">
-                  <Rating ratingValue={5} />
+              {product.averageRating >= 0 && (
+                <div className="rating-review">
+                  <div className="product-list-rating">
+                    <Rating ratingValue={product.averageRating} />
+                  </div>
                 </div>
-              </div>
-              {/* ) : (
-                ""
-              )} */}
-
-              {/* Short desc */}
-              {/* {product.shortDescription ? (
-                <p>{product.shortDescription}</p>
-              ) : (
-                ""
-              )} */}
-
+              )}
               <div className="shop-list-actions d-flex align-items-center">
                 <div className="shop-list-btn btn-hover">
                   {product.variation && product.variation.length >= 1 ? (

@@ -6,6 +6,7 @@ import {
   Radio,
   RadioChangeEvent,
   Space,
+  Spin,
   Tooltip,
   Typography,
 } from "antd";
@@ -126,29 +127,31 @@ const CancelReasonModal: React.FC<CancelReasonModalProps> = ({
       centered
       onOk={handleOk}
     >
-      <Radio.Group onChange={onChange} value={value}>
-        <Space direction="vertical" size="large">
-          <Radio value={1}>Muốn nhập/thay đổi mã voucher</Radio>
-          <Radio value={2}>
-            Muốn thay đổi sản phẩm trong đơn hàng (size, màu sắc,...)
-          </Radio>
-          <Radio value={3}>Tìm thấy giá rẻ hơn ở chỗ khác</Radio>
-          <Radio value={4}>Đổi ý, không muốn mua nữa</Radio>
-          <Radio value={5}>Ngứa tay</Radio>
-          <Radio value={6}>
-            Khác
-            {value === 6 ? (
-              <Input
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const { value: inputValue } = e.target;
-                  setSelectedReason(inputValue);
-                }}
-                style={{ width: 200, marginLeft: 10 }}
-              />
-            ) : null}
-          </Radio>
-        </Space>
-      </Radio.Group>
+      <Spin spinning={isLoading}>
+        <Radio.Group onChange={onChange} value={value}>
+          <Space direction="vertical" size="large">
+            <Radio value={1}>Muốn nhập/thay đổi mã voucher</Radio>
+            <Radio value={2}>
+              Muốn thay đổi sản phẩm trong đơn hàng (size, màu sắc,...)
+            </Radio>
+            <Radio value={3}>Tìm thấy giá rẻ hơn ở chỗ khác</Radio>
+            <Radio value={4}>Đổi ý, không muốn mua nữa</Radio>
+            <Radio value={5}>Ngứa tay</Radio>
+            <Radio value={6}>
+              Khác
+              {value === 6 ? (
+                <Input
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const { value: inputValue } = e.target;
+                    setSelectedReason(inputValue);
+                  }}
+                  style={{ width: 200, marginLeft: 10 }}
+                />
+              ) : null}
+            </Radio>
+          </Space>
+        </Radio.Group>
+      </Spin>
     </Modal>
   );
 };

@@ -174,15 +174,13 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
           <CurrencyFormatter value={finalProductPrice} currency={currency} />
         )}
       </div>
-      {/* {product.rating && product.rating > 0 ? ( */}
-      <div className="pro-details-rating-wrap">
-        <div className="pro-details-rating">
-          <Rating ratingValue={5} />
+      {product.averageRating >= 0 && (
+        <div className="pro-details-rating-wrap">
+          <div className="pro-details-rating">
+            <Rating ratingValue={product.averageRating} />
+          </div>
         </div>
-      </div>
-      {/* ) : (
-        ""
-      )} */}
+      )}
       <div className="pro-details-list">
         <p>
           Bước chân vào phong cách đương đại với đôi sneaker này - sự kết hợp
