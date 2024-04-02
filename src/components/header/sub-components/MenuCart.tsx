@@ -2,22 +2,20 @@ import { GiftOutlined } from "@ant-design/icons";
 import { Authenticated, useGetIdentity } from "@refinedev/core";
 import { Typography } from "antd";
 import clsx from "clsx";
+import { AnimatePresence, motion } from "framer-motion";
+import _ from "lodash";
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { FREE_SHIPPING_THRESHOLD } from "../../../constants";
+import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../../constants/motions";
 import { CurrencyFormatter, formatCurrency } from "../../../helpers/currency";
 import { getDiscountPrice } from "../../../helpers/product";
 import { ICustomerResponse, IVoucherList } from "../../../interfaces";
 import { deleteFromCart, deleteFromDB } from "../../../redux/slices/cart-slice";
 import { AppDispatch, RootState } from "../../../redux/store";
 import { DiscountMessage, DiscountMoney } from "../../../styled/CartStyled";
-import _ from "lodash";
-import { AnimatePresence, Variants, motion } from "framer-motion";
-import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../../constants/motions";
-import { FaShoppingCart } from "react-icons/fa";
-import styled from "styled-components";
 
 const { Title } = Typography;
 

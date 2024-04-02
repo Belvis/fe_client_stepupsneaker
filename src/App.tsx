@@ -47,6 +47,7 @@ import About from "./pages/other/About";
 import ResetPassword from "./pages/other/ResetPassword";
 import ForgotPassword from "./pages/other/ForgotPassword";
 import ReturnForm from "./pages/other/ReturnForm";
+import ReturnSuccess from "./pages/other/ReturnSuccess";
 
 // Icons
 
@@ -171,6 +172,10 @@ function App() {
                       </Route>
 
                       <Route path="/success/:id" element={<Success />} />
+                      <Route
+                        path="/return-success/:id"
+                        element={<ReturnSuccess />}
+                      />
                       <Route path="/return/:id" element={<ReturnForm />} />
                       <Route
                         path="/submission-failed"

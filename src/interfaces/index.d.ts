@@ -20,6 +20,8 @@ export type OrderStatus =
   | "EXPIRED"
   | "RETURNED"
   | "EXCHANGED";
+export type DeliveryStatus = "PENDING" | "RETURNING" | "RECEIVED" | "COMPLETED";
+export type RefundStatus = "PENDING" | "COMPLETED";
 
 // Response
 
@@ -226,6 +228,7 @@ export interface IReviewResponse {
   comment: string;
   rating: number;
   urlImage: string;
+  createdAt: number;
 }
 export interface IReviewResponse {
   id: string;
@@ -251,6 +254,18 @@ export interface IReturnFormResponse {
   createdBy: string;
   createdAt: number;
   returnFormHistories: IReturnFormHistoryResponse[];
+}
+export interface IReturnFormDetailResponse {
+  id: string;
+  orderDetail: IOrderDetailResponse;
+  quantity: number;
+  reason: string;
+  feedback: string;
+  returnInspectionStatus: InspectionStatus;
+  returnInspectionReason: string;
+  urlImage: string;
+  resellable: boolean;
+  createdAt?: number;
 }
 // Request
 

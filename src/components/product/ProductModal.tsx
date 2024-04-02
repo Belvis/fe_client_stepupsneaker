@@ -1,5 +1,5 @@
 import { Authenticated } from "@refinedev/core";
-import { Badge, Space, Tooltip } from "antd";
+import { Badge, Rate, Space, Tooltip } from "antd";
 import { Fragment, useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -253,7 +253,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
               {product.averageRating >= 0 && (
                 <div className="pro-details-rating-wrap">
                   <div className="pro-details-rating">
-                    <Rating ratingValue={product.averageRating} />
+                    <Rate disabled allowHalf value={product.averageRating} />
                   </div>
                 </div>
               )}

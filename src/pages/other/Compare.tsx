@@ -11,6 +11,7 @@ import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { CurrencyFormatter } from "../../helpers/currency";
 import { motion } from "framer-motion";
 import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../constants/motions";
+import { Rate } from "antd";
 
 const Compare = () => {
   const { t } = useTranslation();
@@ -191,8 +192,10 @@ const Compare = () => {
                                 className="product-rating"
                                 key={key}
                               >
-                                <Rating
-                                  ratingValue={compareItem.averageRating}
+                                <Rate
+                                  disabled
+                                  allowHalf
+                                  value={compareItem.averageRating}
                                 />
                               </motion.td>
                             );

@@ -24,7 +24,7 @@ import { addToCompare } from "../../redux/slices/compare-slice";
 import { CurrencyState } from "../../redux/slices/currency-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
 import Rating from "./sub-components/ProductRating";
-import { Badge, Space, Tooltip } from "antd";
+import { Badge, Rate, Space, Tooltip } from "antd";
 import { SaleIcon } from "../icons/icon-sale";
 import { useTranslation } from "react-i18next";
 import { CurrencyFormatter } from "../../helpers/currency";
@@ -177,7 +177,7 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
       {product.averageRating >= 0 && (
         <div className="pro-details-rating-wrap">
           <div className="pro-details-rating">
-            <Rating ratingValue={product.averageRating} />
+            <Rate disabled allowHalf value={product.averageRating} />
           </div>
         </div>
       )}

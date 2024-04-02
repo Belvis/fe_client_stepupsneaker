@@ -259,6 +259,12 @@
     width: 93%;
     margin: 0;
   }
+  .image-and-date {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px; 
+  }
 }
 
 .single-review.child-review {

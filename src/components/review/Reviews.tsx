@@ -8,6 +8,8 @@ import { Avatar, Image, Rate } from "antd";
 import React from "react";
 import { ICustomerResponse, IReviewResponse } from "../../interfaces";
 import { showWarningConfirmDialog } from "../../helpers/confirm";
+import dayjs from "dayjs";
+import { getAvatarColor, getFirstLetterOfLastWord } from "../../helpers/avatar";
 
 type ReviewProps = {
   review: IReviewResponse;
@@ -55,7 +57,25 @@ const Review: React.FC<ReviewProps> = ({ review, calback }) => {
   return (
     <div className="single-review" key={review.id}>
       <div className="review-img">
-        <Avatar shape="square" size={100} src={review.customer.image} />
+        {review.customer && review.customer.image ? (
+          <Avatar
+            size={100}
+            shape="square"
+            src={review.customer.image}
+            style={{ verticalAlign: "baseline" }}
+          />
+        ) : (
+          <Avatar
+            size={100}
+            shape="square"
+            style={{
+              verticalAlign: "baseline",
+              backgroundColor: getAvatarColor(review.customer?.fullName),
+            }}
+          >
+            {getFirstLetterOfLastWord(review.customer?.fullName)}
+          </Avatar>
+        )}
       </div>
       <div className="review-content w-100">
         <div className="review-top-wrap">
@@ -83,7 +103,12 @@ const Review: React.FC<ReviewProps> = ({ review, calback }) => {
         </div>
         <div className="review-bottom">
           <p>{review.comment}</p>
-          <Image width={200} src={review.urlImage} />
+          <div className="image-and-date">
+            <Image width={200} src={review.urlImage} />
+            <p className="text-end">
+              {dayjs(new Date(review.createdAt)).format("LLL")}
+            </p>
+          </div>
         </div>
       </div>
     </div>

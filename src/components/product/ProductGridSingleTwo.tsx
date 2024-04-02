@@ -10,6 +10,7 @@ import { addToWishlist } from "../../redux/slices/wishlist-slice";
 import ProductModal from "./ProductModal";
 import Rating from "./sub-components/ProductRating";
 import { CurrencyFormatter } from "../../helpers/currency";
+import { Rate } from "antd";
 
 type ProductGridSingleTwoProps = {
   cartItem?: ICartItem;
@@ -91,7 +92,7 @@ const ProductGridSingleTwo: React.FC<ProductGridSingleTwoProps> = ({
 
           {product.averageRating >= 0 && (
             <div className="product-rating">
-              <Rating ratingValue={product.averageRating} />
+              <Rate disabled allowHalf value={product.averageRating} />
             </div>
           )}
 

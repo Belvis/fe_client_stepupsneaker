@@ -7,8 +7,11 @@ const BlinkSVG: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      fill="#000000"
+      fill="#52c41a"
       {...props}
+      style={{
+        color: "#52c41a",
+      }}
     >
       <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
       <g

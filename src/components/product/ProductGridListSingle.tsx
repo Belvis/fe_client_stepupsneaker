@@ -1,4 +1,4 @@
-import { Badge } from "antd";
+import { Badge, Rate } from "antd";
 import clsx from "clsx";
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -108,7 +108,7 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
           </h3>
           {product.averageRating >= 0 && (
             <div className="product-rating">
-              <Rating ratingValue={product.averageRating} />
+              <Rate disabled allowHalf value={product.averageRating} />
             </div>
           )}
           <div className="product-price">
@@ -206,7 +206,7 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
               {product.averageRating >= 0 && (
                 <div className="rating-review">
                   <div className="product-list-rating">
-                    <Rating ratingValue={product.averageRating} />
+                    <Rate disabled allowHalf value={product.averageRating} />
                   </div>
                 </div>
               )}
