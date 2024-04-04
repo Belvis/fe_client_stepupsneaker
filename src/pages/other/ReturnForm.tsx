@@ -9,34 +9,25 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../constants/motions";
 import { showWarningConfirmDialog } from "../../helpers/confirm";
 import { showWarningToast } from "../../helpers/toast";
-import {
-  validateCommon,
-  validateEmail,
-  validateFullName,
-  validatePhoneNumber,
-} from "../../helpers/validate";
-import {
-  IDistrict,
-  IOrderResponse,
-  IProvince,
-  IReturnFormDetailRequest,
-  IWard,
-} from "../../interfaces";
+import { validateCommon, validateEmail, validateFullName, validatePhoneNumber } from "../../helpers/validate";
+import { IDistrict, IOrderResponse, IProvince, IReturnFormDetailRequest, IWard } from "../../interfaces";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
+import { CurrencyFormatter } from "../../helpers/currency";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_TOKEN = import.meta.env.VITE_GHN_USER_TOKEN;
 
 const ReturnForm = () => {
   const t = useTranslate();
+  const currency = useSelector((state: RootState) => state.currency);
+
   let { pathname } = useLocation();
   let { id } = useParams();
   const navigate = useNavigate();
 
-  const { data, isLoading, isError, refetch } = useOne<
-    IOrderResponse,
-    HttpError
-  >({
+  const { data, isLoading, isError, refetch } = useOne<IOrderResponse, HttpError>({
     resource: "orders",
     id: id,
     errorNotification: (error, values, resource) => {
@@ -50,8 +41,7 @@ const ReturnForm = () => {
 
   const order = data?.data ? data?.data : ({} as IOrderResponse);
 
-  const [returnDetails, setReturnDetails] =
-    useState<IReturnFormDetailRequest[]>();
+  const [returnDetails, setReturnDetails] = useState<IReturnFormDetailRequest[]>();
   const [hasAgreed, setHasAgreed] = useState<boolean>(false);
 
   const { onFinish, formProps, saveButtonProps, formLoading } = useForm({
@@ -61,6 +51,20 @@ const ReturnForm = () => {
     onMutationSuccess: (data, variables, context, isAutoSave) => {
       navigate(`/return-success/${data.data?.code}`);
     },
+    successNotification: (data, values, resource) => {
+      return {
+        message: t("return-forms.messages.success"),
+        description: t("common.success"),
+        type: "success",
+      };
+    },
+    errorNotification(error) {
+      return {
+        message: t("common.error") + error?.message,
+        description: "Oops!..",
+        type: "success",
+      };
+    },
   });
 
   const [provinces, setProvinces] = useState<IProvince[]>([]);
@@ -69,19 +73,11 @@ const ReturnForm = () => {
   const provinceId = Form.useWatch("provinceId", formProps.form);
   const districtId = Form.useWatch("districtId", formProps.form);
   const wardCode = Form.useWatch("wardCode", formProps.form);
-  const [provinceName, setProvinceName] = useState(
-    order.address ? order.address.provinceName || "" : ""
-  );
-  const [districtName, setDistrictName] = useState(
-    order.address ? order.address.districtName || "" : ""
-  );
-  const [wardName, setWardName] = useState(
-    order.address ? order.address.wardName || "" : ""
-  );
+  const [provinceName, setProvinceName] = useState(order.address ? order.address.provinceName || "" : "");
+  const [districtName, setDistrictName] = useState(order.address ? order.address.districtName || "" : "");
+  const [wardName, setWardName] = useState(order.address ? order.address.wardName || "" : "");
 
-  const { isLoading: isLoadingProvince, refetch: refetchProvince } = useCustom<
-    IProvince[]
-  >({
+  const { isLoading: isLoadingProvince, refetch: refetchProvince } = useCustom<IProvince[]>({
     url: `${GHN_API_BASE_URL}/master-data/province`,
     method: "get",
     config: {
@@ -97,9 +93,7 @@ const ReturnForm = () => {
     },
   });
 
-  const { isLoading: isLoadingDistrict, refetch: refetchDistrict } = useCustom<
-    IDistrict[]
-  >({
+  const { isLoading: isLoadingDistrict, refetch: refetchDistrict } = useCustom<IDistrict[]>({
     url: `${GHN_API_BASE_URL}/master-data/district`,
     method: "get",
     config: {
@@ -118,26 +112,24 @@ const ReturnForm = () => {
     },
   });
 
-  const { isLoading: isLoadingWard, refetch: refetchWard } = useCustom<IWard[]>(
-    {
-      url: `${GHN_API_BASE_URL}/master-data/ward`,
-      method: "get",
-      config: {
-        headers: {
-          token: GHN_TOKEN,
-        },
-        query: {
-          district_id: districtId,
-        },
+  const { isLoading: isLoadingWard, refetch: refetchWard } = useCustom<IWard[]>({
+    url: `${GHN_API_BASE_URL}/master-data/ward`,
+    method: "get",
+    config: {
+      headers: {
+        token: GHN_TOKEN,
       },
-      queryOptions: {
-        enabled: false,
-        onSuccess: (data: any) => {
-          setWards(data.response.data);
-        },
+      query: {
+        district_id: districtId,
       },
-    }
-  );
+    },
+    queryOptions: {
+      enabled: false,
+      onSuccess: (data: any) => {
+        setWards(data.response.data);
+      },
+    },
+  });
 
   useEffect(() => {
     setProvinces([]);
@@ -158,13 +150,9 @@ const ReturnForm = () => {
     }
   }, [districtId]);
 
-  const handleProvinceChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleProvinceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedProvinceID = Number(event.target.value);
-    const selectedProvince = provinces.find(
-      (p) => p.ProvinceID === selectedProvinceID
-    );
+    const selectedProvince = provinces.find((p) => p.ProvinceID === selectedProvinceID);
 
     if (selectedProvince) {
       const provinceName = selectedProvince.ProvinceName;
@@ -174,13 +162,9 @@ const ReturnForm = () => {
     }
   };
 
-  const handleDistrictChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleDistrictChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedDistrictID = Number(event.target.value);
-    const selectedDistrict = districts.find(
-      (d) => d.DistrictID === selectedDistrictID
-    );
+    const selectedDistrict = districts.find((d) => d.DistrictID === selectedDistrictID);
 
     if (selectedDistrict) {
       const districtName = selectedDistrict.DistrictName;
@@ -198,9 +182,7 @@ const ReturnForm = () => {
   };
 
   useEffect(() => {
-    const generateReturnDetails = (
-      order: IOrderResponse | undefined
-    ): IReturnFormDetailRequest[] => {
+    const generateReturnDetails = (order: IOrderResponse | undefined): IReturnFormDetailRequest[] => {
       if (!order) return [];
 
       return order.orderDetails?.map((orderDetail) => ({
@@ -225,26 +207,19 @@ const ReturnForm = () => {
     setTitle(t("nav.return") + " | SUNS");
   }, [t]);
 
-  const handleQuantityChange = (
-    value: number | undefined,
-    record: IReturnFormDetailRequest
-  ) => {
+  const handleQuantityChange = (value: number | undefined, record: IReturnFormDetailRequest) => {
     if (value === undefined || isNaN(value)) {
-      return showWarningToast(t("return-forms.message.invalidQuantityInput"));
+      return showWarningToast(t("return-forms.messages.invalidQuantityInput"));
     }
 
     if (returnDetails) {
-      const index = returnDetails.findIndex(
-        (returnDetail) => returnDetail.orderDetail === record.orderDetail
-      );
+      const index = returnDetails.findIndex((returnDetail) => returnDetail.orderDetail === record.orderDetail);
 
       if (index !== -1) {
         const originalQuantity = returnDetails[index].quantity;
 
         if (value > originalQuantity) {
-          return showWarningToast(
-            t("return-forms.message.invalidReturnQuantity")
-          );
+          return showWarningToast(t("return-forms.messages.invalidReturnQuantity"));
         }
 
         const updatedReturnDetails = [...returnDetails];
@@ -262,7 +237,7 @@ const ReturnForm = () => {
       const updatedReturnDetails = returnDetails.map((detail) => {
         if (detail.orderDetail === record.orderDetail) {
           if (detail.quantity == detail.returnQuantity) {
-            showWarningToast(t("return-forms.message.invalidReturnQuantity"));
+            showWarningToast(t("return-forms.messages.invalidReturnQuantity"));
             return { ...detail };
           }
           return {
@@ -279,10 +254,7 @@ const ReturnForm = () => {
   const handleDecreaseQuantity = (record: IReturnFormDetailRequest) => {
     if (returnDetails) {
       const updatedReturnDetails = returnDetails.map((detail) => {
-        if (
-          detail.orderDetail === record.orderDetail &&
-          detail.returnQuantity > 0
-        ) {
+        if (detail.orderDetail === record.orderDetail && detail.returnQuantity > 0) {
           return {
             ...detail,
             returnQuantity: detail.returnQuantity - 1,
@@ -309,10 +281,7 @@ const ReturnForm = () => {
     }
   };
 
-  const handleReasonChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-    record: IReturnFormDetailRequest
-  ) => {
+  const handleReasonChange = (event: React.ChangeEvent<HTMLTextAreaElement>, record: IReturnFormDetailRequest) => {
     if (returnDetails) {
       const updatedReturnDetails = returnDetails.map((detail) => {
         if (detail.orderDetail === record.orderDetail) {
@@ -327,10 +296,7 @@ const ReturnForm = () => {
     }
   };
 
-  const handleFeedbackChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-    record: IReturnFormDetailRequest
-  ) => {
+  const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>, record: IReturnFormDetailRequest) => {
     if (returnDetails) {
       const updatedReturnDetails = returnDetails.map((detail) => {
         if (detail.orderDetail === record.orderDetail) {
@@ -347,26 +313,24 @@ const ReturnForm = () => {
 
   const handleOnFinish = (values: any) => {
     if (!hasAgreed) {
-      return showWarningToast(t("return-forms.message.notAgree"));
+      return showWarningToast(t("return-forms.messages.notAgree"));
     }
 
     const hasSelected = returnDetails?.some((item) => item.selected) || false;
 
     if (!hasSelected) {
-      showWarningToast(t("return-forms.message.emptySelected"));
+      showWarningToast(t("return-forms.messages.emptySelected"));
       return;
     }
 
     const isValid = returnDetails
       ?.filter((item) => item.selected)
       .every((returnFormDetail) =>
-        Object.values(returnFormDetail).every(
-          (value) => value !== "" && value !== undefined
-        )
+        Object.values(returnFormDetail).every((value) => value !== "" && value !== undefined)
       );
 
     if (!isValid) {
-      return showWarningToast(t("return-forms.message.emptyReturnDetails"));
+      return showWarningToast(t("return-forms.messages.emptyReturnDetails"));
     }
 
     const hasZeroReturnQuantity = returnDetails
@@ -376,11 +340,10 @@ const ReturnForm = () => {
       });
 
     if (hasZeroReturnQuantity) {
-      return showWarningToast(t("return-forms.message.emptyReturnQuantity"));
+      return showWarningToast(t("return-forms.messages.emptyReturnQuantity"));
     }
 
-    const returnFormDetailsPayload =
-      returnFormDetailsToPayloadFormat(returnDetails);
+    const returnFormDetailsPayload = returnFormDetailsToPayloadFormat(returnDetails);
 
     const submitData = {
       address: {
@@ -423,22 +386,12 @@ const ReturnForm = () => {
         <div className="cart-main-area pt-90 pb-100 bg-white">
           <div className="container">
             {returnDetails && returnDetails?.length >= 1 ? (
-              <Form
-                {...formProps}
-                name="app-info"
-                layout="inline"
-                onFinish={handleOnFinish}
-                autoComplete="off"
-              >
+              <Form {...formProps} name="app-info" layout="inline" onFinish={handleOnFinish} autoComplete="off">
                 <div className="container">
                   <div className="cart-tax policy-section">
                     <div className="row policy-header">
                       <div className="col-md-3 app-icon">
-                        <img
-                          className="img-fluid"
-                          src="/images/logo/sunsneaker_logo.png"
-                          alt="Sunsneaker Logo"
-                        />
+                        <img className="img-fluid" src="/images/logo/sunsneaker_logo.png" alt="Sunsneaker Logo" />
                       </div>
                       <div
                         className="col-md-9 title"
@@ -454,8 +407,7 @@ const ReturnForm = () => {
                     </div>
                     <div className="policy-wrapper mt-3">
                       <div className="policy-content mb-3">
-                        Tất cả yêu cầu trả hàng đều phải tuân thủ theo Chính
-                        sách Trả hàng của adidas <br />
+                        Tất cả yêu cầu trả hàng đều phải tuân thủ theo Chính sách Trả hàng của adidas <br />
                         <Link
                           to={
                             "https://www.adidas.com.vn/en/help/sea-returns-refunds/what-are-the-conditions-for-returning-my-products"
@@ -465,31 +417,24 @@ const ReturnForm = () => {
                         </Link>
                       </div>
                       <div className="policy-content mb-3">
-                        Vui lòng điền đầy đủ thông tin vào Phiếu Yêu Cầu Trả
-                        Hàng và đội ngũ Dịch vụ khách hàng sẽ gửi Mẫu Hoàn Trả
-                        Hàng đến bạn qua email trong vòng 3 ngày làm việc. Mẫu
-                        Hoàn Trả Hàng phải được in ra và đính kèm trong bưu kiện
-                        của sản phẩm được trả lại.
+                        Vui lòng điền đầy đủ thông tin vào Phiếu Yêu Cầu Trả Hàng và đội ngũ Dịch vụ khách hàng sẽ gửi
+                        Mẫu Hoàn Trả Hàng đến bạn qua email trong vòng 3 ngày làm việc. Mẫu Hoàn Trả Hàng phải được in
+                        ra và đính kèm trong bưu kiện của sản phẩm được trả lại.
                       </div>
                       <div className="policy-content mb-3">
                         Xin lưu ý: <br />
-                        Yêu cầu trả hàng không áp dụng cho sản phẩm có quy định
-                        “Không đổi trả, không hoàn tiền” trên trang sản phẩm.
-                        Tuy nhiên, vui lòng liên hệ với chúng tôi tại các kênh
-                        hỗ trợ
+                        Yêu cầu trả hàng không áp dụng cho sản phẩm có quy định “Không đổi trả, không hoàn tiền” trên
+                        trang sản phẩm. Tuy nhiên, vui lòng liên hệ với chúng tôi tại các kênh hỗ trợ
                         <br />
                         <Link to="https://www.adidas.com.vn/en/help/sea-contact/contact-us">
                           https://www.adidas.com.vn/en/help/sea-contact/contact-us
                         </Link>
-                        nếu sản phẩm của bạn bị hỏng/ bị lỗi hoặc bạn nhận được
-                        (các) sản phẩm mà bạn không đặt hàng.
+                        nếu sản phẩm của bạn bị hỏng/ bị lỗi hoặc bạn nhận được (các) sản phẩm mà bạn không đặt hàng.
                       </div>
                       <div className="policy-content mb-3">
-                        Yêu cầu trả hàng sẽ không được thực hiện nếu thông tin
-                        bạn cung cấp không chính xác hoặc không đầy đủ. Vui lòng
-                        gửi lại yêu cầu trả hàng nếu bạn không nhận được Mẫu
-                        Hoàn Trả Hàng sau 3 ngày làm việc, hoặc bạn có thể liên
-                        hệ với đội ngũ Dịch vụ khách hàng của chúng tôi tại
+                        Yêu cầu trả hàng sẽ không được thực hiện nếu thông tin bạn cung cấp không chính xác hoặc không
+                        đầy đủ. Vui lòng gửi lại yêu cầu trả hàng nếu bạn không nhận được Mẫu Hoàn Trả Hàng sau 3 ngày
+                        làm việc, hoặc bạn có thể liên hệ với đội ngũ Dịch vụ khách hàng của chúng tôi tại
                         <Link to="https://www.adidas.com.vn/en/help/sea-contact/contact-us">
                           https://www.adidas.com.vn/en/help/sea-contact/contact-us
                         </Link>
@@ -498,12 +443,9 @@ const ReturnForm = () => {
                     </div>
                   </div>
                   <div className="d-flex justify-content-between mt-5">
-                    <h3 className="cart-page-title mb-2">
-                      {t("return-forms.titles.steps.selectProduct")}
-                    </h3>
+                    <h3 className="cart-page-title mb-2">{t("return-forms.titles.steps.selectProduct")}</h3>
                     <h4 className="mb-2">
-                      {t("return-forms.fields.code")}: #
-                      {order.code.toUpperCase()}
+                      {t("return-forms.fields.code")}: #{order.code.toUpperCase()}
                     </h4>
                   </div>
                   <div className="row">
@@ -520,60 +462,30 @@ const ReturnForm = () => {
                             <motion.tr>
                               <th></th>
                               <th>{t(`cart.table.head.image`)}</th>
-                              <th style={{ width: "10%" }}>
-                                {t("return-form-details.fields.product")}
-                              </th>
-                              <th style={{ width: "10%" }}>
-                                {t("return-form-details.fields.quantity")}
-                              </th>
-                              <th style={{ width: "10%" }}>
-                                {t("return-form-details.fields.returnQuantity")}
-                              </th>
-                              <th>
-                                {t("return-form-details.fields.reason.label")}
-                              </th>
-                              <th>
-                                {t("return-form-details.fields.feedback.label")}
-                              </th>
+                              <th style={{ width: "10%" }}>{t("return-form-details.fields.product")}</th>
+                              <th style={{ width: "10%" }}>{t("return-form-details.fields.quantity")}</th>
+                              <th style={{ width: "10%" }}>{t("return-form-details.fields.returnQuantity")}</th>
+                              <th>{t("return-form-details.fields.reason.label")}</th>
+                              <th>{t("return-form-details.fields.feedback.label")}</th>
                             </motion.tr>
                           </motion.thead>
-                          <motion.tbody
-                            layout
-                            variants={PARENT_VARIANT}
-                            initial="hidden"
-                            animate="show"
-                          >
+                          <motion.tbody layout variants={PARENT_VARIANT} initial="hidden" animate="show">
                             {returnDetails.map((returnDetail, key) => {
                               return (
-                                <motion.tr
-                                  key={key}
-                                  layout
-                                  variants={CHILDREN_VARIANT}
-                                >
+                                <motion.tr key={key} layout variants={CHILDREN_VARIANT}>
                                   <td className="row-select">
                                     <input
                                       type="checkbox"
                                       className="w-25"
                                       checked={returnDetail.selected}
-                                      onChange={() =>
-                                        handleToggleSelected(returnDetail)
-                                      }
+                                      onChange={() => handleToggleSelected(returnDetail)}
                                     />
                                   </td>
                                   <td className="product-thumbnail">
-                                    <Link
-                                      to={
-                                        "/product/" +
-                                        returnDetail.orderDetail.productDetail
-                                          .product.id
-                                      }
-                                    >
+                                    <Link to={"/product/" + returnDetail.orderDetail.productDetail.product.id}>
                                       <img
                                         className="img-fluid"
-                                        src={
-                                          returnDetail.orderDetail.productDetail
-                                            .product.image
-                                        }
+                                        src={returnDetail.orderDetail.productDetail.product.image}
                                         alt=""
                                       />
                                     </Link>
@@ -581,11 +493,16 @@ const ReturnForm = () => {
                                   <td className="product-name text-center">
                                     {returnDetail.name}
                                     <br />
+                                    {returnDetail.orderDetail.productDetail.color.name} -{" "}
+                                    {returnDetail.orderDetail.productDetail.size.name}
+                                    <br />
+                                    <CurrencyFormatter
+                                      value={returnDetail.orderDetail.price * currency.currencyRate}
+                                      currency={currency}
+                                    />
                                   </td>
 
-                                  <td className="product-quantity">
-                                    {returnDetail.quantity}
-                                  </td>
+                                  <td className="product-quantity">{returnDetail.quantity}</td>
                                   <td className="product-quantity">
                                     <div className="cart-plus-minus">
                                       <button
@@ -601,13 +518,8 @@ const ReturnForm = () => {
                                         className="cart-plus-minus-box"
                                         type="text"
                                         value={returnDetail.returnQuantity}
-                                        onChange={(
-                                          e: React.ChangeEvent<HTMLInputElement>
-                                        ) =>
-                                          handleQuantityChange(
-                                            parseInt(e.target.value),
-                                            returnDetail
-                                          )
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                          handleQuantityChange(parseInt(e.target.value), returnDetail)
                                         }
                                       />
                                       <button
@@ -627,9 +539,7 @@ const ReturnForm = () => {
                                         id="reason-field"
                                         className="cart-plus-minus-box w-100"
                                         value={returnDetail.reason}
-                                        onChange={(e) =>
-                                          handleReasonChange(e, returnDetail)
-                                        }
+                                        onChange={(e) => handleReasonChange(e, returnDetail)}
                                         maxLength={500}
                                       />
                                     </div>
@@ -640,9 +550,7 @@ const ReturnForm = () => {
                                         id="feedback-field"
                                         className="cart-plus-minus-box w-100"
                                         value={returnDetail.feedback}
-                                        onChange={(e) =>
-                                          handleFeedbackChange(e, returnDetail)
-                                        }
+                                        onChange={(e) => handleFeedbackChange(e, returnDetail)}
                                         maxLength={500}
                                       />
                                     </div>
@@ -660,9 +568,7 @@ const ReturnForm = () => {
                     <div className="return-information mt-5">
                       <div className="row justify-content-between">
                         <div className="col-md-5 cart-tax">
-                          <h3 className="cart-page-title mb-2">
-                            {t("return-forms.titles.shippingInfo")}
-                          </h3>
+                          <h3 className="cart-page-title mb-2">{t("return-forms.titles.shippingInfo")}</h3>
                           <div className="app-info mb-20">
                             <label>{t("return-forms.fields.fullName")}</label>
                             <Form.Item
@@ -670,8 +576,7 @@ const ReturnForm = () => {
                               required
                               rules={[
                                 {
-                                  validator: (_, value) =>
-                                    validateFullName(_, value),
+                                  validator: (_, value) => validateFullName(_, value),
                                 },
                               ]}
                             >
@@ -679,16 +584,13 @@ const ReturnForm = () => {
                             </Form.Item>
                           </div>
                           <div className="app-info mb-20">
-                            <label>
-                              {t("return-forms.fields.phoneNumber")}
-                            </label>
+                            <label>{t("return-forms.fields.phoneNumber")}</label>
                             <Form.Item
                               name="phoneNumber"
                               required
                               rules={[
                                 {
-                                  validator: (_, value) =>
-                                    validatePhoneNumber(_, value),
+                                  validator: (_, value) => validatePhoneNumber(_, value),
                                 },
                               ]}
                             >
@@ -696,15 +598,12 @@ const ReturnForm = () => {
                             </Form.Item>
                           </div>
                           <div className="app-select mb-20">
-                            <label>
-                              {t("checkout.billing_details.province.title")}
-                            </label>
+                            <label>{t("checkout.billing_details.province.title")}</label>
                             <Form.Item
                               name="provinceId"
                               rules={[
                                 {
-                                  validator: (_, value) =>
-                                    validateCommon(_, value, t, "provinceId"),
+                                  validator: (_, value) => validateCommon(_, value, t, "provinceId"),
                                 },
                               ]}
                             >
@@ -712,16 +611,11 @@ const ReturnForm = () => {
                                 <select onChange={handleProvinceChange}>
                                   <option value="">
                                     --
-                                    {t(
-                                      "cart.shipping.address.province.place_holder"
-                                    )}
+                                    {t("cart.shipping.address.province.place_holder")}
                                     --
                                   </option>
                                   {provinces.map((province, index) => (
-                                    <option
-                                      key={index}
-                                      value={province.ProvinceID}
-                                    >
+                                    <option key={index} value={province.ProvinceID}>
                                       {province.ProvinceName}
                                     </option>
                                   ))}
@@ -734,15 +628,12 @@ const ReturnForm = () => {
                             </Form.Item>
                           </div>
                           <div className="app-select mb-20">
-                            <label>
-                              {t("checkout.billing_details.district.title")}
-                            </label>
+                            <label>{t("checkout.billing_details.district.title")}</label>
                             <Form.Item
                               name="districtId"
                               rules={[
                                 {
-                                  validator: (_, value) =>
-                                    validateCommon(_, value, t, "districtId"),
+                                  validator: (_, value) => validateCommon(_, value, t, "districtId"),
                                 },
                               ]}
                             >
@@ -750,16 +641,11 @@ const ReturnForm = () => {
                                 <select onChange={handleDistrictChange}>
                                   <option value="">
                                     --
-                                    {t(
-                                      "cart.shipping.address.district.place_holder"
-                                    )}
+                                    {t("cart.shipping.address.district.place_holder")}
                                     --
                                   </option>
                                   {districts.map((district, index) => (
-                                    <option
-                                      key={index}
-                                      value={district.DistrictID}
-                                    >
+                                    <option key={index} value={district.DistrictID}>
                                       {district.DistrictName}
                                     </option>
                                   ))}
@@ -772,15 +658,12 @@ const ReturnForm = () => {
                             </Form.Item>
                           </div>
                           <div className="app-select mb-20">
-                            <label>
-                              {t("checkout.billing_details.ward.title")}
-                            </label>
+                            <label>{t("checkout.billing_details.ward.title")}</label>
                             <Form.Item
                               name="wardCode"
                               rules={[
                                 {
-                                  validator: (_, value) =>
-                                    validateCommon(_, value, t, "wardCode"),
+                                  validator: (_, value) => validateCommon(_, value, t, "wardCode"),
                                 },
                               ]}
                             >
@@ -788,9 +671,7 @@ const ReturnForm = () => {
                                 <select onChange={handleWardChange}>
                                   <option value="">
                                     --
-                                    {t(
-                                      "cart.shipping.address.ward.place_holder"
-                                    )}
+                                    {t("cart.shipping.address.ward.place_holder")}
                                     --
                                   </option>
                                   {wards.map((ward, index) => (
@@ -812,8 +693,7 @@ const ReturnForm = () => {
                               name="line"
                               rules={[
                                 {
-                                  validator: (_, value) =>
-                                    validateCommon(_, value, t, "line"),
+                                  validator: (_, value) => validateCommon(_, value, t, "line"),
                                 },
                               ]}
                             >
@@ -822,51 +702,33 @@ const ReturnForm = () => {
                           </div>
                         </div>
                         <div className="col-md-5 cart-tax">
-                          <h3 className="cart-page-title mb-2">
-                            {t("return-forms.titles.paymentInfo")}
-                          </h3>
+                          <h3 className="cart-page-title mb-2">{t("return-forms.titles.paymentInfo")}</h3>
                           <div className="app-info mb-20">
-                            <label>
-                              {t("return-forms.fields.paymentInfo.label")}
-                            </label>
+                            <label>{t("return-forms.fields.paymentInfo.label")}</label>
                             <Form.Item
                               name="paymentInfo"
                               required
                               rules={[
                                 {
-                                  validator: (_, value) =>
-                                    validateCommon(_, value, t, "paymentInfo"),
+                                  validator: (_, value) => validateCommon(_, value, t, "paymentInfo"),
                                 },
                               ]}
                             >
-                              <input
-                                type="text"
-                                placeholder={t(
-                                  "return-forms.fields.paymentInfo.placeholder"
-                                )}
-                              />
+                              <input type="text" placeholder={t("return-forms.fields.paymentInfo.placeholder")} />
                             </Form.Item>
                           </div>
                           <div className="app-info mb-20">
-                            <label>
-                              {t("return-forms.fields.email.label")}
-                            </label>
+                            <label>{t("return-forms.fields.email.label")}</label>
                             <Form.Item
                               name="email"
                               required
                               rules={[
                                 {
-                                  validator: (_, value) =>
-                                    validateEmail(_, value),
+                                  validator: (_, value) => validateEmail(_, value),
                                 },
                               ]}
                             >
-                              <input
-                                type="text"
-                                placeholder={t(
-                                  "return-forms.fields.email.placeholder"
-                                )}
-                              />
+                              <input type="text" placeholder={t("return-forms.fields.email.placeholder")} />
                             </Form.Item>
                           </div>
                         </div>
@@ -885,9 +747,7 @@ const ReturnForm = () => {
                             checked={hasAgreed}
                             onChange={() => setHasAgreed(!hasAgreed)}
                           />
-                          <label htmlFor="agree-policy">
-                            {t("return-forms.messages.agree")}
-                          </label>
+                          <label htmlFor="agree-policy">{t("return-forms.messages.agree")}</label>
                         </div>
                       </div>
                     </div>
@@ -899,7 +759,7 @@ const ReturnForm = () => {
                       </div>
                       <div className="col-md-5">
                         <Button
-                          htmlType="submit"
+                          // htmlType="submit"
                           {...saveButtonProps}
                           className="default-btn"
                           type="primary"
@@ -915,12 +775,7 @@ const ReturnForm = () => {
                 </div>
               </Form>
             ) : (
-              <motion.div
-                className="row"
-                initial={{ x: "50%" }}
-                animate={{ x: "0%" }}
-                exit={{ x: "50%" }}
-              >
+              <motion.div className="row" initial={{ x: "50%" }} animate={{ x: "0%" }} exit={{ x: "50%" }}>
                 <motion.div
                   className="col-lg-12"
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -951,18 +806,20 @@ const ReturnForm = () => {
 
 export default ReturnForm;
 
-export const returnFormDetailsToPayloadFormat = (
-  returnFormDetails: IReturnFormDetailRequest[] | undefined
-): any[] => {
+export const returnFormDetailsToPayloadFormat = (returnFormDetails: IReturnFormDetailRequest[] | undefined): any[] => {
   if (!returnFormDetails) return [];
 
-  return returnFormDetails.map((detail) => {
-    return {
-      id: detail.id,
-      orderDetail: detail.orderDetail.id,
-      quantity: detail.returnQuantity,
-      reason: detail.reason,
-      feedback: detail.feedback,
-    };
-  });
+  return returnFormDetails
+    .filter((detail) => {
+      return detail.selected;
+    })
+    .map((detail) => {
+      return {
+        id: detail.id,
+        orderDetail: detail.orderDetail.id,
+        quantity: detail.returnQuantity,
+        reason: detail.reason,
+        feedback: detail.feedback,
+      };
+    });
 };

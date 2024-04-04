@@ -4,6 +4,9 @@ import dayjs from "dayjs";
 import React, { Fragment } from "react";
 import { IReturnFormResponse } from "../../interfaces";
 import { ReturnRefundStatus } from "./ReturnRefundStatus";
+import { CurrencyFormatter } from "../../helpers/currency";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 interface ReturnInfoProps {
   returnForm: IReturnFormResponse;
@@ -11,6 +14,7 @@ interface ReturnInfoProps {
 
 const ReturnInfo: React.FC<ReturnInfoProps> = ({ returnForm }) => {
   const t = useTranslate();
+  const currency = useSelector((state: RootState) => state.currency);
 
   return (
     <Fragment>
@@ -52,7 +56,11 @@ const ReturnInfo: React.FC<ReturnInfoProps> = ({ returnForm }) => {
                 <p>{t("return_tracking.fields.amountToBePaid")}</p>
               </td>
               <td className="value">
-                <p>{returnForm.amountToBePaid}</p>
+                {returnForm.amountToBePaid == 0 ? (
+                  <ReturnRefundStatus status={returnForm.refundStatus} />
+                ) : (
+                  <CurrencyFormatter value={returnForm.amountToBePaid * currency.currencyRate} currency={currency} />
+                )}
               </td>
             </tr>
             <tr>

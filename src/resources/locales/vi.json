@@ -809,7 +809,8 @@
       "emptyReturnQuantity": "Vui lòng nhập số lượng hoàn trả",
       "notAgree": "Vui lòng chắc chắn rằng bạn đã đọc và đồng ý với chính sách của cửa hàng",
       "not_found": "Không tìm thấy đơn hàng hoặc dơn hàng không đủ điều kiện hoàn trả",
-      "contact": "Vui lòng liên hệ với chúng tôi để giải quyết nếu bạn không thể tìm thấy đơn hàng của mình"
+      "contact": "Vui lòng liên hệ với chúng tôi để giải quyết nếu bạn không thể tìm thấy đơn hàng của mình",
+      "success": "Phiếu trả hàng của bạn đã được gửi"
     },
     "buttons": {
       "return_to_orders": "Quay lại trang thông tin đơn hàng",

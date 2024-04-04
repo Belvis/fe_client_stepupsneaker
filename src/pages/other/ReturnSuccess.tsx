@@ -8,11 +8,7 @@ import { TbTruckReturn } from "react-icons/tb";
 import { motion } from "framer-motion";
 import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../constants/motions";
 import { HttpError, useOne } from "@refinedev/core";
-import {
-  IReturnFormDetailRequest,
-  IReturnFormDetailResponse,
-  IReturnFormResponse,
-} from "../../interfaces";
+import { IReturnFormDetailRequest, IReturnFormDetailResponse, IReturnFormResponse } from "../../interfaces";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { CurrencyFormatter } from "../../helpers/currency";
 import { useSelector } from "react-redux";
@@ -37,21 +33,17 @@ const Success = () => {
   }, [t]);
 
   const { data, isLoading, isError } = useOne<IReturnFormResponse, HttpError>({
-    resource: "return-forms/code",
+    resource: "return-forms/tracking",
     id: code,
   });
 
-  const [returnDetails, setReturnDetails] =
-    useState<IReturnFormDetailRequest[]>();
+  const [returnDetails, setReturnDetails] = useState<IReturnFormDetailRequest[]>();
 
   const returnForm = data?.data;
 
   useEffect(() => {
     if (returnForm) {
-      console.log("returnForm", returnForm);
-
-      const returnFormDetailsResponse: IReturnFormDetailResponse[] =
-        returnForm.returnFormDetails;
+      const returnFormDetailsResponse: IReturnFormDetailResponse[] = returnForm.returnFormDetails;
 
       const returnFormDetailsRequest = returnFormDetailResponseToRequestList(
         returnFormDetailsResponse,
@@ -72,10 +64,7 @@ const Success = () => {
       />
 
       {returnForm ? (
-        <div
-          className="success-area pb-80 bg-white"
-          style={{ padding: "80px 30px 100px 30px" }}
-        >
+        <div className="success-area pb-80 bg-white" style={{ padding: "80px 30px 100px 30px" }}>
           <Space direction="vertical" className="w-100" size="middle">
             <Card>
               <Result
@@ -112,26 +101,26 @@ const Success = () => {
                 <Col span={6}>
                   <Space direction="vertical" className="w-100">
                     <Text>Ngày gửi:</Text>
-                    <Text>
-                      {dayjs(new Date(returnForm.createdAt)).format("LLL")}
-                    </Text>
+                    <Text>{dayjs(new Date(returnForm.createdAt)).format("LLL")}</Text>
                   </Space>
                 </Col>
                 <Col span={6}>
                   <Space direction="vertical">
                     <Text>Tổng số tiền được hoàn:</Text>
-                    <CurrencyFormatter
-                      value={returnForm.amountToBePaid * currency.currencyRate}
-                      currency={currency}
-                    />
+                    {returnForm.amountToBePaid == 0 ? (
+                      <ReturnRefundStatus status={returnForm.refundStatus} />
+                    ) : (
+                      <CurrencyFormatter
+                        value={returnForm.amountToBePaid * currency.currencyRate}
+                        currency={currency}
+                      />
+                    )}
                   </Space>
                 </Col>
                 <Col span={6}>
                   <Space direction="vertical">
                     <Text>Trạng giao hàng hoàn trả:</Text>
-                    <ReturnDeliveryStatus
-                      status={returnForm.returnDeliveryStatus}
-                    />
+                    <ReturnDeliveryStatus status={returnForm.returnDeliveryStatus} />
                   </Space>
                 </Col>
                 <Col span={6}>
@@ -157,49 +146,25 @@ const Success = () => {
                         <th>{t("return-form-details.fields.product")}</th>
                         <th>{t("return-form-details.fields.quantity")}</th>
                         <th>{t("return-form-details.fields.reason.label")}</th>
-                        <th>
-                          {t("return-form-details.fields.feedback.label")}
-                        </th>
+                        <th>{t("return-form-details.fields.feedback.label")}</th>
                       </motion.tr>
                     </motion.thead>
-                    <motion.tbody
-                      layout
-                      variants={PARENT_VARIANT}
-                      initial="hidden"
-                      animate="show"
-                    >
+                    <motion.tbody layout variants={PARENT_VARIANT} initial="hidden" animate="show">
                       {returnDetails.map((returnDetail, key) => {
                         return (
-                          <motion.tr
-                            key={key}
-                            layout
-                            variants={CHILDREN_VARIANT}
-                          >
+                          <motion.tr key={key} layout variants={CHILDREN_VARIANT}>
                             <td className="product-thumbnail">
-                              <Link
-                                to={
-                                  "/product/" +
-                                  returnDetail.orderDetail.productDetail.product
-                                    .id
-                                }
-                              >
+                              <Link to={"/product/" + returnDetail.orderDetail.productDetail.product.id}>
                                 <img
                                   className="img-fluid"
-                                  src={
-                                    returnDetail.orderDetail.productDetail
-                                      .product.image
-                                  }
+                                  src={returnDetail.orderDetail.productDetail.product.image}
                                   alt=""
                                 />
                               </Link>
                             </td>
-                            <td className="product-name text-center">
-                              {returnDetail.name}
-                            </td>
+                            <td className="product-name text-center">{returnDetail.name}</td>
 
-                            <td className="product-quantity text-center">
-                              {returnDetail.returnQuantity}
-                            </td>
+                            <td className="product-quantity text-center">{returnDetail.returnQuantity}</td>
                             <td className="product-quantity text-center">
                               <div className="cart-plus-minus w-100 pe-2">
                                 <p>{returnDetail.reason}</p>
@@ -221,12 +186,10 @@ const Success = () => {
                 <div className="col-lg-12">
                   <div className="cart-shiping-update-wrapper">
                     <div className="cart-shiping-update">
-                      <Link to={"/shop"}>
-                        {t(`cart.buttons.continue_shopping`)}
-                      </Link>
+                      <Link to={"/shop"}>{t(`cart.buttons.continue_shopping`)}</Link>
                     </div>
                     <div className="cart-clear">
-                      <button>{t("return_success.buttons.tracking")}</button>
+                      <Link to={`/return-tracking/${returnForm.code}`}>{t("return_success.buttons.tracking")}</Link>
                     </div>
                   </div>
                 </div>
@@ -245,9 +208,7 @@ export const returnFormDetailResponseToRequestList = (
   responseList: IReturnFormDetailResponse[],
   orderCode: string
 ): IReturnFormDetailRequest[] => {
-  return responseList.map((responseItem) =>
-    returnFormDetailResponseToRequest(responseItem, orderCode)
-  );
+  return responseList.map((responseItem) => returnFormDetailResponseToRequest(responseItem, orderCode));
 };
 
 export const returnFormDetailResponseToRequest = (

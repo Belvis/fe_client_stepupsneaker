@@ -797,7 +797,8 @@
       "emptyReturnQuantity": "Please enter the return quantity",
       "notAgree": "Please make sure you have read and agree to the store's policy",
       "not_found": "Order not found or order does not meet return conditions",
-      "contact": "Please contact us for resolution if you cannot find your order"
+      "contact": "Please contact us for resolution if you cannot find your order",
+      "success": "Your return form has been sent successfully"
     },
     "buttons": {
       "return_to_orders": "Return to Order Information Page",

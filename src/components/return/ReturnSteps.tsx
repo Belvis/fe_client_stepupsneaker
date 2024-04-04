@@ -9,12 +9,7 @@ import { useTranslate } from "@refinedev/core";
 import { Card, Grid, Skeleton, Steps, Tooltip } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import {
-  DeliveryStatus,
-  IReturnEvent,
-  IReturnFormHistoryResponse,
-  IReturnFormResponse,
-} from "../../interfaces";
+import { DeliveryStatus, IReturnEvent, IReturnFormHistoryResponse, IReturnFormResponse } from "../../interfaces";
 
 const { useBreakpoint } = Grid;
 
@@ -29,8 +24,7 @@ export const ReturnSteps: React.FC<ReturnStepsProps> = ({ record }) => {
     .filter((screen) => !!screen[1])
     .map((screen) => screen[0]);
 
-  const notFinishedCurrentStep = (event: IReturnEvent, index: number) =>
-    event.status !== "COMPLETED" && event.loading;
+  const notFinishedCurrentStep = (event: IReturnEvent, index: number) => event.status !== "COMPLETED" && event.loading;
 
   const stepStatus = (event: IReturnEvent, index: number) => {
     if (!event.date) return "wait";
@@ -66,38 +60,22 @@ export const ReturnSteps: React.FC<ReturnStepsProps> = ({ record }) => {
       >
         {record && (
           <Steps
-            direction={
-              currentBreakPoints.includes("lg") ? "horizontal" : "vertical"
-            }
-            current={events.findIndex(
-              (el) => el.status === record?.returnDeliveryStatus
-            )}
+            direction={currentBreakPoints.includes("lg") ? "horizontal" : "vertical"}
+            current={events.findIndex((el) => el.status === record?.returnDeliveryStatus)}
           >
             {events.map((event: IReturnEvent, index: number) => (
               <Steps.Step
                 status={stepStatus(event, index)}
                 key={index}
-                title={t(
-                  `return-forms.fields.returnDeliveryStatus.${event.status}`
-                )}
-                icon={
-                  notFinishedCurrentStep(event, index) ? (
-                    <LoadingOutlined />
-                  ) : (
-                    getIconByStatus(event.status)
-                  )
-                }
+                title={t(`return-forms.fields.returnDeliveryStatus.${event.status}`)}
+                icon={notFinishedCurrentStep(event, index) ? <LoadingOutlined /> : getIconByStatus(event.status)}
                 style={{
                   minWidth: "300px",
                   padding: "24px",
                 }}
                 description={event.note && event.note}
                 subTitle={
-                  <Tooltip
-                    title={
-                      event.date && dayjs(new Date(event.date)).format("LLL")
-                    }
-                  >
+                  <Tooltip title={event.date && dayjs(new Date(event.date)).format("LLL")}>
                     {event.date && dayjs(new Date(event.date)).format("DD/MM")}
                   </Tooltip>
                 }
@@ -111,15 +89,8 @@ export const ReturnSteps: React.FC<ReturnStepsProps> = ({ record }) => {
   );
 };
 
-const getReturnStatusTimeline = (
-  returnFormHistories: IReturnFormHistoryResponse[]
-): IReturnEvent[] => {
-  const statusList: DeliveryStatus[] = [
-    "PENDING",
-    "RETURNING",
-    "RECEIVED",
-    "COMPLETED",
-  ];
+const getReturnStatusTimeline = (returnFormHistories: IReturnFormHistoryResponse[]): IReturnEvent[] => {
+  const statusList: DeliveryStatus[] = ["PENDING", "RETURNING", "RECEIVED", "RETURNING", "RECEIVED", "COMPLETED"];
   const eventList: IReturnEvent[] = [];
 
   const exceptionStatusList: DeliveryStatus[] = [];

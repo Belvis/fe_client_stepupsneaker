@@ -11,27 +11,18 @@ interface OrderDeliverablesProps {
   currency: CurrencyState;
 }
 
-const OrderDeliverables: React.FC<OrderDeliverablesProps> = ({
-  order,
-  currency,
-}) => {
+const OrderDeliverables: React.FC<OrderDeliverablesProps> = ({ order, currency }) => {
   const t = useTranslate();
 
   return (
     <Fragment>
-      <h3 className="cart-page-title mt-3">
-        {t("order_tracking.deliverables")}
-      </h3>
+      <h3 className="cart-page-title mt-3">{t("order_tracking.deliverables")}</h3>
       <div className="order-summary table-content table-responsive order-tracking-table-content ">
         <table className="w-100">
           <thead>
             <tr>
-              <th style={{ textAlign: "start" }}>
-                {t("my_order.fields.product")}
-              </th>
-              <th style={{ textAlign: "end" }}>
-                {t(`cart.table.head.subtotal`)}
-              </th>
+              <th style={{ textAlign: "start" }}>{t("my_order.fields.product")}</th>
+              <th style={{ textAlign: "end" }}>{t(`cart.table.head.subtotal`)}</th>
             </tr>
           </thead>
           <tbody>
@@ -42,28 +33,22 @@ const OrderDeliverables: React.FC<OrderDeliverablesProps> = ({
                     <td className="product">
                       <div className="row">
                         <div className="product-thumbnail col-3">
-                          <Link to={"/product/" + detail.id}>
-                            <img
-                              className="img-fluid"
-                              src={detail.productDetail.image}
-                              alt=""
-                            />
+                          <Link to={"/product/" + detail.productDetail.product.id}>
+                            <img className="img-fluid" src={detail.productDetail.image} alt="" />
                           </Link>
                         </div>
                         <div className="cart-item-variation col-9">
                           <span>
                             {t(`cart.table.head.product_name`)}:{" "}
-                            <Link to={"/product/" + detail.id}>
+                            <Link to={"/product/" + detail.productDetail.product.id}>
                               {detail.productDetail.product.name}
                             </Link>
                           </span>
                           <span>
-                            {t(`cart.table.head.color`)}:{" "}
-                            {detail.productDetail.color.name}
+                            {t(`cart.table.head.color`)}: {detail.productDetail.color.name}
                           </span>
                           <span>
-                            {t(`cart.table.head.size`)}:{" "}
-                            {detail.productDetail.size.name}
+                            {t(`cart.table.head.size`)}: {detail.productDetail.size.name}
                           </span>
                           <span>
                             {t(`cart.table.head.qty`)}: {detail.quantity}
@@ -109,9 +94,7 @@ const OrderDeliverables: React.FC<OrderDeliverablesProps> = ({
                         currency={currency}
                       />
                     ) : (
-                      <span className="free-shipping">
-                        {t("common.free_shipping")}
-                      </span>
+                      <span className="free-shipping">{t("common.free_shipping")}</span>
                     )}
                   </div>
                 </div>
@@ -129,9 +112,7 @@ const OrderDeliverables: React.FC<OrderDeliverablesProps> = ({
                 </div>
                 <div className="row">
                   <div className="col-9">
-                    <h4 className="grand-total-title">
-                      {t(`cart.cart_total.grand_total`)}{" "}
-                    </h4>
+                    <h4 className="grand-total-title">{t(`cart.cart_total.grand_total`)} </h4>
                   </div>
                   <div className="col-3">
                     <CurrencyFormatter
