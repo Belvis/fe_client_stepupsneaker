@@ -25,11 +25,8 @@ const ReturnTracking = () => {
 
   let { code } = useParams();
 
-  const { data, isLoading, isError, refetch } = useOne<
-    IReturnFormResponse,
-    HttpError
-  >({
-    resource: "return-forms/code",
+  const { data, isLoading, isError, refetch } = useOne<IReturnFormResponse, HttpError>({
+    resource: "return-forms/tracking",
     id: code,
   });
 
