@@ -3,11 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 import { useTranslation } from "react-i18next";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { useTranslate } from "@refinedev/core";
 
 const NotFound = () => {
   let { pathname } = useLocation();
 
-  const { t } = useTranslation();
+  const t = useTranslate();
 
   const setTitle = useDocumentTitle();
 
@@ -28,18 +29,15 @@ const NotFound = () => {
           <div className="row justify-content-center">
             <div className="col-xl-7 col-lg-8 text-center">
               <div className="error">
-                <h1>404</h1>
-                <h2>BUỒN BAYY! TRANG KHÔNG TÌM THẤY</h2>
-                <p>
-                  Rất tiếc, nhưng trang bạn đang tìm kiếm không tồn tại, đã bị
-                  xóa, đổi tên hoặc tạm thời không khả dụng.
-                </p>
+                <h1>{t("not_found.title")}</h1>
+                <h2>{t("not_found.subtitle")}</h2>
+                <p>{t("not_found.description")}</p>
                 <form className="searchform mb-50">
                   <input
                     type="text"
                     name="search"
                     id="error_search"
-                    placeholder="Tìm kiếm..."
+                    placeholder={t("common.search") + "..."}
                     className="searchform__input"
                   />
                   <button type="submit" className="searchform__submit">
@@ -47,7 +45,7 @@ const NotFound = () => {
                   </button>
                 </form>
                 <Link to={"/"} className="error-btn">
-                  Trở lại trang chủ
+                  {t("buttons.back_home")}
                 </Link>
               </div>
             </div>

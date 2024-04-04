@@ -1,14 +1,7 @@
-import React, {
-  Dispatch,
-  Fragment,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
-import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Rate } from "antd";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  getDiscountPrice,
   getProductCartQuantity,
   getTotalCartQuantity,
 } from "../../helpers/product";
@@ -19,18 +12,11 @@ import {
   ISizeClient,
   IVariation,
 } from "../../interfaces";
-import { addToCart, addToDB } from "../../redux/slices/cart-slice";
-import { addToCompare } from "../../redux/slices/compare-slice";
 import { CurrencyState } from "../../redux/slices/currency-slice";
-import { addToWishlist } from "../../redux/slices/wishlist-slice";
-import Rating from "./sub-components/ProductRating";
-import { Badge, Rate, Space, Tooltip } from "antd";
-import { SaleIcon } from "../icons/icon-sale";
-import { useTranslation } from "react-i18next";
-import { CurrencyFormatter } from "../../helpers/currency";
-import { Authenticated } from "@refinedev/core";
-import { AppDispatch } from "../../redux/store";
-import { showErrorToast } from "../../helpers/toast";
+import ProductDetailsButtons from "./sub-components/ProductDetailsButtons";
+import ProductDetailsPrice from "./sub-components/ProductDetailsPrice";
+import ProductQuantityControl from "./sub-components/ProductQuantityControl";
+import ProductVariations from "./sub-components/ProductVariations";
 
 interface ProductDescriptionInfoProps {
   product: IProductClient;
@@ -54,9 +40,6 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
   selectedVariant,
 }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-
-  const dispatch: AppDispatch = useDispatch();
 
   const initialSelectedSize =
     product.variation && product.variation.length > 0
@@ -83,96 +66,19 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
 
   const totalCartQty = getTotalCartQuantity(cartItems);
 
-  const discountedPrice = getDiscountPrice(
-    selectedProductSize.price,
-    selectedProductSize.discount
-  );
-  const finalProductPrice = +(
-    selectedProductSize.price * currency.currencyRate
-  );
-  const finalDiscountedPrice = +(
-    (discountedPrice ?? selectedProductSize.discount) * currency.currencyRate
-  );
-
   useEffect(() => {
     setSelectedProductSize(initialSelectedSize);
     setProductStock(initialProductStock);
   }, []);
 
-  const isButtonDisabled =
-    productCartQty >= productStock ||
-    quantityCount + productCartQty > 5 ||
-    totalCartQty >= 5;
-
-  const handleDispatchAddToCart = () => {
-    dispatch(
-      addToCart({
-        id: "",
-        cartItemId: product.id,
-        quantity: quantityCount,
-        image: selectedVariant.image[0],
-        name: product.name,
-        selectedProductColor: selectedProductColor,
-        selectedProductSize: selectedProductSize,
-      })
-    );
-  };
-
-  const handleDispatchAddToDB = () => {
-    return new Promise<void>((resolve, reject) => {
-      dispatch(
-        addToDB({
-          id: "",
-          cartItemId: product.id,
-          quantity: quantityCount,
-          image: selectedVariant.image[0],
-          name: product.name,
-          selectedProductColor: selectedProductColor,
-          selectedProductSize: selectedProductSize,
-        })
-      )
-        .then(() => {
-          resolve();
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
-  };
-
-  const handleDBShopNowButtonClick = async () => {
-    try {
-      await handleDispatchAddToDB();
-      navigate("/pages/checkout");
-    } catch (error) {
-      console.error("Error adding to DB:", error);
-    }
-  };
-
-  const handleShopNowButtonClick = () => {
-    handleDispatchAddToCart();
-    navigate("/pages/checkout");
-  };
-
   return (
     <div className="product-details-content ml-70">
       <h2>{product.name}</h2>
       <div className="product-details-price">
-        {discountedPrice !== null ? (
-          <Fragment>
-            <CurrencyFormatter
-              value={finalDiscountedPrice}
-              currency={currency}
-            />{" "}
-            <CurrencyFormatter
-              className="old"
-              value={finalProductPrice}
-              currency={currency}
-            />
-          </Fragment>
-        ) : (
-          <CurrencyFormatter value={finalProductPrice} currency={currency} />
-        )}
+        <ProductDetailsPrice
+          currency={currency}
+          selectedProductSize={selectedProductSize}
+        />
       </div>
       {product.averageRating >= 0 && (
         <div className="pro-details-rating-wrap">
@@ -192,327 +98,39 @@ const ProductDescriptionInfo: React.FC<ProductDescriptionInfoProps> = ({
         </p>
       </div>
       <div className="pro-details-meta">
-        <span>Mã :</span>
+        <span>{t("products.fields.code")} :</span>
         <span className="fw-bold">{product.code}</span>
       </div>
-      {product.variation ? (
-        <div className="pro-details-size-color">
-          <div className="pro-details-color-wrap">
-            <Space direction="vertical" size="middle">
-              <span>{t(`products.fields.colors`)}</span>
-              <div className="pro-details-color-content">
-                {product.variation.map((single, key) => {
-                  const hasSale = single.size.some(
-                    (size) =>
-                      typeof size.discount === "number" && size.discount > 0
-                  );
-
-                  return (
-                    <label
-                      className={`pro-details-color-content--single ${
-                        single.color
-                      } ${
-                        single.color.id === selectedProductColor.id
-                          ? "selected"
-                          : ""
-                      }`}
-                      key={key}
-                      style={{
-                        background: `#${single.color.code}`,
-                        border: "2px solid white",
-                        outline: "transparent solid 2px ",
-                      }}
-                    >
-                      <Badge
-                        offset={[20, 0]}
-                        count={
-                          hasSale ? (
-                            <SaleIcon
-                              style={{
-                                color: "red",
-                                fontSize: "24px",
-                                zIndex: 2,
-                              }}
-                            />
-                          ) : (
-                            0
-                          )
-                        }
-                      >
-                        <input
-                          type="radio"
-                          value={single.color.id}
-                          name="product-color"
-                          checked={single.color.id === selectedProductColor.id}
-                          onChange={() => {
-                            setSelectedProductColor(single.color);
-                            setSelectedProductSize(single.size[0]);
-                            setProductStock(single.size[0].stock);
-                            setQuantityCount(1);
-                          }}
-                        />
-                      </Badge>
-                    </label>
-                  );
-                })}
-              </div>
-            </Space>
-          </div>
-          <div className="pro-details-size">
-            <Space direction="vertical" size="middle">
-              <span>{t(`products.fields.sizes`)}</span>
-              <div className="pro-details-size-content">
-                {product.variation &&
-                  product.variation.map((single) => {
-                    return single.color.id === selectedProductColor.id
-                      ? single.size.map((singleSize, key) => {
-                          const hasSale = singleSize.discount > 0;
-
-                          return (
-                            <label
-                              className={`pro-details-size-content--single`}
-                              key={key}
-                            >
-                              <Badge
-                                count={
-                                  hasSale ? (
-                                    <SaleIcon
-                                      style={{
-                                        color: "red",
-                                        fontSize: "24px",
-                                        zIndex: 2,
-                                      }}
-                                    />
-                                  ) : (
-                                    0
-                                  )
-                                }
-                              >
-                                <input
-                                  type="radio"
-                                  value={singleSize.name}
-                                  checked={
-                                    singleSize.id === selectedProductSize.id
-                                  }
-                                  onChange={() => {
-                                    setSelectedProductSize(singleSize);
-                                    setProductStock(singleSize.stock);
-                                    setQuantityCount(1);
-                                  }}
-                                />
-                                <span className="size-name">
-                                  {singleSize.name}
-                                </span>
-                              </Badge>
-                            </label>
-                          );
-                        })
-                      : "";
-                  })}
-              </div>
-            </Space>
-          </div>
-        </div>
-      ) : (
-        ""
+      {product.variation && (
+        <ProductVariations
+          selectedProductSize={selectedProductSize}
+          selectedProductColor={selectedProductColor}
+          product={product}
+          setSelectedProductSize={setSelectedProductSize}
+          setSelectedProductColor={setSelectedProductColor}
+          setProductStock={setProductStock}
+          setQuantityCount={setQuantityCount}
+        />
       )}
-      <div className="pro-details-quality">
-        <div className="cart-plus-minus">
-          <button
-            onClick={() => {
-              if (quantityCount <= 1) {
-                return showErrorToast("Đã đạt số lượng nhỏ nhất");
-              }
-              setQuantityCount(quantityCount - 1);
-            }}
-            className="dec qtybutton"
-          >
-            -
-          </button>
-          <input
-            className="cart-plus-minus-box"
-            type="text"
-            value={quantityCount}
-            readOnly
-          />
-          <button
-            onClick={() => {
-              if (quantityCount + productCartQty >= 5 || totalCartQty >= 5) {
-                return showErrorToast(
-                  "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
-                );
-              }
-
-              if (quantityCount >= productStock - productCartQty) {
-                return showErrorToast(
-                  "Rất tiếc, đã đạt giới hạn số lượng sản phẩm!"
-                );
-              }
-              setQuantityCount(quantityCount + 1);
-            }}
-            className="inc qtybutton"
-          >
-            +
-          </button>
-        </div>
-        <div className="pro-details-stock">
-          <span className="fw-bold">{productStock}</span>
-          <span>Sản phẩm có sẵn</span>
-        </div>
-      </div>
-      <div className="pro-details-quality">
-        <div className="pro-details-cart btn-hover">
-          {productStock && productStock > 0 ? (
-            <Authenticated
-              fallback={
-                <Tooltip
-                  title={
-                    isButtonDisabled
-                      ? "Bạn chỉ có thể mua tối đa 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
-                      : productCartQty >= productStock
-                      ? "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
-                      : ""
-                  }
-                >
-                  <button
-                    className="mw-250 button-white"
-                    onClick={handleDispatchAddToCart}
-                    disabled={isButtonDisabled}
-                  >
-                    {t(`products.buttons.add_to_cart`)}
-                  </button>
-                </Tooltip>
-              }
-            >
-              <Tooltip
-                title={
-                  isButtonDisabled
-                    ? "Bạn chỉ có thể mua tối đa 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
-                    : productCartQty >= productStock
-                    ? "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
-                    : ""
-                }
-              >
-                <button
-                  className="mw-250 button-white"
-                  onClick={handleDispatchAddToDB}
-                  disabled={isButtonDisabled}
-                >
-                  {t(`products.buttons.add_to_cart`)}
-                </button>
-              </Tooltip>
-            </Authenticated>
-          ) : (
-            <button className="mw-250 button-black" disabled>
-              {t(`products.desc_tab.buttons.out_of_stock`)}
-            </button>
-          )}
-        </div>
-        {productStock > 0 && (
-          <div className="pro-details-cart btn-hover">
-            <Authenticated
-              fallback={
-                <Tooltip
-                  title={
-                    isButtonDisabled
-                      ? "Bạn chỉ có thể mua tối đa 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
-                      : productCartQty >= productStock
-                      ? "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
-                      : ""
-                  }
-                >
-                  <button
-                    className="button-black"
-                    onClick={handleShopNowButtonClick}
-                    disabled={isButtonDisabled}
-                  >
-                    Mua ngay
-                  </button>
-                </Tooltip>
-              }
-            >
-              <Tooltip
-                title={
-                  isButtonDisabled
-                    ? "Bạn chỉ có thể mua tối đa 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
-                    : productCartQty >= productStock
-                    ? "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
-                    : ""
-                }
-              >
-                <button
-                  className="button-black"
-                  onClick={handleDBShopNowButtonClick}
-                  disabled={isButtonDisabled}
-                >
-                  Mua ngay
-                </button>
-              </Tooltip>
-            </Authenticated>
-          </div>
-        )}
-        <div className="pro-details-wishlist">
-          <button
-            className={wishlistItem !== undefined ? "active" : ""}
-            disabled={wishlistItem !== undefined}
-            title={
-              wishlistItem !== undefined
-                ? "Đã thêm vào danh sách yêu thích"
-                : "Thêm vào danh sách yêu thích"
-            }
-            onClick={() => dispatch(addToWishlist(product))}
-          >
-            <i className="pe-7s-like" />
-          </button>
-        </div>
-        <div className="pro-details-compare">
-          <button
-            className={compareItem !== undefined ? "active" : ""}
-            disabled={compareItem !== undefined}
-            title={
-              compareItem !== undefined
-                ? "Đã thêm vào danh sách so sánh"
-                : "Thêm vào danh sách so sánh"
-            }
-            onClick={() => dispatch(addToCompare(product))}
-          >
-            <i className="pe-7s-shuffle" />
-          </button>
-        </div>
-      </div>
-      {/* {product.category ? ( */}
-      <div className="pro-details-meta">
-        <span>{t(`products.fields.styles`)} :</span>
-        <ul>
-          {["Kiểu dáng 1", "Kiểu dáng 2"].map((single, key) => {
-            return (
-              <li key={key}>
-                <Link to={"/shop"}>{single}</Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-      {/* ) : (
-        ""
-      )} */}
-      {/* {product.tag ? ( */}
-      <div className="pro-details-meta">
-        <span>{t(`products.fields.tags`)} :</span>
-        <ul>
-          {["Tag 1, Tag 2"].map((single, key) => {
-            return (
-              <li key={key}>
-                <Link to={"/shop"}>{single}</Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-      {/* ) : (
-        ""
-      )} */}
-
+      <ProductQuantityControl
+        quantityCount={quantityCount}
+        productCartQty={productCartQty}
+        totalCartQty={totalCartQty}
+        productStock={productStock}
+        setQuantityCount={setQuantityCount}
+      />
+      <ProductDetailsButtons
+        productStock={productStock}
+        productCartQty={productCartQty}
+        quantityCount={quantityCount}
+        totalCartQty={totalCartQty}
+        product={product}
+        compareItem={compareItem}
+        wishlistItem={wishlistItem}
+        selectedVariant={selectedVariant}
+        selectedProductColor={selectedProductColor}
+        selectedProductSize={selectedProductSize}
+      />
       <div className="pro-details-social">
         <ul>
           <li>

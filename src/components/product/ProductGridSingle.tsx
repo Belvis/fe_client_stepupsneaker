@@ -11,6 +11,7 @@ import { addToCompare } from "../../redux/slices/compare-slice";
 import { CurrencyState } from "../../redux/slices/currency-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
 import ProductModal from "./ProductModal";
+import { useTranslate } from "@refinedev/core";
 
 type ProductGridSingleNineProps = {
   cartItem?: ICartItem;
@@ -31,7 +32,7 @@ const ProductGridSingleNine: React.FC<ProductGridSingleNineProps> = ({
   spaceBottomClass,
   colorClass,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslate();
 
   const [modalShow, setModalShow] = useState(false);
   const discountedPrice = getDiscountPrice(product.price.max, product.discount);
@@ -79,11 +80,18 @@ const ProductGridSingleNine: React.FC<ProductGridSingleNineProps> = ({
 
             <div className="product-action-2">
               {product.variation && product.variation.length >= 1 ? (
-                <Link to={`/product/${product.id}`} title="Mua ngay">
+                <Link
+                  to={`/product/${product.id}`}
+                  title={t("products.buttons.shop_now")}
+                >
                   <i className="fa fa-cog"></i>
                 </Link>
               ) : (
-                <button disabled className="active" title="Out of stock">
+                <button
+                  disabled
+                  className="active"
+                  title={t("products.desc_tab.buttons.out_of_stock")}
+                >
                   <i className="fa fa-shopping-cart"></i>
                 </button>
               )}
@@ -97,8 +105,8 @@ const ProductGridSingleNine: React.FC<ProductGridSingleNineProps> = ({
                 disabled={compareItem !== undefined}
                 title={
                   compareItem !== undefined
-                    ? "Đã thêm vào danh sách so sánh"
-                    : "Thêm vào danh sách so sánh"
+                    ? t("product_action.tooltips.compare.in")
+                    : t("product_action.tooltips.compare.out")
                 }
                 onClick={() => dispatch(addToCompare(product))}
               >

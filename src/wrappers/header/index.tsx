@@ -30,10 +30,6 @@ export const Header: React.FC<HeaderProps> = ({
   const [scroll, setScroll] = useState(0);
   const [headerTop, setHeaderTop] = useState(0);
 
-  const locale = useGetLocale();
-  const currentLocale = locale();
-  dayjs.locale(currentLocale);
-
   useEffect(() => {
     const header = document.querySelector(".sticky-bar") as HTMLElement | null;
     setHeaderTop(header ? header.offsetTop : 0);

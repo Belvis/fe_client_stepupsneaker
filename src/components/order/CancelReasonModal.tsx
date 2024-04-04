@@ -1,8 +1,9 @@
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { HttpError, useOne, useUpdate } from "@refinedev/core";
+import { HttpError, useOne, useTranslate, useUpdate } from "@refinedev/core";
 import {
   Input,
   Modal,
+  ModalProps,
   Radio,
   RadioChangeEvent,
   Space,
@@ -10,20 +11,14 @@ import {
   Tooltip,
   Typography,
 } from "antd";
-import React, { ReactNode, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { showWarningConfirmDialog } from "../../helpers/confirm";
 import { IOrderResponse } from "../../interfaces";
 import { RootState } from "../../redux/store";
-import { showWarningConfirmDialog } from "../../helpers/confirm";
 
 interface CancelReasonModalProps {
-  restModalProps: {
-    open?: boolean | undefined;
-    confirmLoading?: boolean | undefined;
-    title?: ReactNode;
-    closable?: boolean | undefined;
-  };
+  restModalProps: ModalProps;
   code: string | undefined;
   callBack: any;
   close: () => void;
@@ -37,7 +32,7 @@ const CancelReasonModal: React.FC<CancelReasonModalProps> = ({
   callBack,
   close,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslate();
   const currency = useSelector((state: RootState) => state.currency);
 
   const { mutate: update, isLoading: isLoadingUpdate } = useUpdate();
@@ -61,15 +56,15 @@ const CancelReasonModal: React.FC<CancelReasonModalProps> = ({
       setSelectedReason(() => {
         switch (value) {
           case 1:
-            return "Muốn nhập/thay đổi mã voucher";
+            return t("order_tracking.cancel.cases.1");
           case 2:
-            return "Muốn thay đổi sản phẩm trong đơn hàng (size, màu sắc,...)";
+            return t("order_tracking.cancel.cases.2");
           case 3:
-            return "Tìm thấy giá rẻ hơn ở chỗ khác";
+            return t("order_tracking.cancel.cases.3");
           case 4:
-            return "Đổi ý, không muốn mua nữa";
+            return t("order_tracking.cancel.cases.4");
           case 5:
-            return "Ngứa tay";
+            return t("order_tracking.cancel.cases.5");
           default:
             return "";
         }
@@ -90,9 +85,16 @@ const CancelReasonModal: React.FC<CancelReasonModalProps> = ({
               id: order.code,
               successNotification: (data, values, resource) => {
                 return {
-                  message: `Hủy đơn hàng thành công!`,
-                  description: "Thành công",
+                  message: t("order_tracking.messages.success"),
+                  description: t("common.success"),
                   type: "success",
+                };
+              },
+              errorNotification: (error, values, resource) => {
+                return {
+                  message: t("common.error") + error?.message,
+                  description: "Oops...",
+                  type: "error",
                 };
               },
             },
@@ -115,8 +117,8 @@ const CancelReasonModal: React.FC<CancelReasonModalProps> = ({
     <Modal
       title={
         <Space align="baseline">
-          <Title level={5}>Vui lòng chọn lý do huỷ</Title>
-          <Tooltip title="Để gia tăng chất lượng dịch vụ, xin vui lòng cho chúng tôi biết lý do bạn huỷ đơn hàng.">
+          <Title level={5}>{t("order_tracking.cancel.title")}</Title>
+          <Tooltip title={t("order_tracking.cancel.subtitle")}>
             <InfoCircleOutlined />
           </Tooltip>
         </Space>
@@ -130,15 +132,13 @@ const CancelReasonModal: React.FC<CancelReasonModalProps> = ({
       <Spin spinning={isLoading}>
         <Radio.Group onChange={onChange} value={value}>
           <Space direction="vertical" size="large">
-            <Radio value={1}>Muốn nhập/thay đổi mã voucher</Radio>
-            <Radio value={2}>
-              Muốn thay đổi sản phẩm trong đơn hàng (size, màu sắc,...)
-            </Radio>
-            <Radio value={3}>Tìm thấy giá rẻ hơn ở chỗ khác</Radio>
-            <Radio value={4}>Đổi ý, không muốn mua nữa</Radio>
-            <Radio value={5}>Ngứa tay</Radio>
+            <Radio value={1}>{t("order_tracking.cancel.cases.1")}</Radio>
+            <Radio value={2}>{t("order_tracking.cancel.cases.2")}</Radio>
+            <Radio value={3}>{t("order_tracking.cancel.cases.3")}</Radio>
+            <Radio value={4}>{t("order_tracking.cancel.cases.4")}</Radio>
+            <Radio value={5}>{t("order_tracking.cancel.cases.5")}</Radio>
             <Radio value={6}>
-              Khác
+              {t("order_tracking.cancel.cases.other")}
               {value === 6 ? (
                 <Input
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,80 +1,940 @@
 {
-    "nav": {
-      "home": "Trang chủ",
-      "shop": "Cửa hàng",
-      "collection": "Bộ sưu tập",
-      "pages": {
-        "title": "Trang",
-        "cart": "Giỏ hàng",
-        "checkout": "Thanh toán",
-        "wishlist": "Danh sách mong muốn",
-        "compare": "So sánh",
-        "my_account": "Tài khoản của tôi",
-        "login_register": "Đăng nhập / Đăng ký"
-      },
-      "contact_us": "Liên hệ",
-      "about_us": "Về chúng tôi"
+  "nav": {
+    "home": "Home page",
+    "shop": "Shop",
+    "product": "Product",
+    "collection": "Collection",
+    "return": "Returns",
+    "pages": {
+      "title": "Pages",
+      "cart": "Cart",
+      "checkout": "Pay",
+      "wishlist": "Wish list",
+      "compare": "Compare",
+      "my_account": "My account",
+      "login_register": "Log in & sign up",
+      "/login": "Log in",
+      "/register": "Register",
+      "orders": "My order",
+      "orders_tracking": "Order tracking",
+      "return_tracking": "Track returns",
+      "404_page": "404",
+      "success": "Success",
+      "submission_failed": "Transaction failed",
+      "failed": "Failure",
+      "order": "Order",
+      "tracking_page": "Look up orders",
+      "my_orders": "My order",
+      "reset_password": "Reset Password",
+      "forgot_password": "Forgot password",
+      "return": "Returns"
     },
-    "checkout": {
-      "billing_details": {
-        "title": "Thông tin thanh toán",
-        "full_name": "Họ và tên",
-        "email": "Email",
-        "date_of_birth": "Ngày sinh",
-        "gender": "Giới tính",
-        "phone_number": "Số điện thoại",
-        "province": {
-          "title": "Tỉnh/Thành phố",
-          "place_holder": "Chọn Tỉnh/Thành phố"
+    "contact_us": "Contact",
+    "about_us": "About us"
+  },
+  "checkout": {
+    "billing_details": {
+      "title": "Billing Information",
+      "full_name": "First and last name",
+      "email": "Email",
+      "date_of_birth": "Date of birth",
+      "gender": "Sex",
+      "phone_number": "Phone number",
+      "province": {
+        "title": "Province/City",
+        "place_holder": "Select Province/City"
+      },
+      "district": {
+        "title": "District",
+        "place_holder": "Select District"
+      },
+      "ward": {
+        "title": "Wards",
+        "place_holder": "Select Ward/Commune"
+      },
+      "line": "Address details",
+      "additional_information": {
+        "title": "More information",
+        "order_note": {
+          "title": "Order notes",
+          "place_holder": "Notes about your order, e.g. special notes for delivery.  {{textAreaCount}} characters)"
+        }
+      }
+    },
+    "your_order": {
+      "title": "Your order",
+      "product": "Product",
+      "total": "into money",
+      "shipping": "Transport",
+      "total_money": "total"
+    },
+    "no_items_found": "No products found in the cart.",
+    "payment_methods": {
+      "title": "Payment methods",
+      "options": {
+        "cod": {
+          "title": "Cash on Delivery (COD)",
+          "description": "A method of delivery where payment is collected upon receiving the item. The buyer pays upon receiving the item."
         },
-        "district": {
-          "title": "Quận/Huyện",
-          "place_holder": "Chọn Quận/Huyện"
-        },
-        "ward": {
-          "title": "Phường/Xã",
-          "place_holder": "Chọn Phường/Xã"
-        },
-        "line": "Chi tiết địa chỉ",
-        "additional_information": {
-          "title": "Thông tin thêm",
-          "order_note": {
-            "title": "Ghi chú đơn hàng",
-            "place_holder": "Ghi chú về đơn hàng của bạn, vd: ghi chú đặc biệt cho giao hàng."
-          }
+        "bank_transfer": {
+          "title": "Bank Transfer (VNPAY)",
+          "description": "Transfer funds to our account. Your order will be confirmed immediately upon transfer."
+        }
+      }
+    },
+    "buttons": {
+      "place_order": "Order",
+      "shop_now": "Buy now"
+    }
+  },
+  "success": {
+    "payment": {
+      "methods": {
+        "options": {
+          "Cash": "Cash",
+          "Transfer": "Transfer",
+          "Card": "Bank card"
         }
       },
-      "your_order": {
-        "title": "Đơn hàng của bạn",
-        "product": "Sản phẩm",
-        "total": "Thành tiền",
-        "shipping": "Vận chuyển",
-        "total_money": "Tổng cộng"
+      "transaction_code": "Transaction code"
+    }
+  },
+  "order_tracking": {
+    "title": "Order status",
+    "buttons": {
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "create_return_form": {
+        "label": "Create Return Form",
+        "description": "The return period will expire on {{date}}"
       },
-      "no_items_found": "Không tìm thấy sản phẩm nào trong giỏ hàng để thanh toán.",
-      "buttons": {
-        "place_order": "Đặt hàng",
-        "shop_now": "Mua ngay"
+      "track_return_form": "Track returns"
+    },
+    "fields": {
+      "phoneNumber": "Customer phone number",
+      "date": "Date of purchase",
+      "expectedDelivery": "Estimated delivery date",
+      "address": "Delivery address"
+    },
+    "steps": {
+      "PLACE_ORDER": {
+        "title": "Place Order",
+        "description": "Customer places an order online."
+      },
+      "WAIT_FOR_CONFIRMATION": {
+        "title": "Wait for Confirmation",
+        "description": "Customer waits for order confirmation."
+      },
+      "WAIT_FOR_DELIVERY": {
+        "title": "Ready for Delivery",
+        "description": "Order is ready, waiting to be delivered."
+      },
+      "DELIVERING": {
+        "title": "In Delivery",
+        "description": "Order is being delivered."
+      },
+      "COMPLETED": {
+        "title": "Completed",
+        "description": "Order has been completed."
+      },
+      "RETURNED": {
+        "title": "Returned",
+        "description": "Order has been returned."
+      },
+      "CANCELED": {
+        "title": "Canceled",
+        "description": "Order has been canceled."
       }
     },
-    "home_page": {
-      "buttons": {
-        "shop_now": "Mua ngay"
+    "cancel": {
+      "title": "Please select a reason for cancellation",
+      "subtitle": "To improve service quality, please let us know the reason for canceling your order.",
+      "cases": {
+        "1": "Want to enter/change voucher code",
+        "2": "Want to change products in your order (size, color,...)",
+        "3": "Found cheaper prices elsewhere",
+        "4": "Changed my mind, don't want to buy anymore",
+        "5": "Itchy hands",
+        "other": "Other"
       }
     },
-    "feature_icon": {
-      "1": {
-        "title": "Free Shipping",
-        "subtitle": "Enjoy the convenience of free shipping on all your orders."
+    "messages": {
+      "success": "Order canceled successfully"
+    },
+    "order_status": {
+      "PLACE_ORDER": "Order",
+      "PENDING": "Not resolved",
+      "WAIT_FOR_CONFIRMATION": "Waiting for confirmation",
+      "WAIT_FOR_DELIVERY": "Ready",
+      "DELIVERING": "Delivering",
+      "COMPLETED": "Complete",
+      "CANCELED": "Cancelled",
+      "EXPIRED": "Expired",
+      "RETURNED": "Give back",
+      "EXCHANGED": "Exchange",
+      "ALL": "All"
+    },
+    "deliverables": "The order",
+    "modal": {
+      "title": "Your order",
+      "tooltip": "You can only provide some basic information about the order. In any case, please contact us or create a new order.",
+      "labels": {
+        "orderInfo": "Information line"
       },
-      "2": {
-        "title": "Support 24/7",
-        "subtitle": "We're here for you around the clock."
-      },
-      "3": {
-        "title": "Money Return",
-        "subtitle": "Shop with confidence knowing that your satisfaction is guaranteed."
+      "fields": {
+        "code": "Order code",
+        "fullName": "Full name",
+        "email": "Email",
+        "phoneNumber": "Customer phone number",
+        "note": "Invoice notes"
       }
     }
+  },
+  "return_tracking": {
+    "title": "Track return status",
+    "fields": {
+      "phoneNumber": "Recipient phone number",
+      "date": "Voucher creation date",
+      "amountToBePaid": "Amount to be paid",
+      "refundStatus": "Refund status",
+      "address": "Return address",
+      "unitPrice": "Unit price",
+      "email": "Email"
+    },
+    "deliverables": "Returned products"
+  },
+  "wish_list": {
+    "title": "Your favorites list",
+    "table": {
+      "head": {
+        "image": "Image",
+        "product_name": "Product's name",
+        "unit_price": "Unit price",
+        "add_to_cart": "Add to Basket",
+        "action": "Act"
+      }
+    },
+    "no_items_found": "No products found in the wish list.",
+    "buttons": {
+      "out_of_stock": "Out of stock",
+      "select_option": "Select options",
+      "continue_shopping": "Continue shopping",
+      "clear_wishlist": "Delete favorites list",
+      "add_items": "Buy now"
+    }
+  },
+  "compare": {
+    "title": "Product information",
+    "items": {
+      "price": "Unit price",
+      "description": "Describe",
+      "rating": "Evaluate"
+    },
+    "buttons": {
+      "select_option": "Select options",
+      "out_of_stock": "Out of stock",
+      "add_items": "Buy now"
+    },
+    "no_items_found": "No products found in the comparison list."
+  },
+  "cart": {
+    "title": "Your cart",
+    "table": {
+      "head": {
+        "image": "Image",
+        "product_name": "Product's name",
+        "color": "Color",
+        "size": "Size",
+        "unit_price": "Unit price",
+        "qty": "Quantity",
+        "subtotal": "into money",
+        "action": "Act"
+      }
+    },
+    "shipping": {
+      "title": "Estimate shipping costs.",
+      "subtitle": "Enter your destination address to get shipping cost estimates.",
+      "address": {
+        "province": {
+          "title": "Province/City",
+          "place_holder": "Select Province/City"
+        },
+        "district": {
+          "title": "District",
+          "place_holder": "Select District"
+        },
+        "ward": {
+          "title": "Wards",
+          "place_holder": "Select Ward/Commune"
+        },
+        "messages": {
+          "empty": "Please select an address"
+        }
+      },
+      "messages": {
+        "calculateFee": "Your shipping costs are estimated to be "
+      }
+    },
+    "voucher": {
+      "voucher": "Discount",
+      "title": "Use Discount Voucher",
+      "modal": {
+        "title": "List of active discount vouchers",
+        "antd_list": {
+          "reduce": "Discount",
+          "for_order_above": "For orders over",
+          "valid_til": "Valid until",
+          "detail": "Details"
+        }
+      },
+      "subtitle": "Enter your discount code.",
+      "messages": {
+        "empty": "Please enter the discount code",
+        "success": "Discount voucher applied successfully",
+        "invalid": "Invalid voucher",
+        "unqualified": "Order does not meet the requirements for discount application",
+        "author": "To add or edit discounts, please log in"
+      },
+      "add": "Add voucher",
+      "remove": "Remove voucher"
+    },
+    "cart_total": {
+      "title": "Total cart",
+      "total": "Into money",
+      "shipping": "Shipping fee",
+      "grand_total": "Total"
+    },
+    "no_items_found": "No products found in the cart.",
+    "buttons": {
+      "out_of_stock": "Out of stock",
+      "select_option": "Select options",
+      "continue_shopping": "Continue shopping",
+      "clear_cart": "Delete cart",
+      "add_items": "Buy now",
+      "get_a_quote": "Get a quote",
+      "apply_voucher": "Discount applies",
+      "proceed_to_checkout": "Proceed to payment",
+      "check_voucher": "View vouchers"
+    },
+    "messages": {
+      "buy_more": "Buy more",
+      "for_free_shipping": "for free shipping",
+      "for_discount": "to be reduced to",
+      "zero_qty_cart_warn": "Reducing the quantity to 0 when there is only 1 product left in the cart is equivalent to canceling the order",
+      "zero_qty_warn": "Reducing the quantity to zero is equivalent to removing the product from the cart"
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "follow_us": "Follow us",
+    "keep_in_touch": "Keep contact"
+  },
+  "auth_page": {
+    "forgot_password": {
+      "title": "Forgot password",
+      "fields": {
+        "email": {
+          "label": "Email",
+          "placeholder": "Account registration email..."
+        }
+      },
+      "buttons": {
+        "receive_construction": "Receive email instructions"
+      }
+    },
+    "login_register": {
+      "login": {
+        "title": "Log in",
+        "fields": {
+          "password": {
+            "label": "Password",
+            "placeholder": "Password"
+          },
+          "confirm": {
+            "label": "Confirm password",
+            "placeholder": "Confirm password"
+          }
+        },
+        "labels": {
+          "save_login": "Save login",
+          "forgot_password": "Forgot password?"
+        },
+        "messages": {
+          "success": "Logged in successfully",
+          "hi": "Hello"
+        }
+      },
+      "register": {
+        "title": "Register",
+        "fields": {
+          "email": {
+            "label": "Email"
+          },
+          "gender": {
+            "label": "Choose gender",
+            "male": "Male",
+            "female": "Female",
+            "other": "Other"
+          }
+        },
+        "messages": {
+          "confirm": "Please confirm your password!",
+          "not_match": "The new password you entered does not match!"
+        }
+      }
+    }
+  },
+  "my_account": {
+    "account_infor": {
+      "title": "Edit account information",
+      "labels": {
+        "your_infor": "Your personal information"
+      },
+      "fields": {
+        "name": "Name",
+        "dateOfBirth": "Date of birth",
+        "email": "Email",
+        "gender": {
+          "label": "Sex",
+          "placeholder": "Choose gender",
+          "male": "Male",
+          "female": "Female",
+          "other": "Other"
+        }
+      },
+      "messages": {
+        "success": "Successfully changed personal information!"
+      }
+    },
+    "change_password": {
+      "title": "Change Password",
+      "labels": {
+        "change_password": "Enter information to change password"
+      },
+      "fields": {
+        "oldPassword": "old password",
+        "password": "A new password",
+        "confirm": "Confirm new password"
+      }
+    },
+    "address": {
+      "title": "Modify address list",
+      "labels": {
+        "list": "List of addresses",
+        "create": "Add new address",
+        "edit": "Update address",
+        "default": "Default"
+      },
+      "buttons": {
+        "create": "Add new address",
+        "edit": "Edit",
+        "set_default": "Set default",
+        "delete": "Delete"
+      },
+      "messages": {
+        "set_default": "Set default address successfully",
+        "choose": "Address selected successfully",
+        "create": "Address created successfully",
+        "empty": "You don't have an address yet, please create one first."
+      },
+      "fields": {
+        "phoneNumber": "Phone number",
+        "province": {
+          "title": "Province/City",
+          "place_holder": "Select Province/City"
+        },
+        "district": {
+          "title": "District",
+          "place_holder": "Select District"
+        },
+        "ward": {
+          "title": "Wards",
+          "place_holder": "Select Ward/Commune"
+        },
+        "more": "Detail"
+      }
+    },
+    "voucher": {
+      "title": "Your voucher wallet",
+      "labels": {
+        "list": "List of vouchers for you"
+      }
+    }
+  },
+  "reset_password": {
+    "title": "Reset Password",
+    "password": "Enter your new password",
+    "confirm": "Confirm new password",
+    "messages": {
+      "success": {
+        "message": "Redirecting to login page...",
+        "description": "Password reset successful!"
+      }
+    }
+  },
+  "my_order": {
+    "title": "Your order",
+    "fields": {
+      "code": "Code",
+      "total": "total",
+      "product": "Product",
+      "createdAt": "Create at"
+    },
+    "segmented": {
+      "options": {
+        "ALL": "All",
+        "WAIT_FOR_CONFIRMATION": "Wait for confirmation",
+        "WAIT_FOR_DELIVERY": "Waiting for shipping",
+        "DELIVERING": "Being transported",
+        "COMPLETED": "Complete",
+        "CANCELED": "Cancel"
+      }
+    },
+    "buttons": {
+      "tracking": "Look up orders"
+    }
+  },
+  "not_found": {
+    "title": "404",
+    "subtitle": "SAD BAYY! ",
+    "description": "We're sorry, but the page you're looking for doesn't exist, has been deleted, renamed, or is temporarily unavailable."
+  },
+  "tracking_page": {
+    "title": "Look up orders",
+    "subtitle": "Enter the order code to perform the lookup",
+    "placeholder": "Enter order code... For example: SUS-HGDKA",
+    "messages": {
+      "success": "Order lookup successful",
+      "required": "Please enter your order code"
+    }
+  },
+  "success_page": {
+    "title": "Thank you for your purchase!",
+    "subtitle": {
+      "email": "An order confirmation email with your order details and a link to track progress has been sent to your email address.",
+      "contact": "We will contact you within 24 hours, please wait.",
+      "code": "Code orders",
+      "date": "Date of purchase"
+    },
+    "extra": {
+      "print": "Print invoices"
+    },
+    "address": {
+      "shipping": "Delivery address",
+      "order": "Invoice address",
+      "phoneNumber": "Phone number",
+      "province": {
+        "title": "Province/City",
+        "place_holder": "Select Province/City"
+      },
+      "district": {
+        "title": "District",
+        "place_holder": "Select District"
+      },
+      "ward": {
+        "title": "Wards",
+        "place_holder": "Select Ward/Commune"
+      },
+      "line": "Address details"
+    },
+    "shipping_method": "Shipping method",
+    "payment_method": "Payment method",
+    "giaohangtietkiem": "Giaohangtietkiem"
+  },
+  "return_success": {
+    "title": "Your return form has been sent!",
+    "subtitle": "We will call you to confirm via the phone number below",
+    "buttons": {
+      "tracking": "Track refunds"
+    }
+  },
+  "home_page": {
+    "buttons": {
+      "shop_now": "Buy now"
+    }
+  },
+  "feature_icon": {
+    "1": {
+      "title": "Free shipping",
+      "subtitle": "Enjoy shopping, free shipping on all your orders."
+    },
+    "2": {
+      "title": "24/7 Support",
+      "subtitle": "We are always here to support you at all times."
+    },
+    "3": {
+      "title": "Refund",
+      "subtitle": "Shop with confidence knowing that your satisfaction is guaranteed."
+    }
+  },
+  "video-popup": {
+    "content": {
+      "title": "Conquer speeds beyond your imagination",
+      "subtitle": "Take your style to the next level. "
+    },
+    "buttons": {
+      "more": "Find out more"
+    }
+  },
+  "product_slider": {
+    "new_products": {
+      "title": "New product",
+      "subtitle": "Explore the latest products, let us bring you a wonderful experience."
+    },
+    "best_products": {
+      "title": "Selling products",
+      "subtitle": "Explore the most popular product list, we are confident to bring you the best shopping experience."
+    }
+  },
+  "brand_logo": {
+    "our_clients": "Our partner"
+  },
+  "newsletter": {
+    "title": "Connect with us",
+    "subtitle": "Sign up for our newsletter to stay up to date with the latest information.",
+    "buttons": {
+      "subscribe": {
+        "title": "Register",
+        "place_holder": "Your email address."
+      }
+    }
+  },
+  "footer": {
+    "about_us": {
+      "title": "ABOUT US",
+      "about_us": "About us",
+      "store_location": "Store address",
+      "contact": "Contact",
+      "orders_tracking": "Order tracking"
+    },
+    "usefull_links": {
+      "title": "USEFUL LINKS",
+      "returns": "Return policy",
+      "support_policy": "Supporting policies",
+      "size_guide": "Instructions for choosing size",
+      "faqs": "Frequently asked questions"
+    },
+    "follow_us": {
+      "title": "SOCIAL NETWORK"
+    },
+    "newsletter": {
+      "title": "REGISTER",
+      "subtitle": "Receive the latest email updates about our store and special offers.",
+      "buttons": {
+        "subscribe": {
+          "title": "Register",
+          "place_holder": "Your email address..."
+        }
+      }
+    }
+  },
+  "header": {
+    "menu_cart": {
+      "qty": "Quantity",
+      "total": "Total",
+      "color": "Color",
+      "size": "Size",
+      "buttons": {
+        "view_cart": "View cart",
+        "checkout": "Pay"
+      },
+      "no_items": "There are no products in the cart"
+    },
+    "call_us": "Call us",
+    "dear_user": "Dear users"
+  },
+  "products": {
+    "sale": "Sale up to",
+    "new": "New",
+    "fields": {
+      "code": "Code",
+      "colors": "Colors",
+      "sizes": "Sizes",
+      "styles": "Styles",
+      "tradeMarks": "Trademarks",
+      "materials": "Materials",
+      "soles": "Soles",
+      "tags": "Tags",
+      "descriptions": "Descriptions",
+      "stock": "Available Stock"
+    },
+    "desc_tab": {
+      "additional_information": "Additional Information",
+      "description": "Description",
+      "reviews": "Reviews",
+      "fields": {
+        "name": "Name",
+        "email": "Email",
+        "message": "Message",
+        "your_rating": "Your Rating",
+        "productDetails": {
+          "label": "Product",
+          "placeholder": "Select your product"
+        }
+      },
+      "buttons": {
+        "reply": "Reply",
+        "add_review": "Add Review",
+        "submit": "Submit",
+        "out_of_stock": "Out of Stock"
+      },
+      "messages": {
+        "success": "Review submitted successfully",
+        "delete_review": "Review deleted successfully"
+      }
+    },
+    "anotherinfo": {
+      "weight": "Weight",
+      "dimension": "Dimensions",
+      "material": "Material",
+      "otherInfo": {
+        "title": "Other Information",
+        "content": "You can view detailed views of each corner of the product by scanning the QR code provided on the shoebox."
+      }
+    },
+    "related_products": "Related Products",
+    "buttons": {
+      "add_to_cart": "Add to Cart",
+      "shop_now": "Shop Now"
+    },
+    "messages": {
+      "min_reached": "Minimum quantity reached",
+      "limit_reached": "Sorry, reached the maximum limit of product quantity!",
+      "max_cart_size": "You can only purchase up to 5 products, please contact us if you need to buy in bulk"
+    }
+  },
+  "confirmDialog": {
+    "delete": {
+      "message": "Are you sure?",
+      "header": "Confirm deletion!",
+      "acceptLabel": "Agree",
+      "rejectLabel": "Cancel"
+    },
+    "edit": {
+      "message": "Are you sure you want to continue?",
+      "header": "Confirm!",
+      "acceptLabel": "Agree",
+      "rejectLabel": "Cancel"
+    }
+  },
+  "return-forms": {
+    "return-forms": "Return Forms",
+    "titles": {
+      "list": "Return Forms",
+      "create": "Create Return Form",
+      "show": "Return Form Details",
+      "form": "Return Request Form",
+      "return-details": "Returned Product Details",
+      "return-address": "Return Address Information",
+      "shippingInfo": "Shipping Information",
+      "paymentInfo": "Payment Information",
+      "steps": {
+        "selectOrder": "Select Return Order",
+        "selectProduct": "Select Product to Return",
+        "fillInformation": "Fill Return Information"
+      }
+    },
+    "fields": {
+      "code": "Return Code",
+      "orderCode": "Order Code",
+      "fullName": "Recipient Name",
+      "customer": {
+        "label": "Customer",
+        "placeholder": "Not selected"
+      },
+      "employee": {
+        "label": "Responsible Employee",
+        "placeholder": "Not selected"
+      },
+      "shippingMoney": "Estimated Shipping Fee",
+      "returnProducts": "Returned Products",
+      "phoneNumber": "Recipient Phone Number",
+      "amountToBePaid": "Amount to be Paid",
+      "createdAt": "Created At",
+      "createdBy": "Created By",
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter your email address"
+      },
+      "paymentInfo": {
+        "label": "Payment Information",
+        "placeholder": "VCB XXXBANK XXXXXXXXXXXXXXXXX"
+      },
+      "type": {
+        "label": "Type",
+        "placeholder": "Select return type",
+        "OFFLINE": "In-store",
+        "ONLINE": "Online"
+      },
+      "paymentType": {
+        "label": "Return Payment Method",
+        "placeholder": "Select return payment method",
+        "tooltip": "Return payment method is the method of payment for customers when returning items",
+        "Cash": "Cash",
+        "Transfer": "Bank Transfer"
+      },
+      "returnDeliveryStatus": {
+        "label": "Return Delivery Status",
+        "placeholder": "Select return delivery status",
+        "tooltip": "Return delivery status is the processing status of the order in the return form. For example: when creating a return form in-store, the status will be 'Received', while when customers create a return form online, the status will be 'Pending'",
+        "PENDING": "Pending",
+        "RETURNING": "Returning",
+        "RECEIVED": "Received",
+        "COMPLETED": "Completed"
+      },
+      "refundStatus": {
+        "label": "Refund Status",
+        "placeholder": "Select refund status",
+        "PENDING": "Pending",
+        "COMPLETED": "Completed"
+      }
+    },
+    "messages": {
+      "agree": "I agree with the store's return policy",
+      "emptySelected": "Please select products to return",
+      "emptyReturnDetails": "Please check the returned products first",
+      "invalidReturnQuantity": "Return quantity cannot exceed the original quantity",
+      "emptyReturnQuantity": "Please enter the return quantity",
+      "notAgree": "Please make sure you have read and agree to the store's policy",
+      "not_found": "Order not found or order does not meet return conditions",
+      "contact": "Please contact us for resolution if you cannot find your order"
+    },
+    "buttons": {
+      "return_to_orders": "Return to Order Information Page",
+      "submit": "Submit Return Request Form"
+    }
+  },
+  "return-form-details": {
+    "return-form-details": "Returned Product Details",
+    "fields": {
+      "orderCode": "Invoice Code",
+      "product": "Product",
+      "quantity": "Quantity",
+      "name": "Name",
+      "returnQuantity": "Return Quantity",
+      "unitPrice": "Unit Price",
+      "totalPrice": "Total Price",
+      "reason": {
+        "label": "Return Reason",
+        "placeholder": "Enter the reason for returning the product"
+      },
+      "feedback": {
+        "label": "Feedback",
+        "placeholder": "Enter customer feedback for the product"
+      },
+      "evidence": {
+        "label": "Actual Images",
+        "tooltip": "Actual images showing the condition of the returned product"
+      },
+      "resellable": {
+        "label": "Resellable",
+        "YES": "Yes",
+        "NO": "No"
+      },
+      "returnInspectionStatus": {
+        "label": "Inspection Status",
+        "placeholder": "Select inspection status",
+        "tooltip": "Inspection status is the evaluation status of whether the product can be returned or not.",
+        "PASSED": "Approved",
+        "FAILED": "Rejected",
+        "PENDING": "Pending",
+        "null": "Pending"
+      },
+      "returnInspectionReason": {
+        "label": "Return Inspection Reason",
+        "placeholder": "Enter the return inspection reason",
+        "tooltip": "Return inspection reason is the reason provided for the return inspection decision."
+      }
+    }
+  },
+  "validator": {
+    "message": {
+      "fullName": "Full name cannot be empty!",
+      "full_name": "Full name cannot be empty!",
+      "dateOfBirth": "Date of birth cannot be empty!",
+      "gender": "Gender cannot be empty!",
+      "provinceId": "Province/City cannot be empty!",
+      "districtId": "District cannot be empty!",
+      "wardCode": "Ward cannot be empty!",
+      "more": "Address details cannot be empty!",
+      "line": "Address details cannot be empty",
+      "rating": "Rating cannot be empty",
+      "productDetails": "Please select a product",
+      "comment": "Review content cannot be empty",
+      "paymentInfo": "Payment information cannot be empty",
+      "oldPassword": "Please enter the old password",
+      "password": "Please enter the password",
+      "confirmPassword": "Please confirm the password"
+    }
+  },
+  "common": {
+    "hi": "Hello",
+    "logout": "Logout",
+    "search": "Search",
+    "search_placeholder": "Enter keywords..",
+    "maxLength": "Max {{length}} characters",
+    "rowSelection": "{{count}} item has been selected",
+    "use_now": "Use now",
+    "copied": "Copied to clipboard",
+    "update": {
+      "success": "Update completed"
+    },
+    "checkout": {
+      "success": "Order has been paid successfully!"
+    },
+    "success": "Success",
+    "fail": "Failure",
+    "error": "An error has occurred: ",
+    "free_shipping": "Free shipping",
+    "free_shipping_message": "Free shipping for orders over"
+  },
+  "buttons": {
+    "delete": "Delete",
+    "submit": "Submit",
+    "save_changes": "Save changes",
+    "back_home": "Return to home page",
+    "choose": "Select",
+    "choose_address": "Choose your address"
+  },
+  "image": {
+    "upload": "Upload",
+    "dragger": {
+      "text": "Click or drag files into this area to upload",
+      "hint": "Supports uploading one or more files. "
+    },
+    "error": {
+      "invalid": "You can only upload JPG/PNG files!",
+      "exceed": "Photos must be less than 2MB!"
+    },
+    "description": {
+      "add": "More photos",
+      "edit": "Edit image"
+    },
+    "validation": "Must be {{size}}x{{size}} px"
+  },
+  "product_action": {
+    "tooltips": {
+      "wishlist": {
+        "in": "Added to favorites list",
+        "out": "Add to favorites list"
+      },
+      "compare": {
+        "in": "Added to comparison list",
+        "out": "Add to comparison list"
+      }
+    }
+  },
+  "sort": {
+    "sort_by": "Sort by",
+    "default": "Default",
+    "popularity": "Popularity",
+    "best_seller": "Best Seller",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "price_high_to_low": "Price - High to Low",
+    "price_low_to_high": "Price - Low to High",
+    "showing": "Showing",
+    "results": "results",
+    "out_of": "out of"
   }
-  
+}

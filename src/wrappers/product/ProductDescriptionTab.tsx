@@ -1,23 +1,22 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { useForm } from "@refinedev/antd";
+import { HttpError, useList, useTranslate } from "@refinedev/core";
 import { Form, Modal, Rate, Spin, Upload, UploadFile } from "antd";
 import { RcFile, UploadChangeParam, UploadProps } from "antd/es/upload";
 import clsx from "clsx";
 import { useState } from "react";
 import Nav from "react-bootstrap/Nav";
 import Tab from "react-bootstrap/Tab";
-import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
+import Reviews from "../../components/review/Reviews";
 import { getBase64, getBase64Image } from "../../helpers/image";
 import { showErrorToast } from "../../helpers/toast";
+import { validateCommon } from "../../helpers/validate";
 import {
   IProductResponse,
   IReviewRequest,
   IReviewResponse,
 } from "../../interfaces";
-import { HttpError, useList, useTranslate } from "@refinedev/core";
-import { useParams } from "react-router-dom";
-import Reviews from "../../components/review/Reviews";
-import { validateCommon } from "../../helpers/validate";
 
 interface ProductDescriptionTabProps {
   spaceBottomClass: string;
@@ -50,15 +49,15 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
       },
       successNotification: (data, values, resource) => {
         return {
-          message: `Gửi đánh giá thành công`,
-          description: "Thành công",
+          message: t("products.desc_tab.messages.success"),
+          description: t("common.success"),
           type: "success",
         };
       },
       errorNotification: (error, values, resource) => {
         return {
-          message: `${error?.message}`,
-          description: "Đã có lỗi xảy ra",
+          message: t("common.error") + error?.message,
+          description: "Oops...",
           type: "error",
         };
       },
@@ -159,18 +158,19 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
                 <div className="product-anotherinfo-wrapper">
                   <ul>
                     <li>
-                      <span>Cân nặng</span> 400 g
+                      <span>{t("products.anotherinfo.weight")}</span> 400 g
                     </li>
                     <li>
-                      <span>Kích thước</span>10 x 10 x 15 cm{" "}
+                      <span>{t("products.anotherinfo.dimension")}</span>10 x 10
+                      x 15 cm{" "}
                     </li>
                     <li>
-                      <span>Nguyên liệu</span> 60% cotton, 40% polyester
+                      <span>{t("products.anotherinfo.material")}</span> 60%
+                      cotton, 40% polyester
                     </li>
                     <li>
-                      <span>Thông tin khác</span> Bạn có thể xem chi tiết từng
-                      góc cạnh của sản phẩm bằng cách quét mã QR code đi kèm
-                      trên hộp giày.
+                      <span>{t("products.anotherinfo.otherInfo.title")}</span>{" "}
+                      {t("products.anotherinfo.otherInfo.content")}
                     </li>
                   </ul>
                 </div>
@@ -234,10 +234,27 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
                                   {product.productDetails.length > 0 ? (
                                     <select>
                                       <option value="">
-                                        --Chọn sản phẩm của bạn--
+                                        --
+                                        {t(
+                                          `products.desc_tab.fields.productDetails.placeholder`
+                                        )}
+                                        --
                                       </option>
-                                      {product.productDetails.map(
-                                        (productDetail, index) => (
+                                      {product.productDetails
+                                        .sort((a, b) => {
+                                          if (a.color.name < b.color.name)
+                                            return -1;
+                                          if (a.color.name > b.color.name)
+                                            return 1;
+
+                                          if (a.size.name < b.size.name)
+                                            return -1;
+                                          if (a.size.name > b.size.name)
+                                            return 1;
+
+                                          return 0;
+                                        })
+                                        .map((productDetail, index) => (
                                           <option
                                             key={productDetail.id}
                                             value={productDetail.id}
@@ -246,14 +263,11 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
                                             {productDetail.color.name} -{" "}
                                             {productDetail.size.name}
                                           </option>
-                                        )
-                                      )}
+                                        ))}
                                     </select>
                                   ) : (
                                     <select>
-                                      <option value="">
-                                        Đang tải sản phẩm...
-                                      </option>
+                                      <option value="">Loading...</option>
                                     </select>
                                   )}
                                 </Form.Item>
@@ -315,7 +329,7 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
                                           <div>
                                             <PlusOutlined />
                                             <div style={{ marginTop: 8 }}>
-                                              Tải lên
+                                              {t("image.upload")}
                                             </div>
                                           </div>
                                         )}

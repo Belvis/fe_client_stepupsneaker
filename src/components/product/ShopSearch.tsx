@@ -1,3 +1,4 @@
+import { useTranslate } from "@refinedev/core";
 import { debounce } from "lodash";
 
 interface ShopSearchProps {
@@ -5,6 +6,7 @@ interface ShopSearchProps {
 }
 
 const ShopSearch: React.FC<ShopSearchProps> = ({ updateFilterParams }) => {
+  const t = useTranslate();
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
   };
@@ -18,13 +20,13 @@ const ShopSearch: React.FC<ShopSearchProps> = ({ updateFilterParams }) => {
 
   return (
     <div className="sidebar-widget">
-      <h4 className="pro-sidebar-title">Tìm kiếm</h4>
+      <h4 className="pro-sidebar-title">{t("common.search")}</h4>
       <div className="pro-sidebar-search mb-50 mt-25">
         <form className="pro-sidebar-search-form" onSubmit={handleSubmit}>
           <input
             type="text"
             name="q"
-            placeholder="Nhập từ khoá tại đây..."
+            placeholder={t("common.search_placeholder")}
             onChange={handleChange}
           />
           <button type="submit">

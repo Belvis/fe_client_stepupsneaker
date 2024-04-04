@@ -1,16 +1,16 @@
+import { Rate } from "antd";
 import clsx from "clsx";
 import { Fragment, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { CurrencyFormatter } from "../../helpers/currency";
 import { getDiscountPrice } from "../../helpers/product";
 import { ICartItem, IProductClient } from "../../interfaces";
 import { addToCompare } from "../../redux/slices/compare-slice";
 import { CurrencyState } from "../../redux/slices/currency-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
 import ProductModal from "./ProductModal";
-import Rating from "./sub-components/ProductRating";
-import { CurrencyFormatter } from "../../helpers/currency";
-import { Rate } from "antd";
+import { useTranslate } from "@refinedev/core";
 
 type ProductGridSingleTwoProps = {
   cartItem?: ICartItem;
@@ -31,6 +31,7 @@ const ProductGridSingleTwo: React.FC<ProductGridSingleTwoProps> = ({
   spaceBottomClass,
   colorClass,
 }) => {
+  const t = useTranslate();
   const [modalShow, setModalShow] = useState(false);
   const discountedPrice = getDiscountPrice(product.price.max, product.discount);
   const finalProductPrice = +(product.price.max * currency.currencyRate);
@@ -58,7 +59,11 @@ const ProductGridSingleTwo: React.FC<ProductGridSingleTwoProps> = ({
               ) : (
                 ""
               )}
-              {product.new ? <span className="purple">New</span> : ""}
+              {product.new ? (
+                <span className="purple">{t("products.new")}</span>
+              ) : (
+                ""
+              )}
             </div>
           ) : (
             ""
@@ -73,19 +78,22 @@ const ProductGridSingleTwo: React.FC<ProductGridSingleTwoProps> = ({
             {discountedPrice !== null ? (
               <Fragment>
                 <CurrencyFormatter
+                  value={finalDiscountedPrice}
+                  currency={currency}
+                  notation="compact"
+                />{" "}
+                <CurrencyFormatter
                   className="old"
                   value={finalProductPrice}
                   currency={currency}
-                />{" "}
-                <CurrencyFormatter
-                  value={finalDiscountedPrice}
-                  currency={currency}
+                  notation="compact"
                 />
               </Fragment>
             ) : (
               <CurrencyFormatter
                 value={finalProductPrice}
                 currency={currency}
+                notation="compact"
               />
             )}
           </div>
@@ -103,8 +111,8 @@ const ProductGridSingleTwo: React.FC<ProductGridSingleTwoProps> = ({
                 disabled={wishlistItem !== undefined}
                 title={
                   wishlistItem !== undefined
-                    ? "Đã thêm vào danh sách yêu thích"
-                    : "Thêm vào danh sách yêu thích"
+                    ? t("product_action.tooltips.wishlist.in")
+                    : t("product_action.tooltips.wishlist.out")
                 }
                 onClick={() => dispatch(addToWishlist(product))}
               >
@@ -113,11 +121,18 @@ const ProductGridSingleTwo: React.FC<ProductGridSingleTwoProps> = ({
             </div>
             <div className="pro-same-action pro-cart">
               {product.variation && product.variation.length >= 1 ? (
-                <Link to={`/product/${product.id}`} title="Mua ngay">
+                <Link
+                  to={`/product/${product.id}`}
+                  title={t("products.buttons.shop_now")}
+                >
                   <i className="pe-7s-cart"></i>
                 </Link>
               ) : (
-                <button disabled className="active" title="Out of stock">
+                <button
+                  disabled
+                  className="active"
+                  title={t("products.desc_tab.buttons.out_of_stock")}
+                >
                   <i className="pe-7s-cart"></i>
                 </button>
               )}
@@ -128,8 +143,8 @@ const ProductGridSingleTwo: React.FC<ProductGridSingleTwoProps> = ({
                 disabled={compareItem !== undefined}
                 title={
                   compareItem !== undefined
-                    ? "Đã thêm vào danh sách so sánh"
-                    : "Thêm vào danh sách so sánh"
+                    ? t("product_action.tooltips.compare.in")
+                    : t("product_action.tooltips.compare.out")
                 }
                 onClick={() => dispatch(addToCompare(product))}
               >

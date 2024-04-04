@@ -1,6 +1,6 @@
 import { GiftOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { Form, Image, RadioChangeEvent, Spin } from "antd";
+import { Button, Form, Image, RadioChangeEvent, Spin } from "antd";
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
@@ -501,8 +501,8 @@ const CheckOut = () => {
         successNotification: false,
         errorNotification: (error: any) => {
           return {
-            message: error.message,
-            description: "Đã xẩy ra lỗi",
+            message: t("common.error") + error.message,
+            description: "Oops",
             type: "error",
           };
         },
@@ -562,7 +562,6 @@ const CheckOut = () => {
                 name="billing-info"
                 layout="inline"
                 onFinish={onFinish}
-                // onFinishFailed={onFinishFailed}
                 autoComplete="off"
                 onValuesChange={handleFormChange}
                 initialValues={{
@@ -595,16 +594,16 @@ const CheckOut = () => {
                         <h3>{t("checkout.billing_details.title")}</h3>
                       </div>
                       <div className="col text-end">
-                        <Authenticated fallback={false}>
-                          <button
+                        <Authenticated key="choose-address" fallback={false}>
+                          <Button
                             style={{ marginInlineEnd: "16px" }}
                             onClick={(event) => {
                               event.preventDefault();
                               show();
                             }}
                           >
-                            Chọn địa chỉ của bạn
-                          </button>
+                            {t("buttons.choose_address")}
+                          </Button>
                         </Authenticated>
                       </div>
                     </div>
@@ -672,7 +671,11 @@ const CheckOut = () => {
                             {provinces && provinces.length > 0 ? (
                               <select onChange={handleProvinceChange}>
                                 <option value="">
-                                  --Chọn tỉnh/thành phố--
+                                  --
+                                  {t(
+                                    "checkout.billing_details.province.place_holder"
+                                  )}
+                                  --
                                 </option>
                                 {provinces.map((province, index) => (
                                   <option
@@ -685,9 +688,7 @@ const CheckOut = () => {
                               </select>
                             ) : (
                               <select>
-                                <option value="">
-                                  Đang tải tỉnh/thành phố...
-                                </option>
+                                <option value="">Loading...</option>
                               </select>
                             )}
                           </Form.Item>
@@ -709,7 +710,13 @@ const CheckOut = () => {
                           >
                             {districts && districts.length > 0 ? (
                               <select onChange={handleDistrictChange}>
-                                <option value="">--Chọn quận/huyện--</option>
+                                <option value="">
+                                  --
+                                  {t(
+                                    "checkout.billing_details.district.place_holder"
+                                  )}
+                                  --
+                                </option>
                                 {districts.map((district, index) => (
                                   <option
                                     key={index}
@@ -721,7 +728,7 @@ const CheckOut = () => {
                               </select>
                             ) : (
                               <select>
-                                <option value="">Đang tải quận/huyện...</option>
+                                <option value="">Loading...</option>
                               </select>
                             )}
                           </Form.Item>
@@ -743,7 +750,13 @@ const CheckOut = () => {
                           >
                             {wards && wards.length > 0 ? (
                               <select onChange={handleWardChange}>
-                                <option value="">--Chọn phường/xã--</option>
+                                <option value="">
+                                  --
+                                  {t(
+                                    "checkout.billing_details.ward.place_holder"
+                                  )}
+                                  --
+                                </option>
                                 {wards.map((ward, index) => (
                                   <option key={index} value={ward.WardCode}>
                                     {ward.WardName}
@@ -752,7 +765,7 @@ const CheckOut = () => {
                               </select>
                             ) : (
                               <select>
-                                <option value="">Đang tải phường/...</option>
+                                <option value="">Loading...</option>
                               </select>
                             )}
                           </Form.Item>
@@ -882,18 +895,22 @@ const CheckOut = () => {
                             <li>
                               {cartTotalPrice >= FREE_SHIPPING_THRESHOLD ? (
                                 <span className="free-shipping">
-                                  Miễn phí vận chuyển
+                                  {t("common.free_shipping")}
                                 </span>
                               ) : (
                                 <>
                                   {order.address ? (
                                     <CurrencyFormatter
-                                      value={shippingMoney}
+                                      value={
+                                        shippingMoney * currency.currencyRate
+                                      }
                                       currency={currency}
                                     />
                                   ) : (
                                     <span className="free-shipping">
-                                      Vui lòng chọn địa chỉ
+                                      {t(
+                                        "cart.shipping.address.messages.empty"
+                                      )}
                                     </span>
                                   )}
                                 </>
@@ -902,7 +919,7 @@ const CheckOut = () => {
                           </ul>
                           <ul>
                             <li className="your-order-voucher">
-                              Giảm giá{" "}
+                              {t("cart.voucher.voucher")}{" "}
                               {order.voucher && (
                                 <MinusCircleOutlined
                                   className="remove-voucher"
@@ -912,7 +929,7 @@ const CheckOut = () => {
                             </li>
                             <li>
                               <CurrencyFormatter
-                                value={discount}
+                                value={discount * currency.currencyRate}
                                 currency={currency}
                               />
                             </li>
@@ -946,27 +963,27 @@ const CheckOut = () => {
                             if (shouldDisplayFreeShipping) {
                               return (
                                 <DiscountMessage>
-                                  <GiftOutlined /> Mua thêm{" "}
+                                  <GiftOutlined /> {t("cart.messages.buy_more")}{" "}
                                   <DiscountMoney>
                                     {formatCurrency(
                                       freeShippingDifference,
                                       currency
                                     )}
                                   </DiscountMoney>{" "}
-                                  để được miễn phí vận chuyển
+                                  {t("cart.messages.for_free_shipping")}
                                 </DiscountMessage>
                               );
                             } else if (shouldDisplayVoucher) {
                               return (
                                 <DiscountMessage>
-                                  <GiftOutlined /> Mua thêm{" "}
+                                  <GiftOutlined /> {t("cart.messages.buy_more")}{" "}
                                   <DiscountMoney>
                                     {formatCurrency(
                                       voucherDifference,
                                       currency
                                     )}
                                   </DiscountMoney>{" "}
-                                  để được giảm tới{" "}
+                                  {t("cart.messages.for_discount")}{" "}
                                   <DiscountMoney>
                                     {formatCurrency(
                                       legitVouchers[0].voucher.value,
@@ -1003,7 +1020,10 @@ const CheckOut = () => {
                     </div>
                   </div>
                   <div className="your-order-area mb-2 payment-methods-wrapper">
-                    <Authenticated fallback={false}>
+                    <Authenticated
+                      key="payment-methods-wrapper"
+                      fallback={false}
+                    >
                       <DiscountCodeAccordion
                         totalMoney={cartTotalPrice + shippingMoney - discount}
                         vouchers={user?.customerVoucherList || []}
@@ -1051,7 +1071,7 @@ const CheckOut = () => {
           )}
         </div>
       </div>
-      <Authenticated fallback={false}>
+      <Authenticated key="ListAddressModal" fallback={false}>
         <ListAddressModal
           customer={user}
           modalProps={restModalProps}

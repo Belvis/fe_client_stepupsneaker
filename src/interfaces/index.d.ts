@@ -1,6 +1,14 @@
 export interface IEvent {
   date: number | undefined;
   status: OrderStatus;
+  loading?: boolean;
+  note?: string;
+}
+export interface IReturnEvent {
+  date: number | undefined;
+  status: DeliveryStatus;
+  loading?: boolean;
+  note?: string;
 }
 export interface IFeatureIconData {
   id: number;
@@ -238,13 +246,27 @@ export interface IReviewResponse {
   rating: number;
   urlImage: string;
 }
+export interface IEmployeeResponse {
+  id: string;
+  fullName: string;
+  email: string;
+  password: string;
+  phoneNumber;
+  status: UserStatus;
+  gender: string;
+  image: string;
+  role: IRoleResponse;
+  address: string;
+}
 export interface IReturnFormResponse {
   id: string;
   order: IOrderResponse;
   code: string;
+  phoneNumber: string;
+  email: string;
   employee: IEmployeeResponse;
   address: IAddressResponse;
-  returnDetails: IReturnFormDetailResponse[];
+  returnFormDetails: IReturnFormDetailResponse[];
   amountToBePaid: number;
   type: ReturnType;
   returnDeliveryStatus: DeliveryStatus;
@@ -254,6 +276,14 @@ export interface IReturnFormResponse {
   createdBy: string;
   createdAt: number;
   returnFormHistories: IReturnFormHistoryResponse[];
+}
+export interface IReturnFormHistoryResponse {
+  id: string;
+  returnForm: IReturnFormResponse;
+  actionStatus: DeliveryStatus;
+  note: string;
+  createdAt: number;
+  createdBy: string;
 }
 export interface IReturnFormDetailResponse {
   id: string;

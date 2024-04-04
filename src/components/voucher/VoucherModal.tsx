@@ -1,17 +1,13 @@
-import { List as AntdList, Modal } from "antd";
-import React, { ReactNode } from "react";
+import { List as AntdList, Modal, ModalProps } from "antd";
+import { t } from "i18next";
+import React from "react";
 import { useSelector } from "react-redux";
 import { IOrderResponse, IVoucherList } from "../../interfaces";
 import { RootState } from "../../redux/store";
 import Voucher from "./Voucher";
 
 interface VoucherModalProps {
-  restModalProps: {
-    open?: boolean | undefined;
-    confirmLoading?: boolean | undefined;
-    title?: ReactNode;
-    closable?: boolean | undefined;
-  };
+  restModalProps: ModalProps;
   close: () => void;
   vouchers: IVoucherList[];
   type?: "apply" | "copy";
@@ -43,7 +39,7 @@ const VoucherModal: React.FC<VoucherModalProps> = ({
   }
   return (
     <Modal
-      title="Danh sách phiếu giảm giá còn hoạt động"
+      title={t("cart.voucher.modal.title")}
       {...restModalProps}
       open={restModalProps.open}
       width="700px"

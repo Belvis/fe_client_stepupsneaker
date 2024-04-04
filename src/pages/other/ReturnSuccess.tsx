@@ -25,8 +25,10 @@ const { Text } = Typography;
 const Success = () => {
   const { t } = useTranslation();
   let { pathname } = useLocation();
-  let { id } = useParams();
+  let { code } = useParams();
   const currency = useSelector((state: RootState) => state.currency);
+
+  console.log(code);
 
   const setTitle = useDocumentTitle();
 
@@ -35,8 +37,8 @@ const Success = () => {
   }, [t]);
 
   const { data, isLoading, isError } = useOne<IReturnFormResponse, HttpError>({
-    resource: "return-forms",
-    id: id,
+    resource: "return-forms/code",
+    id: code,
   });
 
   const [returnDetails, setReturnDetails] =
@@ -46,8 +48,10 @@ const Success = () => {
 
   useEffect(() => {
     if (returnForm) {
+      console.log("returnForm", returnForm);
+
       const returnFormDetailsResponse: IReturnFormDetailResponse[] =
-        returnForm.returnDetails;
+        returnForm.returnFormDetails;
 
       const returnFormDetailsRequest = returnFormDetailResponseToRequestList(
         returnFormDetailsResponse,
@@ -76,28 +80,27 @@ const Success = () => {
             <Card>
               <Result
                 status="success"
-                title="Phiếu trả hàng của bạn đã được gửi!"
+                title={t("return_success.title")}
                 icon={<TbTruckReturn size={120} color="#52c41a" />}
                 subTitle={
                   <div>
-                    <Text className="h4">
-                      Chúng tôi sẽ gọi điện xác nhận cho bạn qua số điện thoại
-                      dưới đây
-                    </Text>
+                    <Text className="h4">{t("return_success.subtitle")}</Text>
                     <br />
                     <Text className="h4" strong>
-                      Đơn khách lẻ thì lấy số điện thoại ở đâu hả nguyên!!!
+                      {returnForm.phoneNumber}
                     </Text>
                   </div>
                 }
               />
             </Card>
             <Card
-              headStyle={{
-                paddingRight: "69px",
-                paddingLeft: "69px",
+              styles={{
+                header: {
+                  paddingRight: "69px",
+                  paddingLeft: "69px",
+                },
               }}
-              title={`Mã phiếu trả hàng: ${returnForm.code}`}
+              title={`${t("return-forms.fields.code")}: ${returnForm.code}`}
             >
               <Row
                 gutter={[16, 24]}
@@ -118,7 +121,7 @@ const Success = () => {
                   <Space direction="vertical">
                     <Text>Tổng số tiền được hoàn:</Text>
                     <CurrencyFormatter
-                      value={returnForm.amountToBePaid}
+                      value={returnForm.amountToBePaid * currency.currencyRate}
                       currency={currency}
                     />
                   </Space>
@@ -139,8 +142,8 @@ const Success = () => {
                 </Col>
               </Row>
 
-              {returnDetails && (
-                <div className="table-content table-responsive cart-table-content">
+              {returnDetails && returnDetails.length > 0 && (
+                <div className="table-content table-responsive cart-table-content mt-5">
                   <motion.table
                     layout
                     style={{
@@ -150,13 +153,13 @@ const Success = () => {
                   >
                     <motion.thead layout>
                       <motion.tr>
-                        <th className="text-start">
-                          {t(`cart.table.head.image`)}
+                        <th>{t(`cart.table.head.image`)}</th>
+                        <th>{t("return-form-details.fields.product")}</th>
+                        <th>{t("return-form-details.fields.quantity")}</th>
+                        <th>{t("return-form-details.fields.reason.label")}</th>
+                        <th>
+                          {t("return-form-details.fields.feedback.label")}
                         </th>
-                        <th className="text-start">Sản phẩm</th>
-                        <th className="text-start">SL hoàn trả</th>
-                        <th className="text-start">Lý do</th>
-                        <th className="text-start">Feedback</th>
                       </motion.tr>
                     </motion.thead>
                     <motion.tbody
@@ -192,28 +195,19 @@ const Success = () => {
                             </td>
                             <td className="product-name text-center">
                               {returnDetail.name}
-                              <br />
                             </td>
 
-                            <td className="product-quantity">
+                            <td className="product-quantity text-center">
                               {returnDetail.returnQuantity}
                             </td>
-                            <td className="product-quantity">
+                            <td className="product-quantity text-center">
                               <div className="cart-plus-minus w-100 pe-2">
-                                <textarea
-                                  id="reason-field"
-                                  className="cart-plus-minus-box w-100"
-                                  value={returnDetail.reason}
-                                />
+                                <p>{returnDetail.reason}</p>
                               </div>
                             </td>
-                            <td className="product-quantity">
+                            <td className="product-quantity text-center">
                               <div className="cart-plus-minus w-100 pe-2">
-                                <textarea
-                                  id="feedback-field"
-                                  className="cart-plus-minus-box w-100"
-                                  value={returnDetail.feedback}
-                                />
+                                <p>{returnDetail.feedback}</p>
                               </div>
                             </td>
                           </motion.tr>
@@ -223,6 +217,20 @@ const Success = () => {
                   </motion.table>
                 </div>
               )}
+              <div className="row">
+                <div className="col-lg-12">
+                  <div className="cart-shiping-update-wrapper">
+                    <div className="cart-shiping-update">
+                      <Link to={"/shop"}>
+                        {t(`cart.buttons.continue_shopping`)}
+                      </Link>
+                    </div>
+                    <div className="cart-clear">
+                      <button>{t("return_success.buttons.tracking")}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </Card>
           </Space>
         </div>

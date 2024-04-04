@@ -65,7 +65,7 @@ const CustomForm: React.FC<CustomFormProps> = ({
         <div
           className={`clear-3 ${subscribeBtnClass ? subscribeBtnClass : ""}`}
         >
-          <button className="button" onClick={submit}>
+          <button className="button" onClick={submit} disabled>
             {t(`newsletter.buttons.subscribe.title`)}
           </button>
         </div>

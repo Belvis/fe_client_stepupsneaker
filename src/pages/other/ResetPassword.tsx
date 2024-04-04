@@ -1,17 +1,12 @@
-import { LoginFormTypes, useNotification } from "@refinedev/core";
+import { useNotification, useTranslate } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Form, FormProps } from "antd";
+import clsx from "clsx";
 import { Fragment, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { validateCommon } from "../../helpers/validate";
 import { authProvider } from "../../providers/authProvider";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import clsx from "clsx";
 
 type ResetPasswordProps = {
   formProps?: FormProps<any> | undefined;
@@ -28,7 +23,7 @@ const AUTH_API_URL = `${window.location.protocol}//${
 }:${import.meta.env.VITE_BACKEND_API_AUTH_PATH}`;
 
 const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
-  const { t } = useTranslation();
+  const t = useTranslate();
   const navigate = useNavigate();
   const { open } = useNotification();
 
@@ -58,15 +53,15 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
         if (response.success) {
           open?.({
             type: "success",
-            message: `Đang chuyển hướng đến trang đăng nhập...`,
-            description: "Đặt lại mật khẩu thành công!",
+            message: t("reset_password.messages.success.message"),
+            description: t("reset_password.messages.success.description"),
           });
           navigate("/login");
         } else {
           open?.({
             type: "error",
-            message: `Lý do: ${response.error?.name}`,
-            description: "Đặt lại mật khẩu thất bại!",
+            message: t("common.error") + response.error?.message,
+            description: "Oops...",
           });
           console.log(response.error);
         }
@@ -74,8 +69,8 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
       .catch((error) => {
         open?.({
           type: "error",
-          message: `Lý do: xem console`,
-          description: "Đã xảy ra lỗi!",
+          message: t("common.error") + error?.message,
+          description: "Oops...",
         });
         console.error("Error occurred:", error);
       });
@@ -105,7 +100,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
       <input
         {...props}
         type={showPassword ? "text" : "password"}
-        placeholder="Nhập mật khẩu mới"
+        placeholder={t("reset_password.password")}
       />
       <span
         className={getPasswordEyeIconClass(showPassword)}
@@ -119,7 +114,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
       <input
         {...props}
         type={showConfirmPassword ? "text" : "password"}
-        placeholder="Xác nhận mật khẩu mới"
+        placeholder={t("reset_password.password")}
       />
       <span
         className={getPasswordEyeIconClass(showConfirmPassword)}
@@ -142,7 +137,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
             <div className="col-lg-7 col-md-12 ms-auto me-auto">
               <div className="login-register-wrapper">
                 <div className="reset-password-title">
-                  <h4>Đặt lại mật khẩu</h4>
+                  <h4>{t("reset_password.title")}</h4>
                   <p></p>
                 </div>
                 <div className="login-form-container">
@@ -161,9 +156,8 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
                         name="password"
                         rules={[
                           {
-                            whitespace: true,
-                            required: true,
-                            message: "Mật khẩu mới không được để trống",
+                            validator: (_, value) =>
+                              validateCommon(_, value, t, "password"),
                           },
                         ]}
                       >
@@ -175,8 +169,8 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
                         hasFeedback
                         rules={[
                           {
-                            required: true,
-                            message: "Vui lòng xác nhận mật khẩu của bạn!",
+                            validator: (_, value) =>
+                              validateCommon(_, value, t, "confirmPassword"),
                           },
                           ({ getFieldValue }) => ({
                             validator(_, value) {
@@ -187,7 +181,11 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
                                 return Promise.resolve();
                               }
                               return Promise.reject(
-                                new Error("Mật khẩu mới bạn nhập không khớp!")
+                                new Error(
+                                  t(
+                                    "auth_page.login_register.register.messages.not_match"
+                                  )
+                                )
                               );
                             },
                           }),
@@ -200,7 +198,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ formProps }) => {
                           type="submit"
                           style={{ width: "100%", lineHeight: 2 }}
                         >
-                          <span>Xác nhận</span>
+                          <span>{t("buttons.submit")}</span>
                         </button>
                       </div>
                     </Form>

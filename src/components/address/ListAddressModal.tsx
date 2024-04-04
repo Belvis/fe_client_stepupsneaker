@@ -65,15 +65,17 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
         method: "put",
         values: { address: id },
         successNotification: () => ({
-          message: "Đặt mặc định thành công.",
-          description: "Thành công",
+          message: t("my_account.address.messages.set_default"),
+          description: t("common.success"),
           type: "success",
         }),
-        errorNotification: () => ({
-          message: "Có lỗi xảy ra khi đặt địa chỉ mặc định",
-          description: "Lỗi",
-          type: "error",
-        }),
+        errorNotification: (error, values, resource) => {
+          return {
+            message: t("common.error") + error?.message,
+            description: "Oops...",
+            type: "error",
+          };
+        },
       },
       {
         onSuccess: () => {
@@ -96,13 +98,15 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
       districtId,
       wardCode,
     } = item;
-    const defaultTag = isDefault ? <Tag color="green">Mặc định</Tag> : null;
+    const defaultTag = isDefault ? (
+      <Tag color="green">{t("my_account.address.labels.default")}</Tag>
+    ) : null;
 
     return (
       <AntdList.Item
         actions={[
           <Space size="small" key={id}>
-            <Tooltip title="Sửa">
+            <Tooltip title={t("my_account.address.buttons.edit")}>
               <Button
                 style={{ color: "#52c41a", borderColor: "#52c41a" }}
                 size="small"
@@ -117,7 +121,7 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
                 handleAddressSetDefault(id);
               }}
             >
-              Đặt mặc định
+              {t("my_account.address.buttons.set_default")}
             </Button>
             <Button
               size="small"
@@ -150,8 +154,8 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
                   });
                   open?.({
                     type: "success",
-                    message: "Chọn địa chỉ thành công",
-                    description: "Thành công",
+                    message: t("my_account.address.messages.choose"),
+                    description: t("common.success"),
                   });
                 } else {
                   setViewAddress(newOrder);
@@ -159,7 +163,7 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
                 close();
               }}
             >
-              Chọn
+              {t("buttons.choose")}
             </Button>
           </Space>,
         ]}
@@ -225,15 +229,15 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
     warnWhenUnsavedChanges: false,
     successNotification: (data: any, values) => {
       return {
-        message: "Tạo địa chỉ mới thành công",
-        description: "Thành công",
+        message: t("my_account.address.messages.create"),
+        description: t("common.success"),
         type: "success",
       };
     },
     errorNotification: (error, values) => {
       return {
-        message: `Đã xảy ra lỗi khi tạo địa chỉ`,
-        description: "Lỗi: " + error?.message,
+        message: t("common.error") + error?.message,
+        description: "Oops...",
         type: "error",
       };
     },
@@ -258,15 +262,15 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
     warnWhenUnsavedChanges: false,
     successNotification: (data: any, values) => {
       return {
-        message: "Cập nhật địa chỉ mới thành công",
-        description: "Thành công",
+        message: t("common.update.success"),
+        description: t("common.success"),
         type: "success",
       };
     },
     errorNotification: (error, values) => {
       return {
-        message: `Đã xảy ra lỗi khi Cập nhật địa chỉ`,
-        description: "Lỗi: " + error?.message,
+        message: t("common.error") + error?.message,
+        description: "Oops...",
         type: "error",
       };
     },
@@ -274,7 +278,7 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
 
   return (
     <Modal
-      title="Danh sách địa chỉ của bạn"
+      title={t("my_account.address.labels.list")}
       {...modalProps}
       open={modalProps.open}
       width={breakpoint.sm ? "700px" : "100%"}
@@ -289,7 +293,7 @@ export const ListAddressModal: React.FC<ListAddressModalProps> = ({
               createModalShow();
             }}
           >
-            Tạo địa chỉ mới
+            {t("my_account.address.buttons.create")}
           </Button>
         </Col>
         <Col span={24}>

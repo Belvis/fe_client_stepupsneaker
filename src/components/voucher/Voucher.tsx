@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setOrder } from "../../redux/slices/order-slice";
 import { RootState } from "../../redux/store";
 import { calculateTotalPrice } from "../../helpers/cart";
+import { useTranslate } from "@refinedev/core";
 
 interface VoucherProps {
   item: IVoucherResponse;
@@ -25,32 +26,39 @@ const Voucher: React.FC<VoucherProps> = ({
   setViewOrder,
   close,
 }) => {
+  const t = useTranslate();
   const dispatch = useDispatch();
   const { order } = useSelector((state: RootState) => state.order);
   const { cartItems } = useSelector((state: RootState) => state.cart);
   const { image, endDate, value, type: voucherType, constraint, code } = item;
 
-  const [message, setMessage] = useState<string>("Dùng ngay");
+  const [message, setMessage] = useState<string>(t("common.use_now"));
 
   const cashPrice =
     voucherType === "CASH" ? (
-      <CurrencyFormatter value={value} currency={currency} />
+      <CurrencyFormatter
+        value={value * currency.currencyRate}
+        currency={currency}
+      />
     ) : (
       <>{value}%</>
     );
 
   const constraintPrice = (
-    <CurrencyFormatter value={constraint} currency={currency} />
+    <CurrencyFormatter
+      value={constraint * currency.currencyRate}
+      currency={currency}
+    />
   );
 
   const handleCopyCode = () => {
     if (code) {
       navigator.clipboard.writeText(code).then(() => {
-        showSuccessToast("Đã copy vào bộ nhớ đệm");
+        showSuccessToast(t("common.copied"));
       });
       setMessage(code);
       setTimeout(() => {
-        setMessage("Dùng ngay");
+        setMessage(t("common.use_now"));
       }, 3000);
     }
   };
@@ -65,9 +73,7 @@ const Voucher: React.FC<VoucherProps> = ({
               voucher: item,
             };
           } else {
-            showErrorToast(
-              "Đơn hàng chưa đủ điều kiện để được áp dụng giảm giá"
-            );
+            showErrorToast(t("cart.voucher.messages.unqualified"));
             return prev;
           }
         });
@@ -80,16 +86,14 @@ const Voucher: React.FC<VoucherProps> = ({
             })
           );
         } else {
-          return showErrorToast(
-            "Đơn hàng chưa đủ điều kiện để được áp dụng giảm giá"
-          );
+          return showErrorToast(t("cart.voucher.messages.unqualified"));
         }
       }
 
       close();
-      showSuccessToast("Áp dụng voucher thành công");
+      showSuccessToast(t("cart.voucher.messages.success"));
     } else {
-      showErrorToast("Không hợp lệ");
+      showErrorToast(t("cart.voucher.messages.invalid"));
     }
   };
 
@@ -127,15 +131,21 @@ const Voucher: React.FC<VoucherProps> = ({
             <Col span={16}>
               <div className="auto-group-xh3i-y16">
                 <div className="group-3-WFv">
-                  <p className="gim-1000000-ed2">Giảm {cashPrice}</p>
+                  <p className="gim-1000000-ed2">
+                    {t("cart.voucher.modal.antd_list.reduce")} {cashPrice}
+                  </p>
                   <p className="cc-ruy-to-qqv">
-                    Cho đơn hàng trên {constraintPrice}
+                    {t("cart.voucher.modal.antd_list.for_order_above")}{" "}
+                    {constraintPrice}
                   </p>
                 </div>
                 <p className="c-hiu-lc-n-12102024-xfe">
-                  Có hiệu lực đến: {dayjs(new Date(endDate)).format("LLL")}
+                  {t("cart.voucher.modal.antd_list.valid_til")}:{" "}
+                  {dayjs(new Date(endDate)).format("LLL")}
                 </p>
-                <p className="chi-tit--Fue">Chi tiết &gt;&gt;&gt;</p>
+                <p className="chi-tit--Fue">
+                  {t("cart.voucher.modal.antd_list.detail")} &gt;&gt;&gt;
+                </p>
               </div>{" "}
             </Col>
             <Col

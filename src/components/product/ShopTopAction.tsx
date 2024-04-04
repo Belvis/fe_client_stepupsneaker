@@ -1,5 +1,6 @@
 import React from "react";
 import { setActiveLayout } from "../../helpers/product";
+import { useTranslate } from "@refinedev/core";
 
 interface ShopTopActionProps {
   updateLayout: (
@@ -24,24 +25,25 @@ const ShopTopAction: React.FC<ShopTopActionProps> = ({
   productCount,
   sortedProductCount,
 }) => {
+  const t = useTranslate();
   return (
     <div className="shop-top-bar mb-35">
       <div className="select-shoing-wrap">
-        <span>Sắp xếp theo</span>
+        <span>{t("sort.sort_by")}</span>
         <div className="shop-select">
           <select onChange={(e) => updateSortParams(e.target.value)}>
-            <option value="default">Mặc định</option>
-            <option value="popularity">Phổ biến</option>
-            <option value="best-seller">Bán chạy</option>
-            <option value="newest">Mới nhất</option>
-            <option value="latest">Cũ nhất</option>
-            <option value="price">Giá - Từ cao đến thấp</option>
-            <option value="price-desc">Giá - từ thấp đến cao</option>
+            <option value="default">{t("sort.default")}</option>
+            <option value="popularity">{t("sort.popularity")}</option>
+            <option value="best-seller">{t("sort.best_seller")}</option>
+            <option value="newest">{t("sort.newest")}</option>
+            <option value="latest">{t("sort.oldest")}</option>
+            <option value="price">{t("sort.price_high_to_low")}</option>
+            <option value="price-desc">{t("sort.price_low_to_high")}</option>
           </select>
         </div>
         <p>
-          Hiển thị {sortedProductCount} kết quả trên tổng số {productCount} kết
-          quả
+          {t("sort.showing")} {sortedProductCount} {t("sort.results")}{" "}
+          {t("sort.out_of")} {productCount} {t("sort.results")}
         </p>
       </div>
 

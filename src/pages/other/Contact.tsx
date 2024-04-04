@@ -65,7 +65,7 @@ const Contact = () => {
                   </div>
                 </div>
                 <div className="contact-social text-center">
-                  <h3>Theo dõi chúng tôi</h3>
+                  <h3>{t("contact.follow_us")}</h3>
                   <ul>
                     <li>
                       <a href="//facebook.com">
@@ -99,7 +99,7 @@ const Contact = () => {
             <div className="col-12 col-lg-8 col-md-7">
               <div className="contact-form">
                 <div className="contact-title mb-30">
-                  <h2>Giữ liên lạc</h2>
+                  <h2>{t("contact.keep_in_touch")}</h2>
                 </div>
                 <form className="contact-form-style">
                   <div className="row">
@@ -118,8 +118,8 @@ const Contact = () => {
                         placeholder="Lời nhắn*"
                         defaultValue={""}
                       />
-                      <button className="submit" type="submit">
-                        Gửi
+                      <button className="submit" type="submit" disabled>
+                        {t("buttons.submit")}
                       </button>
                     </div>
                   </div>

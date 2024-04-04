@@ -41,14 +41,15 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
   useEffect(() => {
     if (user && user.customerVoucherList) {
       const convertedLegitVoucher = _.cloneDeep(user.customerVoucherList);
-      convertedLegitVoucher.map((single) => {
-        const updatedVoucher = { ...single };
-        if (single.voucher.type === "PERCENTAGE") {
-          updatedVoucher.voucher.value =
-            (single.voucher.value * cartTotalPrice) / 100;
-        }
-        return updatedVoucher;
-      });
+      convertedLegitVoucher &&
+        convertedLegitVoucher.map((single) => {
+          const updatedVoucher = { ...single };
+          if (single.voucher.type === "PERCENTAGE") {
+            updatedVoucher.voucher.value =
+              (single.voucher.value * cartTotalPrice) / 100;
+          }
+          return updatedVoucher;
+        });
 
       convertedLegitVoucher.sort((a, b) => b.voucher.value - a.voucher.value);
       setLegitVouchers(convertedLegitVoucher);
@@ -134,6 +135,7 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
                     </div>
                     <div className="shopping-cart-delete">
                       <Authenticated
+                        key="shopping-cart-delete"
                         fallback={
                           <button
                             onClick={() => dispatch(deleteFromCart(item?.id))}
@@ -180,21 +182,21 @@ const MenuCart: React.FC<MenuCartProps> = ({ activeIndex }) => {
               if (shouldDisplayFreeShipping) {
                 return (
                   <DiscountMessage>
-                    <GiftOutlined /> Mua thêm{" "}
+                    <GiftOutlined /> {t("cart.messages.buy_more")}{" "}
                     <DiscountMoney>
                       {formatCurrency(freeShippingDifference, currency)}
                     </DiscountMoney>{" "}
-                    để được miễn phí vận chuyển
+                    {t("cart.messages.for_free_shipping")}
                   </DiscountMessage>
                 );
               } else if (shouldDisplayVoucher) {
                 return (
                   <DiscountMessage>
-                    <GiftOutlined /> Mua thêm{" "}
+                    <GiftOutlined /> {t("cart.messages.buy_more")}{" "}
                     <DiscountMoney>
                       {formatCurrency(voucherDifference, currency)}
                     </DiscountMoney>{" "}
-                    để được giảm tới{" "}
+                    {t("cart.messages.for_discount")}{" "}
                     <DiscountMoney>
                       {formatCurrency(legitVouchers[0].voucher.value, currency)}
                     </DiscountMoney>

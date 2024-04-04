@@ -1,5 +1,6 @@
 import { HttpError } from "@refinedev/core";
 import axios from "axios";
+import i18n from "../../i18n";
 
 const axiosInstance = axios.create();
 
@@ -14,7 +15,7 @@ axiosInstance.interceptors.request.use(
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
-      config.headers["Accept-Language"] = "vi";
+      config.headers["Accept-Language"] = i18n.language;
     }
     return config;
   },

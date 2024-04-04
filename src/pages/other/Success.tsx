@@ -77,34 +77,29 @@ const Success = () => {
           >
             <Result
               status="success"
-              title="Cảm ơn bạn đã mua hàng!"
+              title={t("success_page.title")}
               subTitle={
                 <div>
-                  <p>
-                    Email xác nhận đơn hàng với chi tiết đơn hàng của bạn và một
-                    liên kết để theo dõi tiến trình đã được gửi đến địa chỉ
-                    email của bạn.
-                  </p>
-                  <p>
-                    Chúng tôi sẽ liên hệ với bạn trong 24h, xin hãy chờ đợi.
-                  </p>
+                  <p>{t("success_page.subtitle.email")}</p>
+                  <p>{t("success_page.subtitle.contact")}</p>
                   <div className="order-code">
                     <Link to={"/tracking/" + order.code}>
-                      Mã đơn hàng: {order.code.toUpperCase()}
+                      {t("success_page.subtitle.code")}:{" "}
+                      {order.code.toUpperCase()}
                     </Link>
                   </div>
                   <p>
-                    Ngày mua hàng:{" "}
+                    {t("success_page.subtitle.date")}:{" "}
                     {dayjs(new Date(order.createdAt ?? 0)).format("DD/MM/YYYY")}
                   </p>
                 </div>
               }
               extra={[
                 <Link className="order-nav" to={`/shop`}>
-                  <CaretLeftOutlined /> Tiếp tục mua sắm
+                  <CaretLeftOutlined /> {t(`cart.buttons.continue_shopping`)}
                 </Link>,
                 <Link className="order-nav" to={`/shop`}>
-                  <PrinterOutlined /> In hoá đơn
+                  <PrinterOutlined /> {t("success_page.extra.print")}
                 </Link>,
               ]}
             />
@@ -117,7 +112,8 @@ const Success = () => {
                         <thead>
                           <tr>
                             <th style={{ textAlign: "start" }}>
-                              <HomeFilled /> Địa chỉ giao hàng
+                              <HomeFilled />{" "}
+                              {t("success_page.address.shipping")}
                             </th>
                           </tr>
                         </thead>
@@ -127,16 +123,25 @@ const Success = () => {
                               {order.address && (
                                 <>
                                   <p>
-                                    Tỉnh/thành phố: {order.address.provinceName}
+                                    {t("success_page.address.province.title")}:{" "}
+                                    {order.address.provinceName}
                                   </p>
                                   <p>
-                                    Quận/huyện: {order.address.districtName}
+                                    {t("success_page.address.district.title")}:{" "}
+                                    {order.address.districtName}
                                   </p>
-                                  <p>Phường/xã: {order.address.wardName}</p>
                                   <p>
-                                    Số điện thoại: {order.address.phoneNumber}
+                                    {t("success_page.address.ward.title")}:{" "}
+                                    {order.address.wardName}
                                   </p>
-                                  <p>Địa chỉ chi tiết: {order.address.more}</p>
+                                  <p>
+                                    {t("success_page.address.phoneNumber")}:{" "}
+                                    {order.address.phoneNumber}
+                                  </p>
+                                  <p>
+                                    {t("success_page.address.line")}:{" "}
+                                    {order.address.more}
+                                  </p>
                                 </>
                               )}
                             </td>
@@ -151,7 +156,7 @@ const Success = () => {
                         <thead>
                           <tr>
                             <th style={{ textAlign: "start" }}>
-                              <HomeFilled /> Địa chỉ hóa đơn
+                              <HomeFilled /> {t("success_page.address.order")}
                             </th>
                           </tr>
                         </thead>
@@ -163,32 +168,34 @@ const Success = () => {
                                 order.customer.addressList.length > 0 && (
                                   <>
                                     <p>
-                                      Tỉnh/thành phố:{" "}
+                                      {t("success_page.address.province.title")}
+                                      :{" "}
                                       {
                                         order.customer.addressList[0]
                                           .provinceName
                                       }
                                     </p>
                                     <p>
-                                      Quận/huyện:{" "}
+                                      {t("success_page.address.district.title")}
+                                      :{" "}
                                       {
                                         order.customer.addressList[0]
                                           .districtName
                                       }
                                     </p>
                                     <p>
-                                      Phường/xã:{" "}
+                                      {t("success_page.address.ward.title")}:{" "}
                                       {order.customer.addressList[0].wardName}
                                     </p>
                                     <p>
-                                      Số điện thoại:{" "}
+                                      {t("success_page.address.phoneNumber")}:{" "}
                                       {
                                         order.customer.addressList[0]
                                           .phoneNumber
                                       }
                                     </p>
                                     <p>
-                                      Địa chỉ chi tiết:{" "}
+                                      {t("success_page.address.line")}:{" "}
                                       {order.customer.addressList[0].more}
                                     </p>
                                   </>
@@ -207,13 +214,15 @@ const Success = () => {
                         <thead>
                           <tr>
                             <th style={{ textAlign: "start" }}>
-                              <CarFilled /> Phương thức vận chuyển
+                              <CarFilled /> {t("success_page.shipping_method")}
                             </th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr>
-                            <td className="field">Giao hàng tiết kiệm</td>
+                            <td className="field">
+                              {t("success_page.giaohangtietkiem")}
+                            </td>
                           </tr>
                         </tbody>
                       </table>
@@ -226,7 +235,8 @@ const Success = () => {
                         <thead>
                           <tr>
                             <th style={{ textAlign: "start" }}>
-                              <CreditCardFilled /> Phương thức thanh toán
+                              <CreditCardFilled />{" "}
+                              {t("success_page.payment_method")}
                             </th>
                           </tr>
                         </thead>
@@ -259,7 +269,9 @@ const Success = () => {
                 <table className="w-100">
                   <thead>
                     <tr>
-                      <th style={{ textAlign: "start" }}>Sản phẩm</th>
+                      <th style={{ textAlign: "start" }}>
+                        {t("my_order.fields.product")}
+                      </th>
                       <th style={{ textAlign: "end" }}>
                         {t(`cart.table.head.subtotal`)}
                       </th>
@@ -318,7 +330,9 @@ const Success = () => {
                             <td className="value">
                               <CurrencyFormatter
                                 className="amount"
-                                value={detail.totalPrice}
+                                value={
+                                  detail.totalPrice * currency.currencyRate
+                                }
                                 currency={currency}
                               />
                             </td>
@@ -335,7 +349,7 @@ const Success = () => {
                           </div>
                           <div className="col-4">
                             <CurrencyFormatter
-                              value={order.originMoney}
+                              value={order.originMoney * currency.currencyRate}
                               currency={currency}
                             />
                           </div>
@@ -347,11 +361,13 @@ const Success = () => {
                           <div className="col-4">
                             {order.originMoney >= FREE_SHIPPING_THRESHOLD ? (
                               <span className="free-shipping">
-                                Miễn phí vận chuyển
+                                {t("common.free_shipping")}
                               </span>
                             ) : (
                               <CurrencyFormatter
-                                value={order.shippingMoney}
+                                value={
+                                  order.shippingMoney * currency.currencyRate
+                                }
                                 currency={currency}
                               />
                             )}
@@ -359,11 +375,11 @@ const Success = () => {
                         </div>
                         <div className="row">
                           <div className="col-8">
-                            <h5>Giảm giá</h5>
+                            <h5>{t("voucher.voucher")}</h5>
                           </div>
                           <div className="col-4">
                             <CurrencyFormatter
-                              value={order.reduceMoney}
+                              value={order.reduceMoney * currency.currencyRate}
                               currency={currency}
                             />
                           </div>
@@ -376,7 +392,7 @@ const Success = () => {
                           </div>
                           <div className="col-4">
                             <CurrencyFormatter
-                              value={order.totalMoney}
+                              value={order.totalMoney * currency.currencyRate}
                               currency={currency}
                             />
                           </div>

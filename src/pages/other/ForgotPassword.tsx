@@ -1,4 +1,8 @@
-import { LoginFormTypes, useForgotPassword } from "@refinedev/core";
+import {
+  LoginFormTypes,
+  useForgotPassword,
+  useTranslate,
+} from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Form, FormProps } from "antd";
 import { Fragment, useEffect, useState } from "react";
@@ -16,7 +20,7 @@ type forgotPasswordVariables = {
 };
 
 const ForgotPassword: React.FC<ForgotPasswordProps> = ({ formProps }) => {
-  const { t } = useTranslation();
+  const t = useTranslate();
 
   const setTitle = useDocumentTitle();
 
@@ -49,7 +53,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ formProps }) => {
             <div className="col-lg-7 col-md-12 ms-auto me-auto">
               <div className="login-register-wrapper">
                 <div className="reset-password-title">
-                  <h4>Quên mật khẩu</h4>
+                  <h4>{t("auth_page.forgot_password.title")}</h4>
                   <p></p>
                 </div>
                 <div className="login-form-container">
@@ -71,7 +75,9 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ formProps }) => {
                       >
                         <input
                           type="email"
-                          placeholder="Email đăng ký tài khoản..."
+                          placeholder={t(
+                            "auth_page.forgot_password.fields.placeholder"
+                          )}
                         />
                       </Form.Item>
                       <div className="button-box">
@@ -79,7 +85,11 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ formProps }) => {
                           type="submit"
                           style={{ width: "100%", lineHeight: 2 }}
                         >
-                          <span>Nhận email hướng dẫn</span>
+                          <span>
+                            {t(
+                              "auth_page.forgot_password.buttons.receive_construction"
+                            )}
+                          </span>
                         </button>
                       </div>
                     </Form>

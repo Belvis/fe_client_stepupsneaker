@@ -181,14 +181,14 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
       width={breakpoint.sm ? "500px" : "100%"}
       zIndex={1002}
       footer={<></>}
-      title="Tạo địa chỉ mới"
+      title={t("my_account.address.messages.create")}
     >
       <Form {...formProps} onFinish={onFinishHandler}>
         <div className="billing-info-wrap">
           <div className="row">
             <div className="col-12">
               <div className="billing-info mb-20">
-                <label>Số điện thoại</label>
+                <label>{t("my_account.address.fields.phoneNumber")}</label>
                 <Form.Item
                   name="phoneNumber"
                   rules={[
@@ -203,7 +203,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
             </div>
             <div className="col-12">
               <div className="billing-select mb-20">
-                <label>Tỉnh/thành phố</label>
+                <label>{t("my_account.address.fields.province.title")}</label>
                 <Form.Item
                   name="provinceId"
                   rules={[
@@ -213,21 +213,25 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                     },
                   ]}
                 >
-                  {provinces.length > 0 ? (
+                  {provinces ? (
                     <select
                       id="provinceId-create"
                       onChange={handleProvinceChange}
                     >
-                      <option value="">--Chọn tỉnh/thành phố--</option>
-                      {provinces.map((province, index) => (
-                        <option key={index} value={province.ProvinceID}>
-                          {province.ProvinceName}
-                        </option>
-                      ))}
+                      <option value="">
+                        --{t("my_account.address.fields.province.place_holder")}
+                        --
+                      </option>
+                      {provinces &&
+                        provinces.map((province, index) => (
+                          <option key={index} value={province.ProvinceID}>
+                            {province.ProvinceName}
+                          </option>
+                        ))}
                     </select>
                   ) : (
                     <select id="provinceId-create">
-                      <option value="">Đang tải tỉnh/thành phố...</option>
+                      <option value="">Loading...</option>
                     </select>
                   )}
                 </Form.Item>
@@ -235,7 +239,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
             </div>
             <div className="col-12">
               <div className="billing-select mb-20">
-                <label>Quận/huyện</label>
+                <label>{t("my_account.address.fields.district.title")}</label>
                 <Form.Item
                   name="districtId"
                   rules={[
@@ -250,16 +254,20 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                       id="districtId-create"
                       onChange={handleDistrictChange}
                     >
-                      <option value="">--Chọn quận/huyện--</option>
-                      {districts.map((district, index) => (
-                        <option key={index} value={district.DistrictID}>
-                          {district.DistrictName}
-                        </option>
-                      ))}
+                      <option value="">
+                        --{t("my_account.address.fields.district.place_holder")}
+                        --
+                      </option>
+                      {districts &&
+                        districts.map((district, index) => (
+                          <option key={index} value={district.DistrictID}>
+                            {district.DistrictName}
+                          </option>
+                        ))}
                     </select>
                   ) : (
                     <select id="districtId-create">
-                      <option value="">Đang tải quận/huyện...</option>
+                      <option value="">Loading...</option>
                     </select>
                   )}
                 </Form.Item>
@@ -267,7 +275,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
             </div>
             <div className="col-12">
               <div className="billing-select mb-20">
-                <label>Phường/xã</label>
+                <label>{t("my_account.address.fields.ward.title")}</label>
                 <Form.Item
                   name="wardCode"
                   rules={[
@@ -277,18 +285,21 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                     },
                   ]}
                 >
-                  {wards.length > 0 ? (
+                  {wards ? (
                     <select id="wardCode-create" onChange={handleWardChange}>
-                      <option value="">--Chọn phường/xã--</option>
-                      {wards.map((ward, index) => (
-                        <option key={index} value={ward.WardCode}>
-                          {ward.WardName}
-                        </option>
-                      ))}
+                      <option value="">
+                        --{t("my_account.address.fields.ward.place_holder")}--
+                      </option>
+                      {wards &&
+                        wards.map((ward, index) => (
+                          <option key={index} value={ward.WardCode}>
+                            {ward.WardName}
+                          </option>
+                        ))}
                     </select>
                   ) : (
                     <select id="wardCode-create">
-                      <option value="">Đang tải phường/...</option>
+                      <option value="">Loading...</option>
                     </select>
                   )}
                 </Form.Item>
@@ -296,7 +307,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
             </div>
             <div className="col-12">
               <div className="billing-info mb-20">
-                <label>Chi tiết địa chỉ</label>
+                <label>{t("my_account.address.fields.more")}</label>
                 <Form.Item
                   name="more"
                   rules={[
@@ -320,7 +331,7 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
                 <span className="loading me-3">
                   <LoadingOutlined />
                 </span>
-                Lưu thay đổi
+                {t("buttons.save_changes")}
               </button>
             </div>
           </div>

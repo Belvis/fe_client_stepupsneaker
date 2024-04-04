@@ -3,12 +3,14 @@ import LanguageCurrencyChanger from "./sub-components/LanguageCurrencyChanger";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { CurrencyFormatter } from "../../helpers/currency";
+import { useTranslate } from "@refinedev/core";
 
 type HeaderTopProps = {
   borderStyle: string | undefined;
 };
 
 export const HeaderTop: React.FC<HeaderTopProps> = ({ borderStyle }) => {
+  const t = useTranslate();
   const currency = useSelector((state: RootState) => state.currency);
   return (
     <div
@@ -20,8 +22,11 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({ borderStyle }) => {
       <LanguageCurrencyChanger currency={currency} />
       <div className="header-offer">
         <p>
-          Miễn phí vận chuyển cho đơn hàng trên{" "}
-          <CurrencyFormatter value={5000000} currency={currency} />
+          {t("common.free_shipping_message")}{" "}
+          <CurrencyFormatter
+            value={5000000 * currency.currencyRate}
+            currency={currency}
+          />
         </p>
       </div>
     </div>

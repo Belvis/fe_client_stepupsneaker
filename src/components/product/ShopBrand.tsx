@@ -2,6 +2,7 @@ import React from "react";
 import { setActiveSort } from "../../helpers/product";
 import { IBrandResponse } from "../../interfaces";
 import { Collapse, CollapseProps } from "antd";
+import { useTranslate } from "@refinedev/core";
 
 interface ShopBrandProps {
   brands: IBrandResponse[];
@@ -12,10 +13,14 @@ const ShopBrand: React.FC<ShopBrandProps> = ({
   brands,
   updateFilterParams,
 }) => {
+  const t = useTranslate();
+
   const items: CollapseProps["items"] = [
     {
       key: "brand",
-      label: <h4 className="pro-sidebar-title">Nhãn hiệu</h4>,
+      label: (
+        <h4 className="pro-sidebar-title">{t("products.fields.tradeMarks")}</h4>
+      ),
       children: (
         <div className="sidebar-widget-list mt-20">
           {brands ? (

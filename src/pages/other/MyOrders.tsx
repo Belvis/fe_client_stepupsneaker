@@ -57,27 +57,27 @@ const MyOrders = () => {
 
   const options: SegmentedProps["options"] = [
     {
-      label: "Tất cả",
+      label: t("my_order.segmented.options.ALL"),
       value: "",
     },
     {
-      label: "Chờ xác nhận",
+      label: t("my_order.segmented.options.WAIT_FOR_CONFIRMATION"),
       value: "WAIT_FOR_CONFIRMATION",
     },
     {
-      label: "Chờ vận chuyển",
+      label: t("my_order.segmented.options.WAIT_FOR_DELIVERY"),
       value: "WAIT_FOR_DELIVERY",
     },
     {
-      label: "Đang vận chuyển",
+      label: t("my_order.segmented.options.DELIVERING"),
       value: "DELIVERING",
     },
     {
-      label: "Hoàn thành",
+      label: t("my_order.segmented.options.COMPLETED"),
       value: "COMPLETED",
     },
     {
-      label: "Huỷ",
+      label: t("my_order.segmented.options.CANCELED"),
       value: "CANCELED",
     },
   ];
@@ -125,7 +125,7 @@ const MyOrders = () => {
           <Fragment>
             <div className="row mb-2">
               <div className="col-md-3">
-                <h3 className="cart-page-title">Đơn hàng của bạn</h3>
+                <h3 className="cart-page-title">{t("my_order.title")}</h3>
               </div>
               <div className="col-md-9">
                 <Segmented
@@ -143,10 +143,10 @@ const MyOrders = () => {
                       <thead>
                         <tr>
                           <th>#</th>
-                          <th>Mã</th>
-                          <th>Tổng cộng</th>
-                          <th>Sản phẩm</th>
-                          <th>Tạo lúc</th>
+                          <th>{t("my_order.fields.code")}</th>
+                          <th>{t("my_order.fields.total")}</th>
+                          <th>{t("my_order.fields.product")}</th>
+                          <th>{t("my_order.fields.createdAt")}</th>
                         </tr>
                       </thead>
                       {orders && orders.length >= 1 && (
@@ -171,7 +171,9 @@ const MyOrders = () => {
                                 <td className="product-price-cart">
                                   <CurrencyFormatter
                                     className="amount"
-                                    value={item.totalMoney}
+                                    value={
+                                      item.totalMoney * currency.currencyRate
+                                    }
                                     currency={currency}
                                   />
                                 </td>
@@ -203,10 +205,11 @@ const MyOrders = () => {
                                         )}
                                       </ul>
                                     }
-                                    title="Sản phẩm"
+                                    title={t("my_order.fields.product")}
                                     trigger="hover"
                                   >
-                                    {totalQuantity} sản phẩm
+                                    {totalQuantity}{" "}
+                                    {t("my_order.fields.product")}
                                   </Popover>
                                 </td>
 
@@ -245,7 +248,9 @@ const MyOrders = () => {
                     </Link>
                   </div>
                   <div className="cart-clear">
-                    <Link to={"/tracking"}>Tra cứu đơn hàng</Link>
+                    <Link to={"/tracking"}>
+                      {t("my_order.buttons.tracking")}
+                    </Link>
                   </div>
                 </div>
               </div>

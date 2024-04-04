@@ -12,6 +12,7 @@ import { CurrencyState } from "../../redux/slices/currency-slice";
 import { addToWishlist } from "../../redux/slices/wishlist-slice";
 import ProductModal from "./ProductModal";
 import Rating from "./sub-components/ProductRating";
+import { useTranslate } from "@refinedev/core";
 
 interface ProductGridListSingleProps {
   product: IProductClient;
@@ -28,7 +29,7 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
   compareItem,
   spaceBottomClass,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslate();
 
   const [modalShow, setModalShow] = useState(false);
   const discountedPrice = getDiscountPrice(product.price.min, product.discount);
@@ -76,8 +77,8 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
                     disabled={wishlistItem !== undefined}
                     title={
                       wishlistItem !== undefined
-                        ? "Đã thêm vào danh sách yêu thích"
-                        : "Thêm vào danh sách yêu thích"
+                        ? t("product_action.tooltips.wishlist.in")
+                        : t("product_action.tooltips.wishlist.out")
                     }
                     onClick={() => dispatch(addToWishlist(product))}
                   >
@@ -86,10 +87,12 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
                 </div>
                 <div className="pro-same-action pro-cart">
                   {product.variation && product.variation.length >= 1 ? (
-                    <Link to={`/product/${product.id}`}>Mua ngay</Link>
+                    <Link to={`/product/${product.id}`}>
+                      {t("products.buttons.shop_now")}
+                    </Link>
                   ) : (
                     <button disabled className="active">
-                      Out of Stock
+                      {t("products.desc_tab.buttons.out_of_stock")}
                     </button>
                   )}
                 </div>
@@ -213,10 +216,12 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
               <div className="shop-list-actions d-flex align-items-center">
                 <div className="shop-list-btn btn-hover">
                   {product.variation && product.variation.length >= 1 ? (
-                    <Link to={`/product/${product.id}`}>Mua ngay</Link>
+                    <Link to={`/product/${product.id}`}>
+                      {t("products.buttons.shop_now")}
+                    </Link>
                   ) : (
                     <button disabled className="active">
-                      Out of Stock
+                      {t("products.desc_tab.buttons.out_of_stock")}
                     </button>
                   )}
                 </div>
@@ -227,8 +232,8 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
                     disabled={wishlistItem !== undefined}
                     title={
                       wishlistItem !== undefined
-                        ? "Đã thêm vào danh sách yêu thích"
-                        : "Thêm vào danh sách yêu thích"
+                        ? t("product_action.tooltips.wishlist.in")
+                        : t("product_action.tooltips.wishlist.out")
                     }
                     onClick={() => dispatch(addToWishlist(product))}
                   >
@@ -241,8 +246,8 @@ const ProductGridListSingle: React.FC<ProductGridListSingleProps> = ({
                     disabled={compareItem !== undefined}
                     title={
                       compareItem !== undefined
-                        ? "Đã thêm vào danh sách so sánh"
-                        : "Thêm vào danh sách so sánh"
+                        ? t("product_action.tooltips.compare.in")
+                        : t("product_action.tooltips.compare.out")
                     }
                     onClick={() => dispatch(addToCompare(product))}
                   >

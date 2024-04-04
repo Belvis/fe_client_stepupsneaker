@@ -2,6 +2,7 @@ import React from "react";
 import { setActiveSort } from "../../helpers/product";
 import { IStyleResponse } from "../../interfaces";
 import { Collapse, CollapseProps } from "antd";
+import { useTranslate } from "@refinedev/core";
 
 interface ShopStylesProps {
   styles: IStyleResponse[];
@@ -12,10 +13,13 @@ const ShopStyles: React.FC<ShopStylesProps> = ({
   styles,
   updateFilterParams,
 }) => {
+  const t = useTranslate();
   const items: CollapseProps["items"] = [
     {
       key: "style",
-      label: <h4 className="pro-sidebar-title">Kiểu dáng</h4>,
+      label: (
+        <h4 className="pro-sidebar-title">{t("products.fields.styles")}</h4>
+      ),
       children: (
         <div className="sidebar-widget-list mt-30">
           {styles ? (

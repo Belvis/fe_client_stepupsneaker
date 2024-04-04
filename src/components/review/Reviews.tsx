@@ -35,9 +35,16 @@ const Review: React.FC<ReviewProps> = ({ review, calback }) => {
               id,
               successNotification: (data, id, resource) => {
                 return {
-                  message: `Xoá đánh giá thành công`,
+                  message: t("products.desc_tab.messages.delete_review"),
                   description: t("common.success"),
                   type: "success",
+                };
+              },
+              errorNotification: (error, values, resource) => {
+                return {
+                  message: t("common.error") + error?.message,
+                  description: "Oops...",
+                  type: "error",
                 };
               },
             },
@@ -91,7 +98,7 @@ const Review: React.FC<ReviewProps> = ({ review, calback }) => {
               <Rate allowHalf disabled value={review.rating} />
             </div>
           </div>
-          <Authenticated fallback={false}>
+          <Authenticated key="review-rating-delete" fallback={false}>
             {user && user.id === review.customer.id && (
               <div className="review-left">
                 <button onClick={() => removeReview(review.id)}>

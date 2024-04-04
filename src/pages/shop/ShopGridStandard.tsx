@@ -101,12 +101,6 @@ const ShopGridStandard: React.FC = () => {
             order: "desc",
           });
           break;
-        // case "popularity":
-        //   sorters.push({
-        //     field: "popularity", // view - rating - interaction
-        //     order: "desc"
-        //   })
-        //   break;
         case "latest":
           sorters.push({
             field: "createdAt",

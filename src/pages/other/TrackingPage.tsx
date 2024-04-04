@@ -1,18 +1,17 @@
+import { useApiUrl, useTranslate } from "@refinedev/core";
+import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { notification } from "antd";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { useTranslation } from "react-i18next";
-import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { useApiUrl } from "@refinedev/core";
-import { dataProvider } from "../../providers/dataProvider";
-import { Form, notification } from "antd";
 import { showErrorToast } from "../../helpers/toast";
+import { dataProvider } from "../../providers/dataProvider";
+import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
 
 const TrackingPage = () => {
   let { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const { t } = useTranslation();
+  const t = useTranslate();
 
   const setTitle = useDocumentTitle();
 
@@ -29,13 +28,13 @@ const TrackingPage = () => {
       const res = await getOne({ resource: "orders/tracking", id: code });
       navigate(`/tracking/${code}`);
       notification.success({
-        message: "Hoàn tất",
-        description: "Tra cứu đơn hàng thành công",
+        message: t("tracking_page.message.success"),
+        description: t("common.success"),
       });
     } catch (error: any) {
       notification.error({
-        message: "Không tìm thấy đơn hàng",
-        description: "Lỗi: " + error.message,
+        message: t("common.error") + error.message,
+        description: "Oops...",
       });
     }
   };
@@ -46,14 +45,14 @@ const TrackingPage = () => {
     event.preventDefault();
 
     if (!code.trim()) {
-      showErrorToast("Vui lòng nhập mã đơn hàng");
+      showErrorToast(t("tracking_page.message.required"));
       return;
     }
 
     try {
       await trackOrder(code);
     } catch (error) {
-      console.error("Lỗi khi tra cứu đơn hàng:", error);
+      console.error(t("common.error"), error);
     }
   };
 
@@ -74,14 +73,14 @@ const TrackingPage = () => {
           <div className="row justify-content-start">
             <div className="col-xl-7 col-lg-8 text-center">
               <div className="">
-                <h2>Tra cứu đơn hàng</h2>
-                <p>Nhập mã đơn hàng để thực hiện tra cứu</p>
+                <h2>{t("tracking_page.title")}</h2>
+                <p>{t("tracking_page.subtitle")}</p>
                 <form className="searchform mb-50" onSubmit={handleSubmit}>
                   <input
                     type="text"
                     name="search"
                     id="error_search"
-                    placeholder="Nhập mã đơn hàng... Ví dụ: SUS-HGDKA"
+                    placeholder={t("tracking_page.placeholder")}
                     className="searchform__input"
                     value={code}
                     onChange={handleChange}
@@ -91,7 +90,7 @@ const TrackingPage = () => {
                   </button>
                 </form>
                 <Link to={"/"} className="error-btn">
-                  Trở lại trang chủ
+                  {t("buttons.back_home")}
                 </Link>
               </div>
             </div>

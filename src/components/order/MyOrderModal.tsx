@@ -6,13 +6,13 @@ import {
   MinusCircleOutlined,
   PlusCircleOutlined,
 } from "@ant-design/icons";
+import { useModal } from "@refinedev/antd";
 import {
   Authenticated,
-  HttpError,
   useCustom,
   useCustomMutation,
   useGetIdentity,
-  useOne,
+  useTranslate,
   useUpdate,
 } from "@refinedev/core";
 import {
@@ -21,20 +21,26 @@ import {
   Form,
   Input,
   Modal,
+  ModalProps,
   Select,
   Space,
   Tooltip,
   Typography,
 } from "antd";
 import _ from "lodash";
-import React, { ReactNode, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { FREE_SHIPPING_THRESHOLD } from "../../constants";
 import { showWarningConfirmDialog } from "../../helpers/confirm";
 import { CurrencyFormatter, formatCurrency } from "../../helpers/currency";
 import { showErrorToast } from "../../helpers/toast";
+import {
+  validateCommon,
+  validateEmail,
+  validateFullName,
+  validatePhoneNumber,
+} from "../../helpers/validate";
 import {
   ICustomerResponse,
   IDistrict,
@@ -46,16 +52,8 @@ import {
 } from "../../interfaces";
 import { RootState } from "../../redux/store";
 import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
-import { useModal } from "@refinedev/antd";
-import VoucherModal from "../voucher/VoucherModal";
 import { ListAddressModal } from "../address/ListAddressModal";
-import Voucher from "../voucher/Voucher";
-import {
-  validateCommon,
-  validateEmail,
-  validateFullName,
-  validatePhoneNumber,
-} from "../../helpers/validate";
+import VoucherModal from "../voucher/VoucherModal";
 
 const { Text } = Typography;
 
@@ -64,12 +62,7 @@ const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
 const GHN_TOKEN = import.meta.env.VITE_GHN_USER_TOKEN;
 
 interface MyOrderModalProps {
-  restModalProps: {
-    open?: boolean | undefined;
-    confirmLoading?: boolean | undefined;
-    title?: ReactNode;
-    closable?: boolean | undefined;
-  };
+  restModalProps: ModalProps;
   order: IOrderResponse;
   callBack: any;
   close: () => void;
@@ -85,7 +78,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
   close,
   showCancel,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslate();
 
   const currency = useSelector((state: RootState) => state.currency);
 
@@ -385,15 +378,15 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
         id: viewOrder.id,
         successNotification(data, values, resource) {
           return {
-            message: "Cập nhật đơn hàng thành công!",
-            description: "Thành công",
+            message: t("common.update.success"),
+            description: t("common.success"),
             type: "success",
           };
         },
         errorNotification: (error: any) => {
           return {
-            message: error.message,
-            description: "Đã xảy ra lỗi",
+            message: t("common.error") + error?.message,
+            description: "Oops...",
             type: "error",
           };
         },
@@ -485,8 +478,8 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
     <Modal
       title={
         <Space align="baseline">
-          <Title level={5}>Đơn hàng của bạn</Title>
-          <Tooltip title="Bạn chỉ có thể 1 số thông tin cơ bản của đơn hàng, mọi trường hợp xin vui lòng liên hệ với chúng tôi hoặc tạo đơn mới.">
+          <Title level={5}>{t("order_tracking.modal.title")}</Title>
+          <Tooltip title={t("order_tracking.modal.tooltip")}>
             <InfoCircleOutlined />
           </Tooltip>
         </Space>
@@ -495,7 +488,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
       open={restModalProps.open}
       width="1200px"
       centered
-      okText="Xác nhận thay đổi"
+      okText={t("buttons.save_changes")}
       onOk={handleOk}
     >
       <div className="row">
@@ -549,7 +542,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <td className="product-price-cart">
                         <CurrencyFormatter
                           className="amount"
-                          value={single.price}
+                          value={single.price * currency.currencyRate}
                           currency={currency}
                         />
                       </td>
@@ -585,8 +578,9 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                                 if (cartCount === 1) {
                                   showWarningConfirmDialog({
                                     options: {
-                                      message:
-                                        "Giảm số lượng về 0 khi giỏ hàng chỉ còn 1 sản phẩm tương đương với việc huỷ đơn hàng",
+                                      message: t(
+                                        "cart.messages.zero_qty_cart_warn"
+                                      ),
                                       accept: () => {
                                         close();
                                         showCancel();
@@ -598,8 +592,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                                 } else {
                                   showWarningConfirmDialog({
                                     options: {
-                                      message:
-                                        "Giảm số lượng về 0 tương đương với việc loại bỏ sản phẩm khỏi giỏ",
+                                      message: t("cart.messages.zero_qty_warn"),
                                       accept: () => {
                                         setViewOrder((prev) => ({
                                           ...prev,
@@ -629,12 +622,12 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                               const newValue = parseInt(e.target.value, 10);
                               if (newValue >= single.productDetail.quantity) {
                                 return showErrorToast(
-                                  "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                                  t("products.messages.limit_reached")
                                 );
                               }
                               if (newValue > 5) {
                                 return showErrorToast(
-                                  "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                                  t("products.messages.max_cart_size")
                                 );
                               }
                               if (!isNaN(newValue)) {
@@ -664,13 +657,13 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                                 single.quantity >= single.productDetail.quantity
                               ) {
                                 return showErrorToast(
-                                  "Rất tiếc, đã đạt giới hạn số lượng sản phẩm"
+                                  t("products.messages.limit_reached")
                                 );
                               }
 
                               if (single.quantity >= 5) {
                                 return showErrorToast(
-                                  "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+                                  t("products.messages.max_cart_size")
                                 );
                               }
                               setViewOrder((prev) => ({
@@ -700,7 +693,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <td className="product-subtotal">
                         <CurrencyFormatter
                           className="amount"
-                          value={single.totalPrice}
+                          value={single.totalPrice * currency.currencyRate}
                           currency={currency}
                         />
                       </td>
@@ -712,8 +705,9 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                             if (cartCount == 1) {
                               showWarningConfirmDialog({
                                 options: {
-                                  message:
-                                    "Loại bỏ sản phẩm duy nhất tương đương với việc huỷ đơn hàng",
+                                  message: t(
+                                    "cart.messages.zero_qty_cart_warn"
+                                  ),
                                   accept: () => {
                                     close();
                                     showCancel();
@@ -759,7 +753,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <div className="col-3">
                         <CurrencyFormatter
                           className="amount"
-                          value={viewOrder.originMoney}
+                          value={viewOrder.originMoney * currency.currencyRate}
                           currency={currency}
                         />
                       </div>
@@ -774,12 +768,14 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                         {showBadgeShipping ? (
                           <CurrencyFormatter
                             className="amount"
-                            value={viewOrder.shippingMoney}
+                            value={
+                              viewOrder.shippingMoney * currency.currencyRate
+                            }
                             currency={currency}
                           />
                         ) : (
                           <span className="free-shipping">
-                            Miễn phí vận chuyển
+                            {t("common.free_shipping")}
                           </span>
                         )}
                       </div>
@@ -787,15 +783,16 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                     <div className="row">
                       <div className="col-9">
                         <Authenticated
+                          key="discount"
                           fallback={
-                            <Tooltip title="Để thêm, sửa giảm giá vui lòng đăng nhập">
-                              <h5>Giảm giá</h5>
+                            <Tooltip title={t("cart.voucher.messages.author")}>
+                              <h5>{t("cart.voucher.voucher")}</h5>
                             </Tooltip>
                           }
                         >
                           <h5>
                             {viewOrder.voucher ? (
-                              <Tooltip title="Gỡ voucher">
+                              <Tooltip title={t("cart.voucher.remove")}>
                                 <MinusCircleOutlined
                                   className="remove-voucher"
                                   onClick={() => {
@@ -815,21 +812,21 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                                 />
                               </Tooltip>
                             ) : (
-                              <Tooltip title="Thêm voucher">
+                              <Tooltip title={t("cart.voucher.add")}>
                                 <PlusCircleOutlined
                                   className="add-voucher"
                                   onClick={show}
                                 />
                               </Tooltip>
                             )}{" "}
-                            Giảm giá
+                            {t("cart.voucher.voucher")}
                           </h5>
                         </Authenticated>
                       </div>
                       <div className="col-3">
                         <CurrencyFormatter
                           className="amount"
-                          value={viewOrder.reduceMoney}
+                          value={viewOrder.reduceMoney * currency.currencyRate}
                           currency={currency}
                         />
                       </div>
@@ -845,7 +842,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                       <div className="col-3">
                         <CurrencyFormatter
                           className="amount"
-                          value={viewOrder.totalMoney}
+                          value={viewOrder.totalMoney * currency.currencyRate}
                           currency={currency}
                         />
                       </div>
@@ -878,24 +875,24 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                         if (shouldDisplayFreeShipping) {
                           return (
                             <DiscountMessage>
-                              <GiftOutlined /> Mua thêm{" "}
+                              <GiftOutlined /> {t("cart.messages.buy_more")}{" "}
                               <DiscountMoney>
                                 {formatCurrency(
                                   freeShippingDifference,
                                   currency
                                 )}
                               </DiscountMoney>{" "}
-                              để được miễn phí vận chuyển
+                              {t("cart.messages.for_free_shipping")}
                             </DiscountMessage>
                           );
                         } else if (shouldDisplayVoucher) {
                           return (
                             <DiscountMessage>
-                              <GiftOutlined /> Mua thêm{" "}
+                              <GiftOutlined /> {t("cart.messages.buy_more")}{" "}
                               <DiscountMoney>
                                 {formatCurrency(voucherDifference, currency)}
                               </DiscountMoney>{" "}
-                              để được giảm tới{" "}
+                              {t("cart.messages.for_discount")}{" "}
                               <DiscountMoney>
                                 {formatCurrency(
                                   legitVouchers[0].voucher.value,
@@ -916,7 +913,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
           </div>
         </div>
         <div className="col-12 mt-2">
-          <Title level={5}>Thông tin đơn hàng</Title>
+          <Title level={5}>{t("order_tracking.modal.labels.orderInfo")}</Title>
           <Form
             form={form}
             layout="vertical"
@@ -934,11 +931,11 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               orderNote: viewOrder.note,
             }}
           >
-            <Form.Item label="Mã hoá đơn">
+            <Form.Item label={t("order_tracking.modal.fields.code")}>
               <Input value={viewOrder.code} disabled />
             </Form.Item>
             <Form.Item
-              label="Tên đầy đủ"
+              label={t("order_tracking.modal.fields.fullName")}
               name="fullName"
               rules={[
                 {
@@ -949,7 +946,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               <Input />
             </Form.Item>
             <Form.Item
-              label="Email"
+              label={t("order_tracking.modal.fields.email")}
               name="email"
               rules={[
                 {
@@ -960,7 +957,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               <Input />
             </Form.Item>
             <Form.Item
-              label="Số điện thoại"
+              label={t("order_tracking.modal.fields.phoneNumber")}
               name="phoneNumber"
               rules={[
                 {
@@ -974,9 +971,9 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               label={
                 <Space size="large">
                   <Text>{t(`cart.shipping.address.province.title`)}</Text>
-                  <Authenticated fallback={false}>
+                  <Authenticated key="choose-address" fallback={false}>
                     <Button type="default" onClick={showAddress}>
-                      Hoặc chọn địa chỉ của bạn tại đây
+                      {t("buttons.choose_address")}
                     </Button>
                   </Authenticated>
                 </Space>
@@ -992,7 +989,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               <Select
                 className="email s-email s-wid"
                 showSearch
-                placeholder={"Chọn tỉnh/thành phố"}
+                placeholder={t(`cart.shipping.address.province.placeholder`)}
                 loading={isLoadingProvince}
                 onChange={handleProvinceChange}
                 filterOption={filterOption}
@@ -1015,7 +1012,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               <Select
                 className="email s-email s-wid"
                 showSearch
-                placeholder={"Chọn quận/huyện"}
+                placeholder={t(`cart.shipping.address.district.title`)}
                 loading={isLoadingDistrict}
                 onChange={handleDistrictChange}
                 filterOption={filterOption}
@@ -1038,7 +1035,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               <Select
                 className="email s-email s-wid"
                 showSearch
-                placeholder={"Chọn phường/xã phố"}
+                placeholder={t(`cart.shipping.address.ward.title`)}
                 loading={isLoadingWard}
                 onChange={handleWardChange}
                 filterOption={filterOption}
@@ -1049,7 +1046,7 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
               />
             </Form.Item>
             <Form.Item
-              label="Chi tiết địa chỉ"
+              label={t("success_page.address.line")}
               name="line"
               rules={[
                 {
@@ -1059,13 +1056,16 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
             >
               <Input />
             </Form.Item>
-            <Form.Item label="Ghi chú hoá đơn" name="orderNote">
+            <Form.Item
+              label={t("order_tracking.modal.fields.note")}
+              name="orderNote"
+            >
               <Input />
             </Form.Item>
           </Form>
         </div>
       </div>
-      <Authenticated fallback={false}>
+      <Authenticated key="voucher-modal" fallback={false}>
         <VoucherModal
           restModalProps={restVoucherModalProps}
           vouchers={user?.customerVoucherList || []}

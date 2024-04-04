@@ -1,17 +1,16 @@
 import { useDocumentTitle } from "@refinedev/react-router-v6";
+import { Rate } from "antd";
+import { motion } from "framer-motion";
 import { Fragment, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-import Rating from "../../components/product/sub-components/ProductRating";
+import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../constants/motions";
+import { CurrencyFormatter } from "../../helpers/currency";
 import { getDiscountPrice } from "../../helpers/product";
 import { deleteFromCompare } from "../../redux/slices/compare-slice";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import { CurrencyFormatter } from "../../helpers/currency";
-import { motion } from "framer-motion";
-import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../constants/motions";
-import { Rate } from "antd";
 
 const Compare = () => {
   const { t } = useTranslation();

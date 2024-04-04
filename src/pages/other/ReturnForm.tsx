@@ -1,17 +1,17 @@
 import { LeftOutlined } from "@ant-design/icons";
 import { useForm } from "@refinedev/antd";
-import { HttpError, useCustom, useOne } from "@refinedev/core";
+import { HttpError, useCustom, useOne, useTranslate } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Button, Form, Spin } from "antd";
 import { motion } from "framer-motion";
 import { Fragment, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { CHILDREN_VARIANT, PARENT_VARIANT } from "../../constants/motions";
 import { showWarningConfirmDialog } from "../../helpers/confirm";
 import { showWarningToast } from "../../helpers/toast";
 import {
   validateCommon,
+  validateEmail,
   validateFullName,
   validatePhoneNumber,
 } from "../../helpers/validate";
@@ -28,9 +28,10 @@ const GHN_API_BASE_URL = import.meta.env.VITE_GHN_API_BASE_URL;
 const GHN_TOKEN = import.meta.env.VITE_GHN_USER_TOKEN;
 
 const ReturnForm = () => {
-  const { t } = useTranslation();
+  const t = useTranslate();
   let { pathname } = useLocation();
   let { id } = useParams();
+  const navigate = useNavigate();
 
   const { data, isLoading, isError, refetch } = useOne<
     IOrderResponse,
@@ -40,8 +41,8 @@ const ReturnForm = () => {
     id: id,
     errorNotification: (error, values, resource) => {
       return {
-        message: error?.message + "",
-        description: "Oops... " + t("common.error"),
+        message: t("common.error") + error?.message,
+        description: "Oops... ",
         type: "error",
       };
     },
@@ -53,19 +54,13 @@ const ReturnForm = () => {
     useState<IReturnFormDetailRequest[]>();
   const [hasAgreed, setHasAgreed] = useState<boolean>(false);
 
-  const { onFinish, formProps, saveButtonProps, formLoading } = useForm<{
-    provinceId: number;
-    districtId: number;
-    wardCode: string;
-    line: string;
-    fullName: string;
-    phoneNumber: string;
-    paymentInfo: string;
-  }>({
+  const { onFinish, formProps, saveButtonProps, formLoading } = useForm({
     resource: "return-forms",
     action: "create",
     redirect: false,
-    onMutationSuccess: (data, variables, context, isAutoSave) => {},
+    onMutationSuccess: (data, variables, context, isAutoSave) => {
+      navigate(`/return-success/${data.data?.code}`);
+    },
   });
 
   const [provinces, setProvinces] = useState<IProvince[]>([]);
@@ -323,7 +318,7 @@ const ReturnForm = () => {
         if (detail.orderDetail === record.orderDetail) {
           return {
             ...detail,
-            reason: event.target.value, // Cập nhật trường reason với giá trị mới
+            reason: event.target.value,
           };
         }
         return detail;
@@ -341,7 +336,7 @@ const ReturnForm = () => {
         if (detail.orderDetail === record.orderDetail) {
           return {
             ...detail,
-            feedback: event.target.value, // Cập nhật trường feedback với giá trị mới
+            feedback: event.target.value,
           };
         }
         return detail;
@@ -399,8 +394,11 @@ const ReturnForm = () => {
         more: formProps.form?.getFieldValue("line"),
       },
       order: order?.id,
+      phoneNumber: formProps.form?.getFieldValue("phoneNumber"),
+      email: formProps.form?.getFieldValue("email"),
       paymentInfo: formProps.form?.getFieldValue("paymentInfo"),
       returnFormDetails: returnFormDetailsPayload,
+      paymentType: "Transfer",
     };
     showWarningConfirmDialog({
       options: {
@@ -451,7 +449,7 @@ const ReturnForm = () => {
                           justifyContent: "start",
                         }}
                       >
-                        Phiếu Yêu Cầu Trả Hàng
+                        {t("return-forms.titles.form")}
                       </div>
                     </div>
                     <div className="policy-wrapper mt-3">
@@ -501,10 +499,11 @@ const ReturnForm = () => {
                   </div>
                   <div className="d-flex justify-content-between mt-5">
                     <h3 className="cart-page-title mb-2">
-                      Chọn sản phẩm hoàn trả
+                      {t("return-forms.titles.steps.selectProduct")}
                     </h3>
                     <h4 className="mb-2">
-                      Mã hoá đơn: #{order.code.toUpperCase()}
+                      {t("return-forms.fields.code")}: #
+                      {order.code.toUpperCase()}
                     </h4>
                   </div>
                   <div className="row">
@@ -521,11 +520,21 @@ const ReturnForm = () => {
                             <motion.tr>
                               <th></th>
                               <th>{t(`cart.table.head.image`)}</th>
-                              <th style={{ width: "10%" }}>Sản phẩm</th>
-                              <th style={{ width: "10%" }}>Số lượng</th>
-                              <th style={{ width: "10%" }}>SL hoàn trả</th>
-                              <th>Lý do</th>
-                              <th>Feedback</th>
+                              <th style={{ width: "10%" }}>
+                                {t("return-form-details.fields.product")}
+                              </th>
+                              <th style={{ width: "10%" }}>
+                                {t("return-form-details.fields.quantity")}
+                              </th>
+                              <th style={{ width: "10%" }}>
+                                {t("return-form-details.fields.returnQuantity")}
+                              </th>
+                              <th>
+                                {t("return-form-details.fields.reason.label")}
+                              </th>
+                              <th>
+                                {t("return-form-details.fields.feedback.label")}
+                              </th>
                             </motion.tr>
                           </motion.thead>
                           <motion.tbody
@@ -652,10 +661,10 @@ const ReturnForm = () => {
                       <div className="row justify-content-between">
                         <div className="col-md-5 cart-tax">
                           <h3 className="cart-page-title mb-2">
-                            Thông tin giao hàng
+                            {t("return-forms.titles.shippingInfo")}
                           </h3>
                           <div className="app-info mb-20">
-                            <label>Tên người nhận</label>
+                            <label>{t("return-forms.fields.fullName")}</label>
                             <Form.Item
                               name="fullName"
                               required
@@ -670,7 +679,9 @@ const ReturnForm = () => {
                             </Form.Item>
                           </div>
                           <div className="app-info mb-20">
-                            <label>Số điện thoại người nhận</label>
+                            <label>
+                              {t("return-forms.fields.phoneNumber")}
+                            </label>
                             <Form.Item
                               name="phoneNumber"
                               required
@@ -700,7 +711,11 @@ const ReturnForm = () => {
                               {provinces && provinces.length > 0 ? (
                                 <select onChange={handleProvinceChange}>
                                   <option value="">
-                                    --Chọn tỉnh/thành phố--
+                                    --
+                                    {t(
+                                      "cart.shipping.address.province.place_holder"
+                                    )}
+                                    --
                                   </option>
                                   {provinces.map((province, index) => (
                                     <option
@@ -713,9 +728,7 @@ const ReturnForm = () => {
                                 </select>
                               ) : (
                                 <select>
-                                  <option value="">
-                                    Đang tải tỉnh/thành phố...
-                                  </option>
+                                  <option value="">Loading...</option>
                                 </select>
                               )}
                             </Form.Item>
@@ -735,7 +748,13 @@ const ReturnForm = () => {
                             >
                               {districts && districts.length > 0 ? (
                                 <select onChange={handleDistrictChange}>
-                                  <option value="">--Chọn quận/huyện--</option>
+                                  <option value="">
+                                    --
+                                    {t(
+                                      "cart.shipping.address.district.place_holder"
+                                    )}
+                                    --
+                                  </option>
                                   {districts.map((district, index) => (
                                     <option
                                       key={index}
@@ -747,9 +766,7 @@ const ReturnForm = () => {
                                 </select>
                               ) : (
                                 <select>
-                                  <option value="">
-                                    Đang tải quận/huyện...
-                                  </option>
+                                  <option value="">Loading...</option>
                                 </select>
                               )}
                             </Form.Item>
@@ -769,7 +786,13 @@ const ReturnForm = () => {
                             >
                               {wards && wards.length > 0 ? (
                                 <select onChange={handleWardChange}>
-                                  <option value="">--Chọn phường/xã--</option>
+                                  <option value="">
+                                    --
+                                    {t(
+                                      "cart.shipping.address.ward.place_holder"
+                                    )}
+                                    --
+                                  </option>
                                   {wards.map((ward, index) => (
                                     <option key={index} value={ward.WardCode}>
                                       {ward.WardName}
@@ -778,7 +801,7 @@ const ReturnForm = () => {
                                 </select>
                               ) : (
                                 <select>
-                                  <option value="">Đang tải phường/...</option>
+                                  <option value="">Loading...</option>
                                 </select>
                               )}
                             </Form.Item>
@@ -800,10 +823,12 @@ const ReturnForm = () => {
                         </div>
                         <div className="col-md-5 cart-tax">
                           <h3 className="cart-page-title mb-2">
-                            Thông tin thanh toán
+                            {t("return-forms.titles.paymentInfo")}
                           </h3>
                           <div className="app-info mb-20">
-                            <label>Tên ngân hàng & Số tài khoản</label>
+                            <label>
+                              {t("return-forms.fields.paymentInfo.label")}
+                            </label>
                             <Form.Item
                               name="paymentInfo"
                               required
@@ -816,7 +841,31 @@ const ReturnForm = () => {
                             >
                               <input
                                 type="text"
-                                placeholder="VCB NGUYEN VAN A XXXXXXXXXXXXXXXXXXX"
+                                placeholder={t(
+                                  "return-forms.fields.paymentInfo.placeholder"
+                                )}
+                              />
+                            </Form.Item>
+                          </div>
+                          <div className="app-info mb-20">
+                            <label>
+                              {t("return-forms.fields.email.label")}
+                            </label>
+                            <Form.Item
+                              name="email"
+                              required
+                              rules={[
+                                {
+                                  validator: (_, value) =>
+                                    validateEmail(_, value),
+                                },
+                              ]}
+                            >
+                              <input
+                                type="text"
+                                placeholder={t(
+                                  "return-forms.fields.email.placeholder"
+                                )}
                               />
                             </Form.Item>
                           </div>
@@ -837,7 +886,7 @@ const ReturnForm = () => {
                             onChange={() => setHasAgreed(!hasAgreed)}
                           />
                           <label htmlFor="agree-policy">
-                            Tôi đồng ý với chính sách hoàn trả của cửa hàng
+                            {t("return-forms.messages.agree")}
                           </label>
                         </div>
                       </div>
@@ -845,7 +894,7 @@ const ReturnForm = () => {
                     <div className="submit-footer justify-content-between row">
                       <div className="col-md-5">
                         <Button type="link" icon={<LeftOutlined />}>
-                          Quay lại trang thông tin đơn hàng
+                          {t("return-forms.buttons.return_to_orders")}
                         </Button>
                       </div>
                       <div className="col-md-5">
@@ -858,7 +907,7 @@ const ReturnForm = () => {
                             width: "100%",
                           }}
                         >
-                          Gửi phiếu yêu cầu hoàn trả
+                          {t("return-forms.buttons.submit")}
                         </Button>
                       </div>
                     </div>
@@ -883,10 +932,9 @@ const ReturnForm = () => {
                       <i className="pe-7s-shield"></i>
                     </div>
                     <div className="item-empty-area__text">
-                      Không tìm thấy đơn hàng hoặc dơn hàng không đủ điều kiện
-                      hoàn trả
-                      <br /> Vui lòng liên hệ với chúng tôi để giải quyết nếu
-                      bạn không thể tìm thấy đơn hàng của mình
+                      {t(`return-forms.messages.not_found`)}
+                      <br />
+                      {t(`return-forms.messages.contact`)}
                       <br />
                       <Link to={"/shop"}>{t(`cart.buttons.add_items`)}</Link>
                     </div>

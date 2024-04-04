@@ -2,6 +2,7 @@ import React from "react";
 import { setActiveSort } from "../../helpers/product";
 import { IColorResponse } from "../../interfaces";
 import { Collapse, CollapseProps } from "antd";
+import { useTranslate } from "@refinedev/core";
 
 interface ShopColorProps {
   colors: IColorResponse[];
@@ -12,10 +13,13 @@ const ShopColor: React.FC<ShopColorProps> = ({
   colors,
   updateFilterParams,
 }) => {
+  const t = useTranslate();
   const items: CollapseProps["items"] = [
     {
       key: "color",
-      label: <h4 className="pro-sidebar-title">Màu sắc</h4>,
+      label: (
+        <h4 className="pro-sidebar-title">{t("products.fields.colors")}</h4>
+      ),
       children: (
         <div className="sidebar-widget-list mt-20">
           {colors ? (

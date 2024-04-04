@@ -17,6 +17,7 @@
       "/register": "Đăng ký",
       "orders": "Đơn hàng của tôi",
       "orders_tracking": "Theo dõi đơn hàng",
+      "return_tracking": "Theo dõi trả hàng",
       "404_page": "404",
       "success": "Thành công",
       "submission_failed": "Giao dịch không thành công",
@@ -99,6 +100,22 @@
     }
   },
   "order_tracking": {
+    "title": "Trạng thái đơn hàng",
+    "buttons": {
+      "cancel": "Huỷ",
+      "edit": "Sửa đơn hàng",
+      "create_return_form": {
+        "label": "Tạo phiếu hoàn trả",
+        "description": "Trả hàng sẽ hết hạn vào {{date}}"
+      },
+      "track_return_form": "Theo dõi trả hàng"
+    },
+    "fields": {
+      "phoneNumber": "Số điện thoại khách hàng",
+      "date": "Ngày mua hàng",
+      "expectedDelivery": "Ngày dự kiến giao hàng",
+      "address": "Địa chỉ giao hàng"
+    },
     "steps": {
       "PLACE_ORDER": {
         "title": "Đặt hàng",
@@ -128,7 +145,63 @@
         "title": "Đã huỷ",
         "description": "Đơn hàng đã bị huỷ."
       }
+    },
+    "cancel": {
+      "title": "Vui lòng chọn lý do huỷ",
+      "subtitle": "Để gia tăng chất lượng dịch vụ, xin vui lòng cho chúng tôi biết lý do bạn huỷ đơn hàng.",
+      "cases": {
+        "1": "Muốn nhập/thay đổi mã voucher",
+        "2": "Muốn thay đổi sản phẩm trong đơn hàng (size, màu sắc,...)",
+        "3": "Tìm thấy giá rẻ hơn ở chỗ khác",
+        "4": "Đổi ý, không muốn mua nữa",
+        "5": "Ngứa tay",
+        "other": "Khác"
+      }
+    },
+    "messages": {
+      "success": "Huỷ đơn hàng thành công"
+    },
+    "order_status": {
+      "PLACE_ORDER": "Đặt hàng",
+      "PENDING": "Chưa giải quyết",
+      "WAIT_FOR_CONFIRMATION": "Đang chờ xác nhận",
+      "WAIT_FOR_DELIVERY": "Sẵn sàng",
+      "DELIVERING": "Đang giao",
+      "COMPLETED": "Hoàn thành",
+      "CANCELED": "Đã hủy",
+      "EXPIRED": "Hết hạn",
+      "RETURNED": "Trả lại",
+      "EXCHANGED": "Đổi hàng",
+      "ALL": "Tất cả"
+    },
+    "deliverables": "Đơn đặt hàng",
+    "modal": {
+      "title": "Đơn hàng của bạn",
+      "tooltip": "Bạn chỉ có thể 1 số thông tin cơ bản của đơn hàng, mọi trường hợp xin vui lòng liên hệ với chúng tôi hoặc tạo đơn mới.",
+      "labels": {
+        "orderInfo": "Thông tin đơn hàng"
+      },
+      "fields": {
+        "code": "Mã đơn hàng",
+        "fullName": "Tên đầy đủ",
+        "email": "Email",
+        "phoneNumber": "Số điện thoại khách hàng",
+        "note": "Ghi chú hoá đơn"
+      }
     }
+  },
+  "return_tracking": {
+    "title": "Theo dõi trạng thái trả hàng",
+    "fields": {
+      "phoneNumber": "Số điện thoại người nhận",
+      "date": "Ngày tạo phiếu",
+      "amountToBePaid": "Số tiền cần trả",
+      "refundStatus": "Trạng thái hoàn trả",
+      "address": "Địa chỉ hoàn trả",
+      "unitPrice": "Đơn giá",
+      "email": "Email"
+    },
+    "deliverables": "Sản phẩm hoàn trả"
   },
   "wish_list": {
     "title": "Danh sách yêu thích của bạn",
@@ -193,12 +266,37 @@
         "ward": {
           "title": "Phường/Xã",
           "place_holder": "Chọn Phường/Xã"
+        },
+        "messages": {
+          "empty": "Vui lòng chọn địa chỉ"
         }
+      },
+      "messages": {
+        "calculateFee": "Chi phí vận chuyển của bạn được ước tính là "
       }
     },
     "voucher": {
+      "voucher": "Giảm giá",
       "title": "Sử dụng phiếu giảm giá",
-      "subtitle": "Nhập mã giảm giá của bạn."
+      "modal": {
+        "title": "Danh sách phiếu giảm giá còn hoạt động",
+        "antd_list": {
+          "reduce": "Giảm",
+          "for_order_above": "Cho đơn hàng trên",
+          "valid_til": "Có hiệu lực đến",
+          "detail": "Chi tiết"
+        }
+      },
+      "subtitle": "Nhập mã giảm giá của bạn.",
+      "messages": {
+        "empty": "Vui lòng nhập mã giảm giá",
+        "success": "Áp dụng voucher thành công",
+        "invalid": "Voucher không hợp lệ",
+        "unqualified": "Đơn hàng chưa đủ điều kiện để được áp dụng giảm giá",
+        "author": "Để thêm, sửa giảm giá vui lòng đăng nhập"
+      },
+      "add": "Thêm voucher",
+      "remove": "Gỡ voucher"
     },
     "cart_total": {
       "title": "Tổng giỏ hàng",
@@ -215,7 +313,251 @@
       "add_items": "Mua ngay",
       "get_a_quote": "Nhận báo giá",
       "apply_voucher": "Áp dụng giảm giá",
-      "proceed_to_checkout": "Tiến hành thanh toán"
+      "proceed_to_checkout": "Tiến hành thanh toán",
+      "check_voucher": "Xem voucher"
+    },
+    "messages": {
+      "buy_more": "Mua thêm",
+      "for_free_shipping": "để được miễn phí vận chuyển",
+      "for_discount": "để được giảm tới",
+      "zero_qty_cart_warn": "Giảm số lượng về 0 khi giỏ hàng chỉ còn 1 sản phẩm tương đương với việc huỷ đơn hàng",
+      "zero_qty_warn": "Giảm số lượng về 0 tương đương với việc loại bỏ sản phẩm khỏi giỏ"
+    }
+  },
+  "contact": {
+    "title": "Liên hệ",
+    "follow_us": "Theo dõi chúng tôi",
+    "keep_in_touch": "Giữ liên lạc"
+  },
+  "auth_page": {
+    "forgot_password": {
+      "title": "Quên mật khẩu",
+      "fields": {
+        "email": {
+          "label": "Email",
+          "placeholder": "Email đăng ký tài khoản..."
+        }
+      },
+      "buttons": {
+        "receive_construction": "Nhận email hướng dẫn"
+      }
+    },
+    "login_register": {
+      "login": {
+        "title": "Đăng nhập",
+        "fields": {
+          "password": {
+            "label": "Mật khẩu",
+            "placeholder": "Mật khẩu"
+          },
+          "confirm": {
+            "label": "Xác nhận mật khẩu",
+            "placeholder": "Xác nhận mật khẩu"
+          }
+        },
+        "labels": {
+          "save_login": "Lưu thông tin đăng nhập",
+          "forgot_password": "Quên mật khẩu?"
+        },
+        "messages": {
+          "success": "Đăng nhập thành công",
+          "hi": "Xin chào"
+        }
+      },
+      "register": {
+        "title": "Đăng ký",
+        "fields": {
+          "email": {
+            "label": "Email"
+          },
+          "gender": {
+            "label": "Chọn giới tính",
+            "male": "Nam",
+            "female": "Nữ",
+            "other": "Khác"
+          }
+        },
+        "messages": {
+          "confirm": "Vui lòng xác nhận mật khẩu của bạn!",
+          "not_match": "Mật khẩu mới bạn nhập không khớp!"
+        }
+      }
+    }
+  },
+  "my_account": {
+    "account_infor": {
+      "title": "Chỉnh sửa thông tin tài khoản",
+      "labels": {
+        "your_infor": "Thông tin cá nhân của bạn"
+      },
+      "fields": {
+        "name": "Tên",
+        "dateOfBirth": "Ngày sinh",
+        "email": "Email",
+        "gender": {
+          "label": "Giới tính",
+          "placeholder": "Chọn giới tính",
+          "male": "Nam",
+          "female": "Nữ",
+          "other": "Khác"
+        }
+      },
+      "messages": {
+        "success": "Thay đổi thông tin cá nhân thành công!"
+      }
+    },
+    "change_password": {
+      "title": "Đổi mật khẩu",
+      "labels": {
+        "change_password": "Nhập thông tin để thay đổi mật khẩu"
+      },
+      "fields": {
+        "oldPassword": "Mật khẩu cũ",
+        "password": "Mật khẩu mới",
+        "confirm": "Xác nhận mật khẩu mới"
+      }
+    },
+    "address": {
+      "title": "Sửa đổi danh sách địa chỉ",
+      "province": {
+        "title": "Tỉnh/Thành phố",
+        "place_holder": "Chọn Tỉnh/Thành phố"
+      },
+      "district": {
+        "title": "Quận/Huyện",
+        "place_holder": "Chọn Quận/Huyện"
+      },
+      "ward": {
+        "title": "Phường/Xã",
+        "place_holder": "Chọn Phường/Xã"
+      },
+      "labels": {
+        "list": "Danh sách địa chỉ",
+        "create": "Thêm mới địa chỉ",
+        "edit": "Cập nhật địa chỉ",
+        "default": "Mặc định"
+      },
+      "buttons": {
+        "create": "Thêm địa chỉ mới",
+        "edit": "Sửa",
+        "set_default": "Đặt mặc định",
+        "delete": "Xoá"
+      },
+      "messages": {
+        "set_default": "Đặt mặc định địa chỉ thành công",
+        "choose": "Chọn địa chỉ thành công",
+        "create": "Tạo địa chỉ thành công",
+        "empty": "Bạn chưa có địa chỉ, vui lòng tạo địa chỉ trước."
+      },
+      "fields": {
+        "phoneNumber": "Số điện thoại",
+        "province": {
+          "title": "Tỉnh/Thành phố",
+          "place_holder": "Chọn Tỉnh/Thành phố"
+        },
+        "district": {
+          "title": "Quận/Huyện",
+          "place_holder": "Chọn Quận/Huyện"
+        },
+        "ward": {
+          "title": "Phường/Xã",
+          "place_holder": "Chọn Phường/Xã"
+        },
+        "more": "Chi tiết"
+      }
+    },
+    "voucher": {
+      "title": "Ví voucher của bạn",
+      "labels": {
+        "list": "Danh sách voucher dành cho bạn"
+      }
+    }
+  },
+  "reset_password": {
+    "title": "Đặt lại mật khẩu",
+    "password": "Nhập mật khẩu mới",
+    "confirm": "Xác nhận mật khẩu mới",
+    "messages": {
+      "success": {
+        "message": "Đang chuyển hướng đến trang đăng nhập...",
+        "description": "Đặt lại mật khẩu thành công!"
+      }
+    }
+  },
+  "my_order": {
+    "title": "Đơn hàng của bạn",
+    "fields": {
+      "code": "Mã",
+      "total": "Tổng cộng",
+      "product": "Sản phẩm",
+      "createdAt": "Tạo lúc"
+    },
+    "segmented": {
+      "options": {
+        "ALL": "Tất cả",
+        "WAIT_FOR_CONFIRMATION": "Chờ xác nhận",
+        "WAIT_FOR_DELIVERY": "Chờ vận chuyển",
+        "DELIVERING": "Đang vận chuyển",
+        "COMPLETED": "Hoàn thành",
+        "CANCELED": "Huỷ"
+      }
+    },
+    "buttons": {
+      "tracking": "Tra cứu đơn hàng"
+    }
+  },
+  "not_found": {
+    "title": "404",
+    "subtitle": "BUỒN BAYY! TRANG KHÔNG TÌM THẤY",
+    "description": "Rất tiếc, nhưng trang bạn đang tìm kiếm không tồn tại, đã bị xóa, đổi tên hoặc tạm thời không khả dụng."
+  },
+  "tracking_page": {
+    "title": "Tra cứu đơn hàng",
+    "subtitle": "Nhập mã đơn hàng để thực hiện tra cứu",
+    "placeholder": "Nhập mã đơn hàng... Ví dụ: SUS-HGDKA",
+    "messages": {
+      "success": "Tra cứu đơn hàng thành công",
+      "required": "Vui lòng nhập mã đơn hàng"
+    }
+  },
+  "success_page": {
+    "title": "Cảm ơn bạn đã mua hàng!",
+    "subtitle": {
+      "email": "Email xác nhận đơn hàng với chi tiết đơn hàng của bạn và một liên kết để theo dõi tiến trình đã được gửi đến địa chỉ email của bạn.",
+      "contact": "Chúng tôi sẽ liên hệ với bạn trong 24h, xin hãy chờ đợi.",
+      "code": "Mã đơn hàng",
+      "date": "Ngày mua hàng"
+    },
+    "extra": {
+      "print": "In hoá đơn"
+    },
+    "address": {
+      "shipping": "Địa chỉ giao hàng",
+      "order": "Địa chỉ hoá đơn",
+      "phoneNumber": "Số điện thoại",
+      "province": {
+        "title": "Tỉnh/Thành phố",
+        "place_holder": "Chọn Tỉnh/Thành phố"
+      },
+      "district": {
+        "title": "Quận/Huyện",
+        "place_holder": "Chọn Quận/Huyện"
+      },
+      "ward": {
+        "title": "Phường/Xã",
+        "place_holder": "Chọn Phường/Xã"
+      },
+      "line": "Chi tiết địa chỉ"
+    },
+    "shipping_method": "Phương thức vận chuyển",
+    "payment_method": "Phương thức thanh toán",
+    "giaohangtietkiem": "Giao hàng tiết kiệm"
+  },
+  "return_success": {
+    "title": "Phiếu trả hàng của bạn đã được gửi!",
+    "subtitle": "Chúng tôi sẽ gọi điện xác nhận cho bạn qua số điện thoại dưới đây",
+    "buttons": {
+      "tracking": "Theo dõi hoàn phiếu trả hàng"
     }
   },
   "home_page": {
@@ -309,17 +651,24 @@
         "checkout": "Thanh toán"
       },
       "no_items": "Không có sản phẩm nào trong giỏ hàng"
-    }
+    },
+    "call_us": "Gọi cho chúng tôi",
+    "dear_user": "Người dùng thân mến"
   },
   "products": {
     "sale": "Giảm tới",
     "new": "Mới",
     "fields": {
+      "code": "Mã",
       "colors": "Màu sắc",
       "sizes": "Kích cỡ",
       "styles": "Kiểu dáng",
+      "tradeMark": "Nhãn hiệu",
+      "soles": "Đế giày",
+      "materials": "Chất liệu",
       "tags": "Thẻ",
-      "descriptions": "Mô tả"
+      "descriptions": "Mô tả",
+      "stock": "Sản phẩm có sẵn"
     },
     "desc_tab": {
       "additional_information": "Thông tin thêm",
@@ -329,18 +678,41 @@
         "name": "Tên",
         "email": "Email",
         "message": "Nội dung",
-        "your_rating": "Đánh giá của bạn"
+        "your_rating": "Đánh giá của bạn",
+        "productDetails": {
+          "label": "Sản phẩm",
+          "placeholder": "Chọn sản phẩm của bạn"
+        }
       },
       "buttons": {
         "reply": "Phản hồi",
         "add_review": "Tạo đánh giá",
         "submit": "Gửi",
         "out_of_stock": "Hết hàng"
+      },
+      "messages": {
+        "success": "Gửi đánh giá thành công",
+        "delete_review": "Xoá đánh giá thành công"
+      }
+    },
+    "anotherinfo": {
+      "weight": "Cân nặng",
+      "dimension": "Kích thước",
+      "material": "Nguyên liệu",
+      "otherInfo": {
+        "title": "Thông tin khác",
+        "content": "Bạn có thể xem chi tiết từng góc cạnh của sản phẩm bằng cách quét mã QR code đi kèm trên hộp giày."
       }
     },
     "related_products": "Sản phẩm liên quan",
     "buttons": {
-      "add_to_cart": "Thêm vào giỏ hàng"
+      "add_to_cart": "Thêm vào giỏ hàng",
+      "shop_now": "Mua ngay"
+    },
+    "messages": {
+      "min_reached": "Đã đạt số lượng nhỏ nhất",
+      "limit_reached": "Rất tiếc, đã đạt giới hạn số lượng sản phẩm!",
+      "max_cart_size": "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
     }
   },
   "confirmDialog": {
@@ -363,9 +735,11 @@
       "list": "Trả hàng",
       "create": "Tạo phiếu trả hàng",
       "show": "Chi tiết phiếu trả hàng",
-      "form": "Thông tin chung",
+      "form": "Phiếu Yêu Cầu Trả Hàng",
       "return-details": "Thông tin hàng hoá trả lại",
       "return-address": "Thông tin địa chỉ",
+      "shippingInfo": "Thông tin giao hàng",
+      "paymentInfo": "Thông tin thanh toán",
       "steps": {
         "selectOrder": "Chọn đơn hoàn trả",
         "selectProduct": "Chọn sản phẩm hoàn trả",
@@ -375,6 +749,7 @@
     "fields": {
       "code": "Mã trả hàng",
       "orderCode": "Mã đơn hàng",
+      "fullName": "Tên người nhận",
       "customer": {
         "label": "Khách hàng",
         "placeholder": "Không chọn"
@@ -385,10 +760,14 @@
       },
       "shippingMoney": "Phí vận chuyển ước tính",
       "returnProducts": "Sản phẩm hoàn trả",
-      "phoneNumber": "Số điện thoại",
+      "phoneNumber": "Số điện thoại người nhận",
       "amountToBePaid": "Số tiền cần trả",
       "createdAt": "Tạo lúc",
       "createdBy": "Tạo bởi",
+      "email": {
+        "label": "Email",
+        "placeholder": "Nhập địa chỉ email của bạn"
+      },
       "paymentInfo": {
         "label": "Thông tin thanh toán",
         "placeholder": "VCB XXXBANK XXXXXXXXXXXXXXXXX"
@@ -422,12 +801,62 @@
         "COMPLETED": "Hoàn thành"
       }
     },
-    "message": {
+    "messages": {
+      "agree": "Tôi đồng ý với chính sách hoàn trả của cửa hàng",
       "emptySelected": "Vui lòng chọn sản phẩm hoàn trả",
       "emptyReturnDetails": "Vui lòng kiểm tra sản phẩm hoàn trả trước",
       "invalidReturnQuantity": "Số lượng hoàn trả không được phép lớn hơn số lượng ban đầu",
       "emptyReturnQuantity": "Vui lòng nhập số lượng hoàn trả",
-      "notAgree": "Vui lòng chắc chắn rằng bạn đã đọc và đồng ý với chính sách của cửa hàng"
+      "notAgree": "Vui lòng chắc chắn rằng bạn đã đọc và đồng ý với chính sách của cửa hàng",
+      "not_found": "Không tìm thấy đơn hàng hoặc dơn hàng không đủ điều kiện hoàn trả",
+      "contact": "Vui lòng liên hệ với chúng tôi để giải quyết nếu bạn không thể tìm thấy đơn hàng của mình"
+    },
+    "buttons": {
+      "return_to_orders": "Quay lại trang thông tin đơn hàng",
+      "submit": "Gửi phiếu yêu cầu hoàn trả"
+    }
+  },
+  "return-form-details": {
+    "return-form-details": "Thông tin hàng hoá trả lại",
+    "fields": {
+      "orderCode": "Mã hoá đơn",
+      "product": "Sản phẩm",
+      "quantity": "Số lượng",
+      "name": "Tên",
+      "returnQuantity": "SL hoàn trả",
+      "unitPrice": "Đơn giá",
+      "totalPrice": "Thành tiền",
+      "reason": {
+        "label": "Lý do trả hàng",
+        "placeholder": "Nhập lý do trả hàng cho sản phẩm"
+      },
+      "feedback": {
+        "label": "Phản hồi",
+        "placeholder": "Nhập phản hồi của khách đối với sản phẩm"
+      },
+      "evidence": {
+        "label": "Hình ảnh thực tế",
+        "tooltip": "Hình ảnh thực tế hiện trạng sản phẩm hoàn trả"
+      },
+      "resellable": {
+        "label": "Có thể bán lại",
+        "YES": "Có",
+        "NO": "Không"
+      },
+      "returnInspectionStatus": {
+        "label": "Trạng thái kiểm tra",
+        "placeholder": "Chọn trạng thái kiểm tra",
+        "tooltip": "Trạng thái kiểm tra là trạng thái đánh giá xem hàng hoá có được trả lại hay không.",
+        "PASSED": "Đồng ý",
+        "FAILED": "Từ chối",
+        "PENDING": "Chưa giải quyết",
+        "null": "Chưa giải quyết"
+      },
+      "returnInspectionReason": {
+        "label": "Lý do kiểm tra trả hàng",
+        "placeholder": "Nhập lý do kiểm tra trả hàng",
+        "tooltip": "Lý do kiểm tra trả hàng là nguyên nhân được chỉ ra cho quyết định trả hàng."
+      }
     }
   },
   "validator": {
@@ -444,12 +873,20 @@
       "rating": "Đánh giá không được để trống",
       "productDetails": "Vui lòng chọn sản phẩm",
       "comment": "Nội dung đánh giá không được để trống",
-      "paymentInfo": "Thông tin thanh toán không được để trống"
+      "paymentInfo": "Thông tin thanh toán không được để trống",
+      "oldPassword": "Vui lòng nhập mật khẩu cũ",
+      "password": "Vui lòng nhập mật khẩu",
+      "confirmPassword": "Vui lòng xác nhận mật khẩu"
     }
   },
   "common": {
+    "hi": "Xin chào",
+    "logout": "Đăng xuất",
+    "search": "Tìm kiếm",
+    "search_placeholder": "Nhập từ khoá tại đây..",
     "maxLength": "Tối đa {{length}} ký tự",
     "rowSelection": "{{count}} mục đã được chọn",
+    "use_now": "Dùng ngay",
     "copied": "Đã copy vào bộ nhớ đệm",
     "update": {
       "success": "Cập nhật hoàn tất"
@@ -458,9 +895,58 @@
       "success": "Đơn hàng đã được thanh toán thành công!"
     },
     "success": "Thành công",
-    "error": "Đã có lỗi xảy ra: "
+    "fail": "Thất bại",
+    "error": "Đã có lỗi xảy ra: ",
+    "free_shipping": "Miễn phí vận chuyển",
+    "free_shipping_message": "Miễn phí vận chuyển cho đơn hàng trên"
   },
   "buttons": {
-    "delete": "Xoá"
+    "delete": "Xoá",
+    "submit": "Gửi",
+    "save_changes": "Lưu thay đổi",
+    "back_home": "Trở lại trang chủ",
+    "choose": "Chọn",
+    "choose_address": "Chọn địa chỉ của bạn"
+  },
+  "image": {
+    "upload": "Tải lên",
+    "dragger": {
+      "text": "Nhấp hoặc kéo tệp vào khu vực này để tải lên",
+      "hint": "Hỗ trợ tải lên một hoặc nhiều tệp. Nghiêm cấm tải lên dữ liệu của công ty hoặc các tệp bị cấm khác."
+    },
+    "error": {
+      "invalid": "Bạn chỉ có thể đăng tải file JPG/PNG!",
+      "exceed": "Ảnh phải nhỏ hơn 2MB!"
+    },
+    "description": {
+      "add": "Thêm hình ảnh",
+      "edit": "Chỉnh sửa hình ảnh"
+    },
+    "validation": "phải là {{size}}x{{size}} px"
+  },
+  "product_action": {
+    "tooltips": {
+      "wishlist": {
+        "in": "Đã thêm vào danh sách yêu thích",
+        "out": "Thêm vào danh sách yêu thích"
+      },
+      "compare": {
+        "in": "Đã thêm vào danh sách so sánh",
+        "out": "Thêm vào danh sách so sánh"
+      }
+    }
+  },
+  "sort": {
+    "sort_by": "Sắp xếp theo",
+    "default": "Mặc định",
+    "popularity": "Phổ biến",
+    "best_seller": "Bán chạy nhất",
+    "newest": "Mới nhất",
+    "oldest": "Cũ nhất",
+    "price_high_to_low": "Giá - Cao đến thấp",
+    "price_low_to_high": "Giá - Thấp đến cao",
+    "showing": "Hiển thị",
+    "results": "kết quả",
+    "out_of": "trên tổng số"
   }
 }

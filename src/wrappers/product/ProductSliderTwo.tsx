@@ -1,7 +1,7 @@
+import { useTranslate } from "@refinedev/core";
 import clsx from "clsx";
 import SectionTitleSeven from "../../components/section-title/SectionTitleSeven";
 import ProductGridEight from "./ProductGridTwo";
-import { useTranslation } from "react-i18next";
 
 type ProductSliderTwoProps = {
   spaceBottomClass?: string;
@@ -12,7 +12,7 @@ const ProductSliderTwo: React.FC<ProductSliderTwoProps> = ({
   spaceBottomClass,
   colorClass,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslate();
 
   return (
     <div className={clsx("related-product-area", spaceBottomClass, "bg-white")}>

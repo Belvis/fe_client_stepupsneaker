@@ -48,6 +48,8 @@ import ResetPassword from "./pages/other/ResetPassword";
 import ForgotPassword from "./pages/other/ForgotPassword";
 import ReturnForm from "./pages/other/ReturnForm";
 import ReturnSuccess from "./pages/other/ReturnSuccess";
+import ReturnTracking from "./pages/other/ReturnTracking";
+import ReturnDetail from "./pages/other/ReturnDetail";
 
 // Icons
 
@@ -155,6 +157,7 @@ function App() {
                         <Route
                           element={
                             <Authenticated
+                              key="login"
                               fallback={<CatchAllNavigate to="/login" />}
                             >
                               <Outlet />
@@ -163,9 +166,13 @@ function App() {
                         >
                           <Route path="my-account">
                             <Route index element={<MyAccount />} />
-                            <Route path={"orders"}>
+                            <Route path="orders">
                               <Route index element={<MyOrders />} />
                               <Route path=":id" element={<OrderDetail />} />
+                            </Route>
+                            <Route path="returns">
+                              {/* <Route index element={<MyOrders />} /> */}
+                              <Route path=":id" element={<ReturnDetail />} />
                             </Route>
                           </Route>
                         </Route>
@@ -173,7 +180,7 @@ function App() {
 
                       <Route path="/success/:id" element={<Success />} />
                       <Route
-                        path="/return-success/:id"
+                        path="/return-success/:code"
                         element={<ReturnSuccess />}
                       />
                       <Route path="/return/:id" element={<ReturnForm />} />
@@ -185,10 +192,14 @@ function App() {
                         <Route index element={<TrackingPage />} />
                         <Route path=":code" element={<OrderTracking />} />
                       </Route>
+                      <Route path="/return-tracking">
+                        {/* <Route index element={<TrackingPage />} /> */}
+                        <Route path=":code" element={<ReturnTracking />} />
+                      </Route>
 
                       <Route
                         element={
-                          <Authenticated fallback={<Outlet />}>
+                          <Authenticated key="wrapper" fallback={<Outlet />}>
                             <Navigate to="/" />
                           </Authenticated>
                         }

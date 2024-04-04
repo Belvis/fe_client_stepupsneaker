@@ -1,4 +1,9 @@
-import { Authenticated, useGetIdentity, useLogout } from "@refinedev/core";
+import {
+  Authenticated,
+  useGetIdentity,
+  useLogout,
+  useTranslate,
+} from "@refinedev/core";
 import { Avatar } from "antd";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
@@ -14,6 +19,7 @@ type IconGroupProps = {
 };
 
 export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
+  const t = useTranslate();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const { mutate: logout } = useLogout();
 
@@ -75,7 +81,10 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
           })}
           onClick={() => handleClick(1)}
         >
-          <Authenticated fallback={<i className="pe-7s-user-female" />}>
+          <Authenticated
+            key="account-setting"
+            fallback={<i className="pe-7s-user-female" />}
+          >
             {user && user.image ? (
               <Avatar
                 size={24}
@@ -100,26 +109,31 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
         >
           <ul>
             <Authenticated
+              key="account-dropdown"
               fallback={
                 <>
                   <li>
-                    <Link to={"/login"}>Đăng nhập</Link>
+                    <Link to={"/login"}>{t("nav.pages./login")}</Link>
                   </li>
                   <li>
-                    <Link to={"/register"}>Đăng ký</Link>
+                    <Link to={"/register"}>{t("nav.pages./register")}</Link>
                   </li>
                 </>
               }
             >
               <li>
-                <Link to={"/pages/my-account"}>Tài khoản</Link>
+                <Link to={"/pages/my-account"}>
+                  {t("nav.pages.my_account")}
+                </Link>
               </li>
               <li>
-                <Link to={"/pages/my-account/orders"}>Đơn hàng</Link>
+                <Link to={"/pages/my-account/orders"}>
+                  {t("nav.pages.orders")}
+                </Link>
               </li>
               <li>
                 <Link to={"/"} onClick={() => logout()}>
-                  Đăng xuất
+                  {t("common.logout")}
                 </Link>
               </li>
             </Authenticated>

@@ -2,6 +2,7 @@ import React from "react";
 import { setActiveSort } from "../../helpers/product";
 import { IMaterialResponse } from "../../interfaces";
 import { Collapse, CollapseProps } from "antd";
+import { useTranslate } from "@refinedev/core";
 
 interface ShopMaterialProps {
   materials: IMaterialResponse[];
@@ -12,10 +13,14 @@ const ShopMaterial: React.FC<ShopMaterialProps> = ({
   materials,
   updateFilterParams,
 }) => {
+  const t = useTranslate();
+
   const items: CollapseProps["items"] = [
     {
       key: "material",
-      label: <h4 className="pro-sidebar-title">Chất liệu</h4>,
+      label: (
+        <h4 className="pro-sidebar-title">{t("products.fields.materials")}</h4>
+      ),
       children: (
         <div className="sidebar-widget-list mt-20">
           {materials ? (

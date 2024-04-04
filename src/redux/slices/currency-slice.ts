@@ -21,7 +21,7 @@ const currencySlice = createSlice({
         return {
           ...state,
           currencySymbol: "$",
-          currencyRate: 0.000041,
+          currencyRate: 0.00004,
           currencyName,
         };
       }

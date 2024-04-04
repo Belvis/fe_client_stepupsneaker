@@ -2,8 +2,15 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { setCurrency } from "../../../redux/slices/currency-slice";
 import TextScroller from "../../text/TextScroller";
-import { Authenticated, useGetIdentity } from "@refinedev/core";
+import {
+  Authenticated,
+  useGetIdentity,
+  useGetLocale,
+  useSetLocale,
+  useTranslate,
+} from "@refinedev/core";
 import { ICustomerResponse } from "../../../interfaces";
+import dayjs from "dayjs";
 
 type LanguageCurrencyChangerProps = {
   currency: any;
@@ -12,12 +19,19 @@ type LanguageCurrencyChangerProps = {
 const LanguageCurrencyChanger: React.FC<LanguageCurrencyChangerProps> = ({
   currency,
 }) => {
-  const { i18n } = useTranslation();
+  const t = useTranslate();
+  const locale = useGetLocale();
+  const changeLanguage = useSetLocale();
+
+  const currentLocale = locale();
+  dayjs.locale(currentLocale);
+
   const dispatch = useDispatch();
 
   const changeLanguageTrigger = (e: React.MouseEvent<HTMLButtonElement>) => {
     const languageCode = e.currentTarget.value;
-    i18n.changeLanguage(languageCode);
+    changeLanguage(languageCode);
+    dayjs.locale(languageCode);
   };
 
   const setCurrencyTrigger = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -31,9 +45,9 @@ const LanguageCurrencyChanger: React.FC<LanguageCurrencyChangerProps> = ({
     <div className="language-currency-wrap">
       <div className="same-language-currency language-style">
         <span>
-          {i18n.resolvedLanguage === "vi"
+          {currentLocale === "vi"
             ? "Tiếng Việt"
-            : i18n.resolvedLanguage === "en"
+            : currentLocale === "en"
             ? "English"
             : ""}{" "}
           <i className="fa fa-angle-down" />
@@ -74,9 +88,10 @@ const LanguageCurrencyChanger: React.FC<LanguageCurrencyChangerProps> = ({
       </div>
       <div className="same-language-currency">
         <Authenticated
+          key="same-language-currency"
           fallback={
             <p>
-              Gọi cho chúng tôi:{" "}
+              {t("header.call_us")}:{" "}
               <span className="phone-number">0987654321</span>
             </p>
           }
@@ -85,11 +100,11 @@ const LanguageCurrencyChanger: React.FC<LanguageCurrencyChangerProps> = ({
             <TextScroller
               text={[
                 <p>
-                  Xin chào:{" "}
+                  {t("common.hi")}:{" "}
                   <span className="phone-number">{user.fullName}</span>
                 </p>,
                 <p>
-                  Gọi cho chúng tôi:{" "}
+                  {t("header.call_us")}:{" "}
                   <span className="phone-number">0987654321</span>
                 </p>,
               ]}
@@ -98,11 +113,11 @@ const LanguageCurrencyChanger: React.FC<LanguageCurrencyChangerProps> = ({
             <TextScroller
               text={[
                 <p>
-                  Xin chào:{" "}
-                  <span className="phone-number">Người dùng thân mến</span>
+                  {t("common.hi")}:{" "}
+                  <span className="phone-number">{t("header.dear_user")}</span>
                 </p>,
                 <p>
-                  Gọi cho chúng tôi:{" "}
+                  {t("header.call_us")}:{" "}
                   <span className="phone-number">0987654321</span>
                 </p>,
               ]}

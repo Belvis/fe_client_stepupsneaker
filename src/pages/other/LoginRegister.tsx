@@ -12,6 +12,7 @@ import {
   useLogin,
   useNotification,
   useRegister,
+  useTranslate,
 } from "@refinedev/core";
 import { Form, FormProps } from "antd";
 import { ICustomerRequest } from "../../interfaces";
@@ -29,7 +30,7 @@ type LoginRegisterProps = {
 };
 
 const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
-  const { t } = useTranslation();
+  const t = useTranslate();
 
   let { pathname } = useLocation();
 
@@ -61,8 +62,8 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
 
         open?.({
           type: "success",
-          message: "Đăng nhập thành công",
-          description: `Xin chào`,
+          message: t("auth_page.login_register.login.messages.success"),
+          description: t("auth_page.login_register.login.messages.hi"),
         });
       },
     });
@@ -108,7 +109,9 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
         {...props}
         id={Math.random()}
         type={showPassword ? "text" : "password"}
-        placeholder="Mật khẩu"
+        placeholder={t(
+          "auth_page.login_register.login.fields.password.placeholder"
+        )}
       />
       <span
         id={Math.random() + ""}
@@ -124,7 +127,9 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
         {...props}
         id={Math.random()}
         type={showConfirmPassword ? "text" : "password"}
-        placeholder="Xác nhận mật khẩu"
+        placeholder={t(
+          "auth_page.login_register.login.fields.confirm.placeholder"
+        )}
       />
       <span
         id={Math.random() + ""}
@@ -151,12 +156,12 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                   <Nav variant="pills" className="login-register-tab-list">
                     <Nav.Item>
                       <NavLink to="/login">
-                        <h4>Đăng nhập</h4>
+                        <h4>{t("auth_page.login_register.login.title")}</h4>
                       </NavLink>
                     </Nav.Item>
                     <Nav.Item>
                       <NavLink to="/register">
-                        <h4>Đăng ký</h4>
+                        <h4>{t("auth_page.login_register.register.title")}</h4>
                       </NavLink>
                     </Nav.Item>
                   </Nav>
@@ -206,14 +211,20 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                                   <input type="checkbox" />
                                 </Form.Item>
                                 <label className="ml-10">
-                                  Lưu thông tin đăng nhập
+                                  {t(
+                                    "auth_page.login_register.login.labels.save_login"
+                                  )}
                                 </label>
                                 <Link to={"/forgot-password"}>
-                                  Quên mật khẩu?
+                                  {t(
+                                    "auth_page.login_register.login.labels.forgot_password"
+                                  )}
                                 </Link>
                               </div>
                               <button type="submit">
-                                <span>Đăng nhập</span>
+                                <span>
+                                  {t("auth_page.login_register.login.title")}
+                                </span>
                               </button>
                             </div>
                           </Form>
@@ -242,18 +253,7 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                               name="email"
                               rules={[
                                 {
-                                  required: true,
-                                  whitespace: true,
-                                  message: "Vui lòng nhập vào địa chỉ email",
-                                },
-                                {
-                                  type: "email",
-                                  message: (
-                                    <span>
-                                      Địa chỉ email không hợp lệ. Vui lòng nhập
-                                      vào địa chỉ email có định dạng hợp lệ.
-                                    </span>
-                                  ),
+                                  validator: validateEmail,
                                 },
                               ]}
                             >
@@ -290,10 +290,28 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                               ]}
                             >
                               <select>
-                                <option value="">--Chọn giới tính--</option>
-                                <option value="Male">Nam</option>
-                                <option value="Female">Nữ</option>
-                                <option value="Other">Khác</option>
+                                <option value="">
+                                  --
+                                  {t(
+                                    "auth_page.login_register.register.fields.gender.label"
+                                  )}
+                                  --
+                                </option>
+                                <option value="Male">
+                                  {t(
+                                    "auth_page.login_register.register.fields.gender.male"
+                                  )}
+                                </option>
+                                <option value="Female">
+                                  {t(
+                                    "auth_page.login_register.register.fields.gender.female"
+                                  )}
+                                </option>
+                                <option value="Other">
+                                  {t(
+                                    "auth_page.login_register.register.fields.other"
+                                  )}
+                                </option>
                               </select>
                             </Form.Item>
                             <Form.Item
@@ -314,8 +332,9 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                               rules={[
                                 {
                                   required: true,
-                                  message:
-                                    "Vui lòng xác nhận mật khẩu của bạn!",
+                                  message: t(
+                                    "auth_page.login_register.register.messages.confirm"
+                                  ),
                                 },
                                 ({ getFieldValue }) => ({
                                   validator(_, value) {
@@ -327,7 +346,9 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                                     }
                                     return Promise.reject(
                                       new Error(
-                                        "Mật khẩu mới bạn nhập không khớp!"
+                                        t(
+                                          "auth_page.login_register.register.messages.not_match"
+                                        )
                                       )
                                     );
                                   },
@@ -338,7 +359,9 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                             </Form.Item>
                             <div className="button-box text-center">
                               <button type="submit">
-                                <span>Đăng ký</span>
+                                <span>
+                                  {t("auth_page.login_register.register.title")}
+                                </span>
                               </button>
                             </div>
                           </Form>
