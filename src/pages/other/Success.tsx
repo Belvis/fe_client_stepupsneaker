@@ -375,7 +375,7 @@ const Success = () => {
                         </div>
                         <div className="row">
                           <div className="col-8">
-                            <h5>{t("voucher.voucher")}</h5>
+                            <h5>{t("cart.voucher.voucher")}</h5>
                           </div>
                           <div className="col-4">
                             <CurrencyFormatter

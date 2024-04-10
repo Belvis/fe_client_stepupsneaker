@@ -4,12 +4,7 @@ export interface IEvent {
   loading?: boolean;
   note?: string;
 }
-export interface IReturnEvent {
-  date: number | undefined;
-  status: DeliveryStatus;
-  loading?: boolean;
-  note?: string;
-}
+
 export interface IFeatureIconData {
   id: number;
   title: string;
@@ -258,45 +253,6 @@ export interface IEmployeeResponse {
   role: IRoleResponse;
   address: string;
 }
-export interface IReturnFormResponse {
-  id: string;
-  order: IOrderResponse;
-  code: string;
-  phoneNumber: string;
-  email: string;
-  employee: IEmployeeResponse;
-  address: IAddressResponse;
-  returnFormDetails: IReturnFormDetailResponse[];
-  amountToBePaid: number;
-  type: ReturnType;
-  returnDeliveryStatus: DeliveryStatus;
-  paymentType: PaymentType;
-  paymentInfo: string;
-  refundStatus: RefundStatus;
-  createdBy: string;
-  createdAt: number;
-  returnFormHistories: IReturnFormHistoryResponse[];
-}
-export interface IReturnFormHistoryResponse {
-  id: string;
-  returnForm: IReturnFormResponse;
-  actionStatus: DeliveryStatus;
-  note: string;
-  createdAt: number;
-  createdBy: string;
-}
-export interface IReturnFormDetailResponse {
-  id: string;
-  orderDetail: IOrderDetailResponse;
-  quantity: number;
-  reason: string;
-  feedback: string;
-  returnInspectionStatus: InspectionStatus;
-  returnInspectionReason: string;
-  urlImage: string;
-  resellable: boolean;
-  createdAt?: number;
-}
 // Request
 
 export interface ICustomerRequest {
@@ -369,18 +325,6 @@ export interface IReviewRequest {
   comment: string;
   rating: number;
   urlImage: string;
-}
-export interface IReturnFormDetailRequest {
-  id?: string;
-  orderCode: string;
-  orderDetail: IOrderDetailResponse;
-  quantity: number;
-  returnQuantity: number;
-  name: string;
-  reason: string;
-  feedback: string;
-  unitPrice: number;
-  selected: boolean;
 }
 // GHN
 export interface IProvince {

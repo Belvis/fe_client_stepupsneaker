@@ -4,7 +4,7 @@ import {
   useLogout,
   useTranslate,
 } from "@refinedev/core";
-import { Avatar } from "antd";
+import { Avatar, Button } from "antd";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -24,6 +24,9 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
   const { mutate: logout } = useLogout();
 
   const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
+
+  const url =
+    "https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg";
 
   const handleClick = (index: number) => {
     setActiveIndex((prevIndex) => (prevIndex === index ? null : index));
@@ -85,7 +88,7 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
             key="account-setting"
             fallback={<i className="pe-7s-user-female" />}
           >
-            {user && user.image ? (
+            {user && !user.image ? (
               <Avatar
                 size={24}
                 src={user.image}
@@ -96,10 +99,11 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
                 size={24}
                 style={{
                   verticalAlign: "baseline",
+                  alignItems: "baseline",
                   backgroundColor: getAvatarColor(user?.fullName),
                 }}
               >
-                {getFirstLetterOfLastWord(user?.fullName)}
+                <span>{getFirstLetterOfLastWord(user?.fullName)}</span>
               </Avatar>
             )}
           </Authenticated>

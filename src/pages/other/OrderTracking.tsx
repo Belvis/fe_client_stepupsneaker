@@ -54,18 +54,6 @@ const OrderTracking = () => {
               <OrderInfo order={order} refetch={refetch} />
               <OrderSteps record={order} callBack={refetch} />
               <OrderDeliverables order={order} currency={currency} />
-              <div className="order-code text-center mt-5">
-                <Link to={"/return/" + order?.id}>
-                  {t("order_tracking.buttons.create_return_form.label")}
-                </Link>
-                <p>
-                  {t("order_tracking.buttons.create_return_form.description", {
-                    date: dayjs(new Date(order?.receivedDate))
-                      .add(7, "day")
-                      .format("LLL"),
-                  })}{" "}
-                </p>
-              </div>
             </Fragment>
           )}
         </div>
