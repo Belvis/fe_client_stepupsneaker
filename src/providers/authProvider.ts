@@ -1,17 +1,17 @@
 import { notification } from "antd";
 import { AxiosInstance } from "axios";
 import { TOKEN_KEY, axiosInstance } from "../utils";
-import {
-  AuthActionResponse,
-  CheckResponse,
-  IdentityResponse,
-  OnErrorResponse,
-  PermissionResponse,
-} from "@refinedev/core/dist/interfaces";
 import { store } from "../redux/store";
 import { deleteAllFromCart, mergeCart } from "../redux/slices/cart-slice";
 import { showSuccessToast } from "../helpers/toast";
 import { clearOrder } from "../redux/slices/order-slice";
+import {
+  PermissionResponse,
+  AuthActionResponse,
+  CheckResponse,
+  IdentityResponse,
+  OnErrorResponse,
+} from "@refinedev/core/dist/contexts/auth/types";
 
 const httpClient: AxiosInstance = axiosInstance;
 

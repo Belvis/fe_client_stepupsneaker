@@ -1,14 +1,12 @@
-import React from "react";
 import { useTranslate } from "@refinedev/core";
 import { Badge, Space } from "antd";
-import { ChangeEventHandler, FC } from "react";
+import React, { FC } from "react";
 import {
   IColorResponse,
   IProductClient,
   ISizeClient,
 } from "../../../interfaces";
 import { SaleIcon } from "../../icons/icon-sale";
-import clsx from "clsx";
 
 interface ProductVariationsProps {
   selectedProductSize: ISizeClient;
@@ -60,6 +58,7 @@ const ProductVariations: FC<ProductVariationsProps> = React.memo(
                       background: `#${single.color.code}`,
                       border: "2px solid white",
                       outline: "transparent solid 2px ",
+                      boxShadow: "0 0 8px rgba(0, 0, 0, 0.3)",
                     }}
                   >
                     <Badge
