@@ -181,16 +181,20 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
       width={breakpoint.sm ? "500px" : "100%"}
       zIndex={1002}
       footer={<></>}
-      title={t("my_account.address.messages.create")}
+      title={t("my_account.address.labels.create")}
     >
       <Form {...formProps} onFinish={onFinishHandler}>
         <div className="billing-info-wrap">
           <div className="row">
             <div className="col-12">
               <div className="billing-info mb-20">
-                <label>{t("my_account.address.fields.phoneNumber")}</label>
+                <label>
+                  <span style={{ color: "red" }}>*</span>{" "}
+                  {t("my_account.address.fields.phoneNumber")}
+                </label>
                 <Form.Item
                   name="phoneNumber"
+                  required
                   rules={[
                     {
                       validator: validatePhoneNumber,
@@ -203,9 +207,13 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
             </div>
             <div className="col-12">
               <div className="billing-select mb-20">
-                <label>{t("my_account.address.fields.province.title")}</label>
+                <label>
+                  <span style={{ color: "red" }}>*</span>{" "}
+                  {t("my_account.address.fields.province.title")}
+                </label>
                 <Form.Item
                   name="provinceId"
+                  required
                   rules={[
                     {
                       validator: (_, value) =>
@@ -239,9 +247,13 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
             </div>
             <div className="col-12">
               <div className="billing-select mb-20">
-                <label>{t("my_account.address.fields.district.title")}</label>
+                <label>
+                  <span style={{ color: "red" }}>*</span>{" "}
+                  {t("my_account.address.fields.district.title")}
+                </label>
                 <Form.Item
                   name="districtId"
+                  required
                   rules={[
                     {
                       validator: (_, value) =>
@@ -275,9 +287,13 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
             </div>
             <div className="col-12">
               <div className="billing-select mb-20">
-                <label>{t("my_account.address.fields.ward.title")}</label>
+                <label>
+                  <span style={{ color: "red" }}>*</span>{" "}
+                  {t("my_account.address.fields.ward.title")}
+                </label>
                 <Form.Item
                   name="wardCode"
+                  required
                   rules={[
                     {
                       validator: (_, value) =>
@@ -307,9 +323,13 @@ export const CreateAddressModal: React.FC<CreateAddressModalProps> = ({
             </div>
             <div className="col-12">
               <div className="billing-info mb-20">
-                <label>{t("my_account.address.fields.more")}</label>
+                <label>
+                  <span style={{ color: "red" }}>*</span>{" "}
+                  {t("my_account.address.fields.more")}
+                </label>
                 <Form.Item
                   name="more"
+                  required
                   rules={[
                     {
                       validator: (_, value) =>

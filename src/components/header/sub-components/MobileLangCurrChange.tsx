@@ -1,19 +1,34 @@
-import { useTranslation } from "react-i18next";
+import { useGetLocale, useSetLocale, useTranslate } from "@refinedev/core";
+import dayjs from "dayjs";
+import { ChangeEvent } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setCurrency } from "../../../redux/slices/currency-slice";
+import { RootState } from "../../../redux/store";
 
 const MobileLangCurrChange = () => {
-  const { i18n } = useTranslation();
-  // const dispatch = useDispatch();
-  // const currency = useSelector((state) => state.currency);
+  const t = useTranslate();
+  const currency = useSelector((state: RootState) => state.currency);
 
-  const changeLanguageTrigger = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const languageCode = e.target.value;
-    i18n.changeLanguage(languageCode);
+  const locale = useGetLocale();
+  const changeLanguage = useSetLocale();
+
+  const currentLocale = locale();
+  dayjs.locale(currentLocale);
+
+  const dispatch = useDispatch();
+
+  const changeLanguageTrigger = (e: ChangeEvent<HTMLSelectElement>) => {
+    const languageCode = e.currentTarget.value;
+    changeLanguage(languageCode);
+    dayjs.locale(languageCode);
+
     closeMobileMenu();
   };
 
-  const setCurrencyTrigger = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const currencyName = e.target.value;
-    // dispatch(setCurrency(currencyName));
+  const setCurrencyTrigger = (e: ChangeEvent<HTMLSelectElement>) => {
+    const currencyName = e.currentTarget.value;
+    dispatch(setCurrency(currencyName));
+
     closeMobileMenu();
   };
 
@@ -30,25 +45,21 @@ const MobileLangCurrChange = () => {
   return (
     <div className="mobile-menu-middle">
       <div className="lang-curr-style">
-        <span className="title mb-2">Choose Language </span>
-        <select
-          // value={i18n.resolvedLanguage}
-          onChange={changeLanguageTrigger}
-        >
+        <span className="title mb-2">
+          {t("common.choose_language", "Choose Language")}
+        </span>
+        <select value={currentLocale} onChange={changeLanguageTrigger}>
+          <option value="vi">Tiếng Việt</option>
           <option value="en">English</option>
-          <option value="fn">French</option>
-          <option value="de">Germany</option>
         </select>
       </div>
       <div className="lang-curr-style">
-        <span className="title mb-2">Choose Currency</span>
-        <select
-          // value={currency.currencyName}
-          onChange={setCurrencyTrigger}
-        >
+        <span className="title mb-2">
+          {t("common.choose_currency", "Choose Currency")}
+        </span>
+        <select value={currency.currencyName} onChange={setCurrencyTrigger}>
+          <option value="VND">VND</option>
           <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
-          <option value="GBP">GBP</option>
         </select>
       </div>
     </div>

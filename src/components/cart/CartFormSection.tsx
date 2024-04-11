@@ -351,6 +351,7 @@ const CartFormSection: React.FC<CartFormSectionProps> = ({
                 <Form.Item
                   label={t(`cart.shipping.address.province.title`)}
                   name="provinceId"
+                  required
                   rules={[
                     {
                       validator: (_, value) =>
@@ -382,6 +383,7 @@ const CartFormSection: React.FC<CartFormSectionProps> = ({
                 <Form.Item
                   label={t(`cart.shipping.address.district.title`)}
                   name="districtId"
+                  required
                   rules={[
                     {
                       validator: (_, value) =>
@@ -413,6 +415,7 @@ const CartFormSection: React.FC<CartFormSectionProps> = ({
                 <Form.Item
                   label={t(`cart.shipping.address.ward.title`)}
                   name="wardCode"
+                  required
                   rules={[
                     {
                       validator: (_, value) =>
@@ -460,7 +463,10 @@ const CartFormSection: React.FC<CartFormSectionProps> = ({
               </h4>
             </div>
             <div className="discount-code">
-              <p>{t(`cart.voucher.subtitle`)}</p>
+              <p>
+                <span style={{ color: "red" }}>*</span>{" "}
+                {t(`cart.voucher.subtitle`)}
+              </p>
               <form onSubmit={handleSubmit}>
                 <input
                   type="text"

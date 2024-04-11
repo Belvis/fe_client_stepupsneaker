@@ -248,7 +248,7 @@ const CartItemsTable: React.FC<CartItemsTableProps> = ({
                                     }
                                     if (newValue > 5 || totalCartQty >= 5) {
                                       return showErrorToast(
-                                        t("products.message.max_cart_size")
+                                        t("products.messages.max_cart_size")
                                       );
                                     }
                                     if (!isNaN(newValue)) {
@@ -278,7 +278,7 @@ const CartItemsTable: React.FC<CartItemsTableProps> = ({
                                   }
                                   if (newValue > 5 || totalCartQty >= 5) {
                                     return showErrorToast(
-                                      t("products.message.max_cart_size")
+                                      t("products.messages.max_cart_size")
                                     );
                                   }
                                   if (!isNaN(newValue)) {
@@ -319,7 +319,7 @@ const CartItemsTable: React.FC<CartItemsTableProps> = ({
                                       totalCartQty >= 5
                                     ) {
                                       return showErrorToast(
-                                        t("products.message.max_cart_size")
+                                        t("products.messages.max_cart_size")
                                       );
                                     }
                                     dispatch(
@@ -355,7 +355,7 @@ const CartItemsTable: React.FC<CartItemsTableProps> = ({
                                     totalCartQty >= 5
                                   ) {
                                     return showErrorToast(
-                                      t("products.message.max_cart_size")
+                                      t("products.messages.max_cart_size")
                                     );
                                   }
                                   dispatch(

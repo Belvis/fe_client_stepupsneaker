@@ -899,7 +899,9 @@
     "fail": "Thất bại",
     "error": "Đã có lỗi xảy ra: ",
     "free_shipping": "Miễn phí vận chuyển",
-    "free_shipping_message": "Miễn phí vận chuyển cho đơn hàng trên"
+    "free_shipping_message": "Miễn phí vận chuyển cho đơn hàng trên",
+    "choose_language": "Chọn ngôn ngữ",
+    "choose_currency": "Chọn tiền tệ"
   },
   "buttons": {
     "delete": "Xoá",

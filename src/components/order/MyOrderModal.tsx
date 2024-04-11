@@ -44,6 +44,7 @@ import {
 import {
   ICustomerResponse,
   IDistrict,
+  IOrderDetailResponse,
   IOrderRequest,
   IOrderResponse,
   IProvince,
@@ -620,39 +621,60 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
                             value={single.quantity}
                             onChange={(e) => {
                               const newValue = parseInt(e.target.value, 10);
-                              if (newValue >= single.productDetail.quantity) {
-                                return showErrorToast(
-                                  t("products.messages.limit_reached")
-                                );
+
+                              if (isNaN(newValue) || newValue <= 0) {
+                                return;
                               }
-                              if (newValue > 5) {
-                                return showErrorToast(
+
+                              if (
+                                calculateTotalQuantity(viewOrder) +
+                                  (newValue - single.quantity) >
+                                5
+                              ) {
+                                showErrorToast(
                                   t("products.messages.max_cart_size")
                                 );
+                                return;
                               }
-                              if (!isNaN(newValue)) {
-                                setViewOrder((prev) => ({
-                                  ...prev,
-                                  orderDetails: prev.orderDetails.map(
-                                    (detail) => {
-                                      if (detail.id === single.id) {
-                                        return {
-                                          ...detail,
-                                          quantity: newValue,
-                                          totalPrice: detail.price * newValue,
-                                        };
-                                      } else {
-                                        return detail;
-                                      }
+
+                              if (
+                                newValue > single.productDetail.quantity ||
+                                newValue > 5
+                              ) {
+                                showErrorToast(
+                                  t("products.messages.limit_reached")
+                                );
+                                return;
+                              }
+
+                              // Cập nhật số lượng và tổng giá trị cho chi tiết đơn hàng
+                              setViewOrder((prev) => ({
+                                ...prev,
+                                orderDetails: prev.orderDetails.map(
+                                  (detail) => {
+                                    if (detail.id === single.id) {
+                                      return {
+                                        ...detail,
+                                        quantity: newValue,
+                                        totalPrice: detail.price * newValue,
+                                      };
+                                    } else {
+                                      return detail;
                                     }
-                                  ),
-                                }));
-                              }
+                                  }
+                                ),
+                              }));
                             }}
                           />
                           <button
                             className="inc qtybutton"
                             onClick={() => {
+                              if (calculateTotalQuantity(viewOrder) >= 5) {
+                                return showErrorToast(
+                                  t("products.messages.max_cart_size")
+                                );
+                              }
+
                               if (
                                 single.quantity >= single.productDetail.quantity
                               ) {
@@ -1090,3 +1112,13 @@ const filterOption = (
   input: string,
   option?: { label: string; value: number | string }
 ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+
+function calculateTotalQuantity(order: IOrderResponse): number {
+  let totalQuantity: number = 0;
+
+  order.orderDetails.forEach((orderDetail: IOrderDetailResponse) => {
+    totalQuantity += orderDetail.quantity;
+  });
+
+  return totalQuantity;
+}

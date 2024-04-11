@@ -18,6 +18,7 @@ export const ColorModeContextProvider: React.FC<PropsWithChildren> = ({
         token: {
           // Seed Token
           colorPrimary: "#fb5231",
+          // fontFamily: "Josefin Sans",
           // borderRadius: 2,
           // // Alias Token
           // colorBgContainer: '#f6ffed',
@@ -45,6 +46,9 @@ export const ColorModeContextProvider: React.FC<PropsWithChildren> = ({
             headerSortActiveBg: "#bfbfbf",
           },
           Button: {
+            fontFamily: "Josefin Sans",
+          },
+          Typography: {
             fontFamily: "Josefin Sans",
           },
         },

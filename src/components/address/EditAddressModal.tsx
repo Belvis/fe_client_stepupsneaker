@@ -187,9 +187,13 @@ export const EditAddressModal: React.FC<EditAddressModalProps> = ({
           <div className="row">
             <div className="col-12">
               <div className="billing-info mb-20">
-                <label>{t("my_account.address.fields.phoneNumber")}</label>
+                <label>
+                  <span style={{ color: "red" }}>*</span>{" "}
+                  {t("my_account.address.fields.phoneNumber")}
+                </label>
                 <Form.Item
                   name="phoneNumber"
+                  required
                   rules={[
                     {
                       validator: validatePhoneNumber,
@@ -202,9 +206,13 @@ export const EditAddressModal: React.FC<EditAddressModalProps> = ({
             </div>
             <div className="col-12">
               <div className="billing-select mb-20">
-                <label>{t("my_account.address.fields.province.title")}</label>
+                <label>
+                  <span style={{ color: "red" }}>*</span>{" "}
+                  {t("my_account.address.fields.province.title")}
+                </label>
                 <Form.Item
                   name="provinceId"
+                  required
                   rules={[
                     {
                       validator: (_, value) =>
@@ -235,9 +243,13 @@ export const EditAddressModal: React.FC<EditAddressModalProps> = ({
             </div>
             <div className="col-12">
               <div className="billing-select mb-20">
-                <label>{t("my_account.address.fields.district.title")}</label>{" "}
+                <label>
+                  <span style={{ color: "red" }}>*</span>{" "}
+                  {t("my_account.address.fields.district.title")}
+                </label>{" "}
                 <Form.Item
                   name="districtId"
+                  required
                   rules={[
                     {
                       validator: (_, value) =>
@@ -268,9 +280,13 @@ export const EditAddressModal: React.FC<EditAddressModalProps> = ({
             </div>
             <div className="col-12">
               <div className="billing-select mb-20">
-                <label>{t("my_account.address.fields.ward.title")}</label>
+                <label>
+                  <span style={{ color: "red" }}>*</span>{" "}
+                  {t("my_account.address.fields.ward.title")}
+                </label>
                 <Form.Item
                   name="wardCode"
+                  required
                   rules={[
                     {
                       validator: (_, value) =>
@@ -300,9 +316,13 @@ export const EditAddressModal: React.FC<EditAddressModalProps> = ({
             </div>
             <div className="col-12">
               <div className="billing-info mb-20">
-                <label>{t("my_account.address.fields.more")}</label>
+                <label>
+                  <span style={{ color: "red" }}>*</span>{" "}
+                  {t("my_account.address.fields.more")}
+                </label>
                 <Form.Item
                   name="more"
+                  required
                   rules={[
                     {
                       validator: (_, value) =>
