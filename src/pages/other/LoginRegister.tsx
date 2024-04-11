@@ -309,7 +309,7 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                                 </option>
                                 <option value="Other">
                                   {t(
-                                    "auth_page.login_register.register.fields.other"
+                                    "auth_page.login_register.register.fields.gender.other"
                                   )}
                                 </option>
                               </select>
