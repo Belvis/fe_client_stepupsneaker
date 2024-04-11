@@ -23,6 +23,8 @@ import {
   validateEmail,
   validateFullName,
 } from "../../helpers/validate";
+import { AuthActionResponse } from "@refinedev/core/dist/contexts/auth/types";
+import dayjs from "dayjs";
 
 type LoginRegisterProps = {
   type: "login" | "register";
@@ -55,7 +57,7 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
 
   const onSubmitLogin = (values: LoginFormTypes) => {
     login(values, {
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         if (!data.success) {
           return console.log(data.error);
         }
@@ -78,8 +80,10 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
     };
 
     register(submitData, {
-      onSuccess: () => {
-        login(submitData);
+      onSuccess: (data) => {
+        if (data.success) {
+          login(submitData);
+        }
       },
     });
   };
@@ -278,7 +282,10 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ type, formProps }) => {
                                 },
                               ]}
                             >
-                              <input type="date" />
+                              <input
+                                type="date"
+                                max={dayjs().format("YYYY-MM-DD")}
+                              />
                             </Form.Item>
                             <Form.Item
                               name="gender"

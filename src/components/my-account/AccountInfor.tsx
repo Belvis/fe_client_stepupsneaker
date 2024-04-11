@@ -213,7 +213,7 @@ const AccountInfor: React.FC<AccountInforProps> = ({ data, refetch }) => {
                       },
                     ]}
                   >
-                    <input type="date" />
+                    <input type="date" max={dayjs().format("YYYY-MM-DD")} />
                   </Form.Item>
                 </div>
               </div>

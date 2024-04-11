@@ -25,9 +25,6 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
 
   const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
 
-  const url =
-    "https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg";
-
   const handleClick = (index: number) => {
     setActiveIndex((prevIndex) => (prevIndex === index ? null : index));
   };
