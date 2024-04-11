@@ -1,5 +1,6 @@
 export function getFirstLetterOfLastWord(fullName: string | undefined) {
   if (!fullName) {
+    console.log("fullname", fullName);
     return "U";
   }
 

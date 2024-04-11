@@ -85,15 +85,10 @@ export const IconGroup: React.FC<IconGroupProps> = ({ iconWhiteClass }) => {
             key="account-setting"
             fallback={<i className="pe-7s-user-female" />}
           >
-            {user && !user.image ? (
+            {user && (
               <Avatar
                 size={24}
                 src={user.image}
-                style={{ verticalAlign: "baseline" }}
-              />
-            ) : (
-              <Avatar
-                size={24}
                 style={{
                   verticalAlign: "baseline",
                   alignItems: "baseline",
