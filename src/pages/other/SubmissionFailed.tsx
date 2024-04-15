@@ -53,7 +53,7 @@ const SubmissionFailed: React.FC = ({}) => {
             <Link className="order-nav" to={`/shop`}>
               <CaretLeftOutlined /> Tiếp tục mua sắm
             </Link>,
-            <Link className="order-nav" to={`/shop`}>
+            <Link className="order-nav" to="">
               <PrinterOutlined /> In hoá đơn
             </Link>,
           ]}

@@ -533,7 +533,7 @@
     },
     "address": {
       "shipping": "Địa chỉ giao hàng",
-      "order": "Địa chỉ hoá đơn",
+      "order": "Địa chỉ người dùng",
       "phoneNumber": "Số điện thoại",
       "province": {
         "title": "Tỉnh/Thành phố",
@@ -901,7 +901,8 @@
     "free_shipping": "Miễn phí vận chuyển",
     "free_shipping_message": "Miễn phí vận chuyển cho đơn hàng trên",
     "choose_language": "Chọn ngôn ngữ",
-    "choose_currency": "Chọn tiền tệ"
+    "choose_currency": "Chọn tiền tệ",
+    "retail_customer": "Khách lẻ"
   },
   "buttons": {
     "delete": "Xoá",

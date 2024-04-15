@@ -28,7 +28,7 @@ const TrackingPage = () => {
       const res = await getOne({ resource: "orders/tracking", id: code });
       navigate(`/tracking/${code}`);
       notification.success({
-        message: t("tracking_page.message.success"),
+        message: t("tracking_page.messages.success"),
         description: t("common.success"),
       });
     } catch (error: any) {
@@ -45,7 +45,7 @@ const TrackingPage = () => {
     event.preventDefault();
 
     if (!code.trim()) {
-      showErrorToast(t("tracking_page.message.required"));
+      showErrorToast(t("tracking_page.messages.required"));
       return;
     }
 

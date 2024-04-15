@@ -243,7 +243,7 @@ const CartItemsTable: React.FC<CartItemsTableProps> = ({
                                       )
                                     ) {
                                       return showErrorToast(
-                                        t("products.message.min_reached")
+                                        t("products.messages.min_reached")
                                       );
                                     }
                                     if (newValue > 5 || totalCartQty >= 5) {
@@ -273,7 +273,7 @@ const CartItemsTable: React.FC<CartItemsTableProps> = ({
                                     cartItemStock(cartItem.selectedProductSize)
                                   ) {
                                     return showErrorToast(
-                                      t("products.message.min_reached")
+                                      t("products.messages.min_reached")
                                     );
                                   }
                                   if (newValue > 5 || totalCartQty >= 5) {
@@ -310,7 +310,7 @@ const CartItemsTable: React.FC<CartItemsTableProps> = ({
                                         )
                                     ) {
                                       return showErrorToast(
-                                        t("products.message.min_reached")
+                                        t("products.messages.min_reached")
                                       );
                                     }
 
@@ -346,7 +346,7 @@ const CartItemsTable: React.FC<CartItemsTableProps> = ({
                                       )
                                   ) {
                                     return showErrorToast(
-                                      t("products.message.min_reached")
+                                      t("products.messages.min_reached")
                                     );
                                   }
 

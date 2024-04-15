@@ -118,6 +118,7 @@ export interface IVoucherResponse {
 export interface IOrderResponse {
   id: string;
   customer: ICustomerResponse;
+  employee: IEmployeeResponse;
   voucher?: IVoucherResponse;
   address: IAddressResponse;
   phoneNumber: string;

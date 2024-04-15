@@ -9,7 +9,7 @@ import { HttpError, useGetIdentity, useOne } from "@refinedev/core";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Result, Spin } from "antd";
 import dayjs from "dayjs";
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useParams } from "react-router-dom";
@@ -22,6 +22,8 @@ import {
   deleteAllByOrderFromDB,
   deleteCartItemsByOrder,
 } from "../../redux/slices/cart-slice";
+import { InvoiceTemplate } from "../../template/InvoiceTemplate";
+import { useReactToPrint } from "react-to-print";
 
 const Success = () => {
   const { t } = useTranslation();
@@ -38,6 +40,21 @@ const Success = () => {
   let { pathname } = useLocation();
 
   let { id } = useParams();
+
+  const [printOrder, setPrintOrder] = useState<IOrderResponse | undefined>();
+
+  const componentRef = useRef(null);
+
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+
+  useEffect(() => {
+    if (printOrder && componentRef.current) {
+      handlePrint();
+      setPrintOrder(undefined);
+    }
+  }, [printOrder, componentRef.current]);
 
   const { data, isLoading, isError } = useOne<IOrderResponse, HttpError>({
     resource: "orders",
@@ -84,8 +101,7 @@ const Success = () => {
                   <p>{t("success_page.subtitle.contact")}</p>
                   <div className="order-code">
                     <Link to={"/tracking/" + order.code}>
-                      {t("success_page.subtitle.code")}:{" "}
-                      {order.code.toUpperCase()}
+                      {t("success_page.subtitle.code")}: {order.code}
                     </Link>
                   </div>
                   <p>
@@ -98,7 +114,13 @@ const Success = () => {
                 <Link className="order-nav" to={`/shop`}>
                   <CaretLeftOutlined /> {t(`cart.buttons.continue_shopping`)}
                 </Link>,
-                <Link className="order-nav" to={`/shop`}>
+                <Link
+                  className="order-nav"
+                  to=""
+                  onClick={() => {
+                    setPrintOrder(order);
+                  }}
+                >
                   <PrinterOutlined /> {t("success_page.extra.print")}
                 </Link>,
               ]}
@@ -164,42 +186,38 @@ const Success = () => {
                           <tr>
                             <td className="field">
                               {order.address &&
-                                order.customer &&
-                                order.customer.addressList.length > 0 && (
-                                  <>
-                                    <p>
-                                      {t("success_page.address.province.title")}
-                                      :{" "}
-                                      {
-                                        order.customer.addressList[0]
-                                          .provinceName
-                                      }
-                                    </p>
-                                    <p>
-                                      {t("success_page.address.district.title")}
-                                      :{" "}
-                                      {
-                                        order.customer.addressList[0]
-                                          .districtName
-                                      }
-                                    </p>
-                                    <p>
-                                      {t("success_page.address.ward.title")}:{" "}
-                                      {order.customer.addressList[0].wardName}
-                                    </p>
-                                    <p>
-                                      {t("success_page.address.phoneNumber")}:{" "}
-                                      {
-                                        order.customer.addressList[0]
-                                          .phoneNumber
-                                      }
-                                    </p>
-                                    <p>
-                                      {t("success_page.address.line")}:{" "}
-                                      {order.customer.addressList[0].more}
-                                    </p>
-                                  </>
-                                )}
+                              order.customer &&
+                              order.customer.addressList.length > 0 ? (
+                                <>
+                                  <p>
+                                    {t("success_page.address.province.title")}:{" "}
+                                    {order.customer.addressList[0].provinceName}
+                                  </p>
+                                  <p>
+                                    {t("success_page.address.district.title")}:{" "}
+                                    {order.customer.addressList[0].districtName}
+                                  </p>
+                                  <p>
+                                    {t("success_page.address.ward.title")}:{" "}
+                                    {order.customer.addressList[0].wardName}
+                                  </p>
+                                  <p>
+                                    {t("success_page.address.phoneNumber")}:{" "}
+                                    {order.customer.addressList[0].phoneNumber}
+                                  </p>
+                                  <p>
+                                    {t("success_page.address.line")}:{" "}
+                                    {order.customer.addressList[0].more}
+                                  </p>
+                                </>
+                              ) : (
+                                <p>
+                                  {t(
+                                    "common.retail_customer",
+                                    "Retail customer"
+                                  )}
+                                </p>
+                              )}
                             </td>
                           </tr>
                         </tbody>
@@ -408,6 +426,15 @@ const Success = () => {
           <div></div>
         )}
       </Spin>
+      <div className="d-none" key={printOrder?.id}>
+        {printOrder && (
+          <InvoiceTemplate
+            key={printOrder.id || Date.now()}
+            order={printOrder}
+            ref={componentRef}
+          />
+        )}
+      </div>
     </Fragment>
   );
 };
