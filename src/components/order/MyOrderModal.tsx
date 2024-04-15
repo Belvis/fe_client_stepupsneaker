@@ -55,6 +55,7 @@ import { RootState } from "../../redux/store";
 import { DiscountMessage, DiscountMoney } from "../../styled/CartStyled";
 import { ListAddressModal } from "../address/ListAddressModal";
 import VoucherModal from "../voucher/VoucherModal";
+import { AdvancedAddModal } from "./advanced-add/AdvancedAddModal";
 
 const { Text } = Typography;
 
@@ -112,6 +113,12 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
   const [viewOrder, setViewOrder] = useState<IOrderResponse>(order);
 
   const [shippingMoney, setShippingMoney] = useState<number>(0);
+
+  const {
+    show: advancedAddShow,
+    close: advancedAddClose,
+    modalProps: advancedAddModalProps,
+  } = useModal();
 
   const { data: user, refetch } = useGetIdentity<ICustomerResponse>();
 
@@ -351,7 +358,11 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
   const handleUpdateOrder = () => {
     const simplifiedCartItems: { id: string; quantity: number }[] =
       viewOrder.orderDetails.map((item) => {
-        return { id: item.id, quantity: item.quantity };
+        return {
+          id: item.id,
+          productDetailId: item.productDetail.id,
+          quantity: item.quantity,
+        };
       });
     const submitData = {
       fullName: form.getFieldValue("fullName"),
@@ -483,6 +494,9 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
           <Tooltip title={t("order_tracking.modal.tooltip")}>
             <InfoCircleOutlined />
           </Tooltip>
+          <Button type="primary" onClick={advancedAddShow}>
+            {t("products.titles.add")}
+          </Button>
         </Space>
       }
       {...restModalProps}
@@ -1102,6 +1116,13 @@ const MyOrderModal: React.FC<MyOrderModalProps> = ({
           setAddresses={setAddresses}
         />
       </Authenticated>
+      {advancedAddModalProps.open && (
+        <AdvancedAddModal
+          setViewOrder={setViewOrder}
+          modalProps={advancedAddModalProps}
+          close={advancedAddClose}
+        />
+      )}
     </Modal>
   );
 };

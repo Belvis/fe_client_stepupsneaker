@@ -98,12 +98,12 @@ export const authProvider = (url: string): AuthBindings => ({
         success: true,
         redirectTo: "/",
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         error: {
-          message: "Register failed",
-          name: "Invalid email or password",
+          message: "Oops..",
+          name: error.message,
         },
       };
     }
@@ -131,7 +131,7 @@ export const authProvider = (url: string): AuthBindings => ({
       return {
         success: false,
         error: {
-          message: "Cập nhật thất bại",
+          message: "Oops..",
           name: error.message,
         },
       };
@@ -157,7 +157,7 @@ export const authProvider = (url: string): AuthBindings => ({
       return {
         success: false,
         error: {
-          message: "Đã xảy ra lỗi",
+          message: "Oops..",
           name: error.message,
         },
       };
@@ -183,7 +183,7 @@ export const authProvider = (url: string): AuthBindings => ({
       return {
         success: false,
         error: {
-          message: "Đã xảy ra lỗi",
+          message: "Oops..",
           name: error.message,
         },
       };

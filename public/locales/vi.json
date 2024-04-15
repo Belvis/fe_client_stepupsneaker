@@ -668,7 +668,16 @@
       "materials": "Chất liệu",
       "tags": "Thẻ",
       "descriptions": "Mô tả",
-      "stock": "Sản phẩm có sẵn"
+      "stock": "Sản phẩm có sẵn",
+      "id": "ID",
+      "name": "Tên",
+      "description": "Mô tả",
+      "price": "Giá",
+      "createdAt": "Tạo lúc",
+      "quantity": "SL tồn",
+      "status": "Trạng thái",
+      "color": "Màu sắc",
+      "size": "Kích cỡ"
     },
     "desc_tab": {
       "additional_information": "Thông tin thêm",
@@ -712,7 +721,35 @@
     "messages": {
       "min_reached": "Đã đạt số lượng nhỏ nhất",
       "limit_reached": "Rất tiếc, đã đạt giới hạn số lượng sản phẩm!",
-      "max_cart_size": "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn"
+      "max_cart_size": "Bạn chỉ có thể mua tối da 5 sản phẩm, vui lòng liên hệ với chúng tôi nếu có nhu cầu mua số lượng lớn",
+      "limitReached": "Rất tiếc, đã đạt đến giới hạn số lượng sản phẩm",
+      "purchaseLimit": "Bạn chỉ có thể mua tối đa 5 sản phẩm",
+      "minReached": "Đã đạt số lượng nhỏ nhất",
+      "selectProductFirst": "Vui lòng chọn sản phẩm trước",
+      "invalid": "Sản phẩm không hợp lệ"
+    },
+    "products": "Danh sách sản phẩm",
+    "noProducts": "Không có sản phẩm",
+    "titles": {
+      "list": "Sản phẩm",
+      "create": "Tạo Sản phẩm",
+      "edit": "Chỉnh sửa Sản phẩm",
+      "add": "Thêm sản phẩm"
+    },
+    "filters": {
+      "title": "Bộ lọc",
+      "search": {
+        "label": "Tên",
+        "placeholder": "Tìm kiếm theo tên"
+      },
+      "status": {
+        "label": "Trạng thái",
+        "placeholder": "Lọc theo trạng thái"
+      },
+      "attribute": "Lọc theo thuộc tính sản phẩm"
+    },
+    "sorters": {
+      "attribute": "Sắp xếp theo thuộc tính sản phẩm"
     }
   },
   "confirmDialog": {
@@ -910,7 +947,11 @@
     "save_changes": "Lưu thay đổi",
     "back_home": "Trở lại trang chủ",
     "choose": "Chọn",
-    "choose_address": "Chọn địa chỉ của bạn"
+    "choose_address": "Chọn địa chỉ của bạn",
+    "checkSelected": "Xem lựa chọn của bạn",
+    "addAndGo": "Thêm và hoàn tất",
+    "addAndContinue": "Xác nhận và tiếp tục",
+    "go": "Hoàn tất"
   },
   "image": {
     "upload": "Tải lên",
@@ -952,5 +993,117 @@
     "showing": "Hiển thị",
     "results": "kết quả",
     "out_of": "trên tổng số"
+  },
+  "productDetails": {
+    "productDetails": "Chi tiết sản phẩm",
+    "list": "Danh sách sản phẩm chi tiết",
+    "fields": {
+      "id": "Id",
+      "name": "Tên",
+      "quantity": "Số lượng",
+      "price": "Giá",
+      "image": "Hình ảnh",
+      "size": "Kích cỡ",
+      "color": "Màu sắc",
+      "status": "Trạng thái",
+      "brand": "Thương hiệu",
+      "style": "Kiểu dáng",
+      "material": "Chất liệu",
+      "tradeMark": "Nhãn hiệu",
+      "sole": "Đế"
+    },
+    "filters": {
+      "title": "Bộ lọc",
+      "search": {
+        "title": "Tìm kiếm",
+        "placeholder": "Tìm kiếm theo từ khoá"
+      },
+      "status": {
+        "label": "Trạng thái",
+        "placeholder": "Lọc theo trạng thái"
+      },
+      "brand": {
+        "label": "Thương hiệu",
+        "placeholder": "Lọc theo thương hiệu"
+      },
+      "color": {
+        "label": "Màu sắc",
+        "placeholder": "Lọc theo màu"
+      },
+      "material": {
+        "label": "Chất liệu",
+        "placeholder": "Lọc theo chất liệu"
+      },
+      "size": {
+        "label": "Kích cỡ",
+        "placeholder": "Lọc theo kích thước"
+      },
+      "sole": {
+        "label": "Duy Nhất",
+        "placeholder": "Lọc theo đế"
+      },
+      "style": {
+        "label": "Phong cách",
+        "placeholder": "Lọc theo kiểu"
+      },
+      "tradeMark": {
+        "label": "Nhãn hiệu",
+        "placeholder": "Lọc theo nhãn hiệu"
+      },
+      "priceMax": {
+        "label": "Giá tối đa",
+        "placeholder": "Lọc theo Giá tối đa"
+      },
+      "priceMin": {
+        "label": "Giá tối thiểu",
+        "placeholder": "Lọc theo giá tối thiểu"
+      },
+      "quantity": {
+        "label": "Số lượng",
+        "placeholder": "Lọc theo số lượng"
+      }
+    }
+  },
+  "actions": {
+    "list": "Danh sách",
+    "create": "Tạo mới",
+    "add": "Thêm",
+    "edit": "Chỉnh sửa",
+    "show": "Chi tiết",
+    "delete": "Xóa",
+    "clear": "Làm mới",
+    "setDefault": "Đặt mặc định",
+    "apply": "Áp dụng",
+    "remove": "Loại bỏ",
+    "submit": "Xác nhận",
+    "submitChanges": "Xác nhận thay đổi",
+    "pay": "THANH TOÁN",
+    "payConfirm": "Xác nhận thanh toán",
+    "proceedPay": "TIẾN HÀNH THANH TOÁN",
+    "calculateShipping": "Tính phí vận chuyển",
+    "showAddress": "Hiển thị địa chỉ của người dùng",
+    "deselectAll": "Xoá chọn tất cả",
+    "skip": "Bỏ qua",
+    "ok": "Đồng ý",
+    "reset": "Trở về mặc định"
+  },
+  "orderDetails": {
+    "orderDetails": "Chi tiết đơn hàng",
+    "titles": {},
+    "fields": {
+      "products": "Sản phẩm",
+      "qty": "SL",
+      "price": "Đơn giá",
+      "totalPrice": "Thành tiền"
+    }
+  },
+  "pos": {
+    "pos": "Bán hàng tại quầy",
+    "titles": {
+      "advancedAdd": "Thêm sản phẩm nâng cao"
+    },
+    "message": {
+      "orderDetailLengthExceed": "Vui lòng thêm sản phẩm vào trước."
+    }
   }
 }

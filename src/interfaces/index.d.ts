@@ -1,3 +1,7 @@
+export type TranslateFunction = {
+  (key: string, options?: any, defaultMessage?: string | undefined): string;
+  (key: string, defaultMessage?: string | undefined): string;
+};
 export interface IEvent {
   date: number | undefined;
   status: OrderStatus;
@@ -341,4 +345,39 @@ export interface IWard {
   DistrictID: number;
   WardName: string;
   WardCode: string;
+}
+export interface IOrderDetailRequest {
+  id?: string;
+  order: string;
+  productDetail: string;
+  quantity: number;
+  price: number;
+  totalPrice: number;
+  status: OrderStatus;
+}
+export interface IProductDetailFilterVariables {
+  q?: string;
+  tradeMark: string;
+  style: string;
+  size: string;
+  material: string;
+  color: string;
+  brand: string;
+  sole: string;
+  priceMin: number;
+  priceMax: number;
+  quantity: number;
+  status: ProductStatus;
+}
+export interface IColorResponse {
+  id: string;
+  code: string;
+  name: string;
+  status: ProductStatus;
+  createdAt: number;
+}
+export interface IProdAttributeResponse {
+  id: string;
+  name: string;
+  status: ProductStatus;
 }

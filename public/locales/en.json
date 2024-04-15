@@ -314,7 +314,11 @@
       "get_a_quote": "Get a quote",
       "apply_voucher": "Discount applies",
       "proceed_to_checkout": "Proceed to payment",
-      "check_voucher": "View vouchers"
+      "check_voucher": "View vouchers",
+      "checkSelected": "View your options",
+      "addAndContinue": "Add and continue",
+      "addAndGo": "Add and go",
+      "go": "Go"
     },
     "messages": {
       "buy_more": "Buy more",
@@ -656,7 +660,16 @@
       "soles": "Soles",
       "tags": "Tags",
       "descriptions": "Descriptions",
-      "stock": "Available Stock"
+      "stock": "Available Stock",
+      "id": "ID",
+      "name": "Name",
+      "description": "Description",
+      "price": "Price",
+      "createdAt": "Create at",
+      "quantity": "Quantity",
+      "status": "Status",
+      "color": "Color",
+      "size": "Size"
     },
     "desc_tab": {
       "additional_information": "Additional Information",
@@ -700,7 +713,35 @@
     "messages": {
       "min_reached": "Minimum quantity reached",
       "limit_reached": "Sorry, reached the maximum limit of product quantity!",
-      "max_cart_size": "You can only purchase up to 5 products, please contact us if you need to buy in bulk"
+      "max_cart_size": "You can only purchase up to 5 products, please contact us if you need to buy in bulk",
+      "limitReached": "Sorry, the product quantity limit has been reached",
+      "purchaseLimit": "You can only purchase a maximum of 5 products",
+      "minReached": "Minimum quantity reached",
+      "selectProductFirst": "Please select the product first",
+      "invalid": "Invalid product"
+    },
+    "products": "List of products",
+    "noProducts": "No products",
+    "titles": {
+      "list": "Product",
+      "create": "Create Product",
+      "edit": "Edit Products",
+      "add": "Add products"
+    },
+    "filters": {
+      "title": "Filter",
+      "search": {
+        "label": "Name",
+        "placeholder": "Search by name"
+      },
+      "status": {
+        "label": "Status",
+        "placeholder": "Filter by status"
+      },
+      "attribute": "Filter by product attributes"
+    },
+    "sorters": {
+      "attribute": "Sort by product attributes"
     }
   },
   "confirmDialog": {
@@ -937,5 +978,117 @@
     "showing": "Showing",
     "results": "results",
     "out_of": "out of"
+  },
+  "productDetails": {
+    "productDetails": "Product details",
+    "list": "Detailed product list",
+    "fields": {
+      "id": "Id",
+      "name": "Name",
+      "quantity": "Quantity",
+      "price": "Price",
+      "image": "Image",
+      "size": "Size",
+      "color": "Color",
+      "status": "Status",
+      "brand": "Brand",
+      "style": "Designs",
+      "material": "Material",
+      "tradeMark": "Trademark",
+      "sole": "Sole"
+    },
+    "filters": {
+      "title": "Filter",
+      "search": {
+        "title": "Search",
+        "placeholder": "Search by keyword"
+      },
+      "status": {
+        "label": "Status",
+        "placeholder": "Filter by status"
+      },
+      "brand": {
+        "label": "Brand",
+        "placeholder": "Filter by brand"
+      },
+      "color": {
+        "label": "Color",
+        "placeholder": "Filter by color"
+      },
+      "material": {
+        "label": "Material",
+        "placeholder": "Filter by material"
+      },
+      "size": {
+        "label": "Size",
+        "placeholder": "Filter by size"
+      },
+      "sole": {
+        "label": "Only",
+        "placeholder": "Filter by base"
+      },
+      "style": {
+        "label": "Style",
+        "placeholder": "Filter by style"
+      },
+      "tradeMark": {
+        "label": "Trademark",
+        "placeholder": "Filter by Trademark"
+      },
+      "priceMax": {
+        "label": "Maximum price",
+        "placeholder": "Filter by Maximum Price"
+      },
+      "priceMin": {
+        "label": "Minimum price",
+        "placeholder": "Filter by minimum price"
+      },
+      "quantity": {
+        "label": "Quantity",
+        "placeholder": "Filter by quantity"
+      }
+    }
+  },
+  "actions": {
+    "list": "List",
+    "create": "Create",
+    "add": "More",
+    "edit": "Edit",
+    "show": "Detail",
+    "delete": "Delete",
+    "clear": "Clear",
+    "setDefault": "Set default",
+    "apply": "Apply",
+    "remove": "Remove",
+    "submit": "Submit",
+    "submitChanges": "Confirm changes",
+    "pay": "PAY",
+    "payConfirm": "Payment confirmation",
+    "proceedPay": "PROCEED TO PAY",
+    "calculateShipping": "Calculate shipping fees",
+    "showAddress": "View user's addresses",
+    "deselectAll": "Deselect all",
+    "skip": "Skip",
+    "ok": "Agree",
+    "reset": "Reset"
+  },
+  "orderDetails": {
+    "orderDetails": "Order details",
+    "titles": {},
+    "fields": {
+      "products": "Product",
+      "qty": "Qty",
+      "price": "Unit price",
+      "totalPrice": "Into money"
+    }
+  },
+  "pos": {
+    "pos": "Point of Sale",
+    "titles": {
+      "advancedAdd": "Advanced Product Addition"
+    },
+    "message": {
+      "orderDetailLengthExceed": "Please add products first."
+    }
   }
 }
