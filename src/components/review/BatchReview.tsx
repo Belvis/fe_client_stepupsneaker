@@ -46,6 +46,7 @@ export const BatchReview: React.FC<BatchReviewProps> = ({
     const payLoad = orderDetailToReview.map((o, index) => {
       return {
         productDetail: o.productDetail.id,
+        order: o.order.id,
         comment: form.getFieldValue(`comment${index}`),
         rating: form.getFieldValue(`rating${index}`),
         urlImage: form.getFieldValue(`urlImage${index}`),

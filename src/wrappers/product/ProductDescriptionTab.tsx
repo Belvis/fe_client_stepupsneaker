@@ -1,7 +1,7 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { useForm } from "@refinedev/antd";
 import { HttpError, useList, useTranslate } from "@refinedev/core";
-import { Form, Modal, Rate, Spin, Upload, UploadFile } from "antd";
+import { Form, Input, Modal, Rate, Spin, Upload, UploadFile } from "antd";
 import { RcFile, UploadChangeParam, UploadProps } from "antd/es/upload";
 import clsx from "clsx";
 import { useState } from "react";
@@ -317,6 +317,9 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
                                 </div>
                               </div>
                             </div>
+                            <Form.Item name="order" initialValue={null}>
+                              <Input />
+                            </Form.Item>
                           </Form>
                         </Spin>
                       </div>
