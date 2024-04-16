@@ -17,6 +17,7 @@ import {
   IReviewRequest,
   IReviewResponse,
 } from "../../interfaces";
+import ImageUpload from "../../components/form/ImageUpload";
 
 interface ProductDescriptionTabProps {
   spaceBottomClass: string;
@@ -290,54 +291,24 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
                                     ]}
                                   >
                                     <textarea
+                                      className="m-0"
                                       placeholder={
                                         t(`products.desc_tab.fields.message`) ||
                                         ""
                                       }
                                     />
                                   </Form.Item>
-                                  <div className="col-md-12">
-                                    <Form.Item name="urlImage">
-                                      <Upload
-                                        listType="picture-card"
-                                        onPreview={handlePreview}
-                                        fileList={fileList}
-                                        beforeUpload={beforeUpload}
-                                        maxCount={1}
-                                        onChange={handleChange}
-                                        customRequest={({
-                                          onSuccess,
-                                          onError,
-                                          file,
-                                        }) => {
-                                          if (onSuccess) {
-                                            try {
-                                              onSuccess("ok");
-                                            } catch (error) {
-                                              console.error(error);
-                                            }
-                                          }
-                                        }}
-                                        multiple
-                                        style={{
-                                          border: "none",
-                                          width: "100%",
-                                          background: "none",
-                                        }}
-                                      >
-                                        {fileList.length >= 1 ? null : (
-                                          <div>
-                                            <PlusOutlined />
-                                            <div style={{ marginTop: 8 }}>
-                                              {t("image.upload")}
-                                            </div>
-                                          </div>
-                                        )}
-                                      </Upload>
-                                    </Form.Item>
+                                  <div
+                                    className="col-md-12"
+                                    style={{ marginBottom: "24px" }}
+                                  >
+                                    {formProps.form && (
+                                      <ImageUpload form={formProps.form} raw />
+                                    )}
                                   </div>
                                   <input
                                     type="submit"
+                                    className="w-100"
                                     value={
                                       t(`products.desc_tab.buttons.submit`) ||
                                       ""

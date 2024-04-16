@@ -4,14 +4,15 @@ import { Spin } from "antd";
 import { Fragment, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import OrderDeliverables from "../../components/order/OrderDeliverables";
 import OrderInfo from "../../components/order/OrderInfo";
 import { OrderSteps } from "../../components/order/OrderSteps";
 import { IOrderResponse } from "../../interfaces";
 import { RootState } from "../../redux/store";
 import Breadcrumb from "../../wrappers/breadcrumb/Breadcrumb";
-import dayjs from "dayjs";
+import { Accordion } from "react-bootstrap";
+import OrderReviews from "../../components/order/OrderReviews";
 
 const OrderDetail = () => {
   const { t } = useTranslation();
@@ -36,10 +37,6 @@ const OrderDetail = () => {
 
   const order = data?.data;
 
-  const returnedHistory = order?.orderHistories.find(
-    (history) => history.actionStatus === "RETURNED"
-  );
-
   const currency = useSelector((state: RootState) => state.currency);
 
   return (
@@ -58,6 +55,9 @@ const OrderDetail = () => {
               <OrderInfo order={order} refetch={refetch} />
               <OrderSteps record={order} callBack={refetch} />
               <OrderDeliverables order={order} currency={currency} />
+              <Accordion defaultActiveKey="0">
+                <OrderReviews order={order} />
+              </Accordion>
             </Fragment>
           )}
         </div>

@@ -126,6 +126,9 @@ export interface IOrderResponse {
   voucher?: IVoucherResponse;
   address: IAddressResponse;
   phoneNumber: string;
+  countReview: number;
+  orderDetailToReview: IOrderDetailResponse[];
+  reviews: IReviewResponse[];
   email: string;
   fullName: string;
   shippingMoney: number;

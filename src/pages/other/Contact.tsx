@@ -12,7 +12,7 @@ const Contact = () => {
   const setTitle = useDocumentTitle();
 
   useEffect(() => {
-    setTitle(t("nav.pages.contact_us") + " | SUNS");
+    setTitle(t("nav.contact_us") + " | SUNS");
   }, [t]);
 
   return (
