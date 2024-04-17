@@ -58,7 +58,7 @@ export const BatchReview: React.FC<BatchReviewProps> = ({
     try {
       mutate(
         {
-          resource: "product/reviews/add",
+          resource: "product/reviews",
           values: payLoad,
           successNotification: () => {
             return false;
