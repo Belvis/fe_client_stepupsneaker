@@ -27,6 +27,7 @@ const { Text } = Typography;
 type BatchReviewProps = {
   modalProps: ModalProps;
   close: () => void;
+  callBack: any;
   orderDetailToReview: IOrderDetailResponse[];
 };
 
@@ -34,6 +35,7 @@ export const BatchReview: React.FC<BatchReviewProps> = ({
   modalProps,
   close,
   orderDetailToReview,
+  callBack,
 }) => {
   const t = useTranslate();
   const breakpoint = Grid.useBreakpoint();
@@ -67,7 +69,10 @@ export const BatchReview: React.FC<BatchReviewProps> = ({
         },
         {
           onError: (error, variables, context) => {},
-          onSuccess: () => {},
+          onSuccess: () => {
+            close();
+            callBack();
+          },
         }
       );
     } catch (error) {

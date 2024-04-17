@@ -56,7 +56,7 @@ const OrderDetail = () => {
               <OrderSteps record={order} callBack={refetch} />
               <OrderDeliverables order={order} currency={currency} />
               <Accordion defaultActiveKey="0">
-                <OrderReviews order={order} />
+                <OrderReviews order={order} callBack={refetch} />
               </Accordion>
             </Fragment>
           )}

@@ -1,29 +1,18 @@
+import { useModal } from "@refinedev/antd";
 import { useTranslate } from "@refinedev/core";
+import { List as AntdList, Image, Input, Rate, Space, Typography } from "antd";
 import { Accordion } from "react-bootstrap";
 import { IOrderResponse, IReviewResponse } from "../../interfaces";
-import { useModal } from "@refinedev/antd";
 import { BatchReview } from "../review/BatchReview";
-import {
-  List as AntdList,
-  Form,
-  FormInstance,
-  Grid,
-  Image,
-  Input,
-  Modal,
-  ModalProps,
-  Rate,
-  Space,
-  Typography,
-} from "antd";
 
 type OrderReviewsProps = {
   order: IOrderResponse;
+  callBack: any;
 };
 
 const { Text } = Typography;
 
-const OrderReviews: React.FC<OrderReviewsProps> = ({ order }) => {
+const OrderReviews: React.FC<OrderReviewsProps> = ({ order, callBack }) => {
   const t = useTranslate();
 
   const {
@@ -84,6 +73,7 @@ const OrderReviews: React.FC<OrderReviewsProps> = ({ order }) => {
         modalProps={restProps}
         close={close}
         orderDetailToReview={order.orderDetailToReview}
+        callBack={callBack}
       />
     </div>
   );

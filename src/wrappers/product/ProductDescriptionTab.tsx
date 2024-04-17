@@ -1,23 +1,19 @@
-import { PlusOutlined } from "@ant-design/icons";
 import { useForm } from "@refinedev/antd";
 import { HttpError, useList, useTranslate } from "@refinedev/core";
-import { Form, Input, Modal, Rate, Spin, Upload, UploadFile } from "antd";
-import { RcFile, UploadChangeParam, UploadProps } from "antd/es/upload";
+import { Form, Input, Rate, Spin } from "antd";
 import clsx from "clsx";
 import { useState } from "react";
 import Nav from "react-bootstrap/Nav";
 import Tab from "react-bootstrap/Tab";
 import { useParams } from "react-router-dom";
+import ImageUpload from "../../components/form/ImageUpload";
 import Reviews from "../../components/review/Reviews";
-import { getBase64, getBase64Image } from "../../helpers/image";
-import { showErrorToast } from "../../helpers/toast";
 import { validateCommon } from "../../helpers/validate";
 import {
   IProductResponse,
   IReviewRequest,
   IReviewResponse,
 } from "../../interfaces";
-import ImageUpload from "../../components/form/ImageUpload";
 
 interface ProductDescriptionTabProps {
   spaceBottomClass: string;
@@ -34,11 +30,6 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
   let { id } = useParams();
 
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
-  const [previewTitle, setPreviewTitle] = useState("");
-
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [loadingImage, setLoadingImage] = useState(false);
 
   const { onFinish, formProps, saveButtonProps, formLoading } =
     useForm<IReviewRequest>({
@@ -81,54 +72,16 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
   const reviews = data?.data ? data?.data : [];
 
   const onFinishHandler = (values: any) => {
-    const updatedValues = {
-      ...values,
-    };
+    const updatedValues = [
+      {
+        ...values,
+      },
+    ];
 
     onFinish(updatedValues);
   };
 
   const handleCancel = () => setPreviewOpen(false);
-  const handlePreview = async (file: UploadFile) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj as RcFile);
-    }
-
-    setPreviewImage(file.url || (file.preview as string));
-    setPreviewOpen(true);
-    setPreviewTitle(
-      file.name || file.url!.substring(file.url!.lastIndexOf("/") + 1)
-    );
-  };
-
-  const beforeUpload = (file: RcFile) => {
-    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-    if (!isJpgOrPng) {
-      showErrorToast(t("image.error.invalid"));
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      showErrorToast(t("image.error.exceed"));
-    }
-    return isJpgOrPng && isLt2M;
-  };
-
-  const handleChange: UploadProps["onChange"] = (
-    info: UploadChangeParam<UploadFile>
-  ) => {
-    setFileList(info.fileList);
-
-    if (info.file.status === "uploading") {
-      setLoadingImage(true);
-      return;
-    }
-    if (info.file.status === "done") {
-      getBase64Image(info.file.originFileObj as RcFile, (url) => {
-        setLoadingImage(false);
-        formProps.form?.setFieldValue("urlImage", url);
-      });
-    }
-  };
 
   return (
     <div
@@ -331,14 +284,6 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
           </Tab.Container>
         </div>
       </div>
-      <Modal
-        open={previewOpen}
-        title={previewTitle}
-        footer={null}
-        onCancel={handleCancel}
-      >
-        <img className="w-100" alt="image-preview" src={previewImage} />
-      </Modal>
     </div>
   );
 };
