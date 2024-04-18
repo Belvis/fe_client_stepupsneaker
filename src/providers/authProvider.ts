@@ -92,11 +92,21 @@ export const authProvider = (url: string): AuthBindings => ({
 
       const token = response.data.token ?? null;
 
-      if (token) localStorage.setItem(TOKEN_KEY, token);
-
+      if (token) {
+        localStorage.setItem(TOKEN_KEY, token);
+        const cartState = store.getState().cart;
+        store.dispatch(mergeCart(cartState.cartItems));
+        return {
+          success: true,
+          redirectTo: "/",
+        };
+      }
       return {
-        success: true,
-        redirectTo: "/",
+        success: false,
+        error: {
+          message: "Oops..",
+          name: "Có gì đó sai sai",
+        },
       };
     } catch (error: any) {
       return {
