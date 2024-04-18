@@ -125,7 +125,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 {selectedVariant &&
                   selectedVariant.image &&
                   selectedVariant.image.length > 0 &&
-                  selectedVariant.image.map((img, i) => {
+                  selectedVariant.image.sort().map((img, i) => {
                     return (
                       <SwiperSlide key={i}>
                         <div className="single-image">
@@ -140,7 +140,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
               <Swiper options={thumbnailSwiperParams}>
                 {selectedVariant &&
                   selectedVariant.image &&
-                  selectedVariant.image.map((image, i) => {
+                  selectedVariant.image.sort().map((image, i) => {
                     return (
                       <SwiperSlide key={i}>
                         <div className="single-image">

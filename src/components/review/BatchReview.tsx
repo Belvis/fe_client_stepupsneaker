@@ -60,12 +60,16 @@ export const BatchReview: React.FC<BatchReviewProps> = ({
         {
           resource: "product/reviews",
           values: payLoad,
-          successNotification: () => {
-            return false;
-          },
-          errorNotification: () => {
-            return false;
-          },
+          successNotification: () => ({
+            message: "Cảm ơn bạn đã chia sẻ trải nghiệm mua sắm với chúng tôi!",
+            description: "Đánh giá thành công",
+            type: "success",
+          }),
+          errorNotification: (error) => ({
+            message: t("common.error") + error?.message,
+            description: "Oops...",
+            type: "error",
+          }),
         },
         {
           onError: (error, variables, context) => {},

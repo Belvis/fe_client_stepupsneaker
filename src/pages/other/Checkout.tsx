@@ -259,7 +259,11 @@ const CheckOut = () => {
       );
       const hasDefaultAddress = !!defaultAddress;
 
-      if (!order.address && hasDefaultAddress) {
+      const isValid = Object.values(order.address ?? {}).every(
+        (value) => value !== "" && value !== undefined
+      );
+
+      if (!isValid && hasDefaultAddress) {
         const {
           phoneNumber,
           provinceId,
@@ -270,6 +274,8 @@ const CheckOut = () => {
           wardName,
           more,
         } = defaultAddress;
+
+        console.log("phoneNumber", phoneNumber);
 
         form.setFieldsValue({
           phone_number: phoneNumber,

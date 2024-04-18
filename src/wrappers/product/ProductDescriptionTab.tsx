@@ -270,7 +270,7 @@ const ProductDescriptionTab: React.FC<ProductDescriptionTabProps> = ({
                                 </div>
                               </div>
                             </div>
-                            <Form.Item name="order" initialValue={null}>
+                            <Form.Item name="order" initialValue={null} hidden>
                               <Input />
                             </Form.Item>
                           </Form>

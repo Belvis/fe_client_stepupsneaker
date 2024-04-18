@@ -38,7 +38,7 @@ const ProductVariations: FC<ProductVariationsProps> = React.memo(
           <Space direction="vertical">
             <span>{t(`products.fields.colors`)}</span>
             <div className="pro-details-color-content">
-              {product.variation.map((single, key) => {
+              {product.variation.sort().map((single, key) => {
                 const hasSale = single.size.some(
                   (size) =>
                     typeof size.discount === "number" && size.discount > 0
@@ -101,9 +101,9 @@ const ProductVariations: FC<ProductVariationsProps> = React.memo(
             <span>{t(`products.fields.sizes`)}</span>
             <div className="pro-details-size-content">
               {product.variation &&
-                product.variation.map((single) => {
+                product.variation.sort().map((single) => {
                   return single.color.id === selectedProductColor.id
-                    ? single.size.map((singleSize, key) => {
+                    ? single.size.sort().map((singleSize, key) => {
                         const hasSale = singleSize.discount > 0;
                         return (
                           <label

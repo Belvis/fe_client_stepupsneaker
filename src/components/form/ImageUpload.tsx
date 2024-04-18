@@ -7,6 +7,7 @@ import {
   FormInstance,
   FormProps,
   Image,
+  Input,
   Space,
   Spin,
   Typography,
@@ -60,19 +61,6 @@ const ImageUpload: React.FC<IImageUploadProps> = ({
       getBase64Image(info.file.originFileObj as RcFile, (url) => {
         setLoadingImage(false);
         form.setFieldValue(name, url);
-
-        let newFileList = [...info.fileList];
-
-        newFileList = newFileList.slice(-2);
-
-        newFileList = newFileList.map((file) => {
-          if (file.response) {
-            file.url = file.response.url;
-          }
-          return file;
-        });
-
-        form.setFieldValue("fileList", newFileList);
       });
     }
   };
@@ -158,9 +146,6 @@ const ImageUpload: React.FC<IImageUploadProps> = ({
             </Space>
           )}
         </Upload.Dragger>
-      </Form.Item>
-      <Form.Item name="fileList" hidden>
-        <Upload />
       </Form.Item>
     </Spin>
   );
