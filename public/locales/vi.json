@@ -1105,5 +1105,165 @@
     "message": {
       "orderDetailLengthExceed": "Vui lòng thêm sản phẩm vào trước."
     }
+  },
+  "orders": {
+    "orders": "Đơn Hàng",
+    "titles": {
+      "list": "Danh sách đơn Hàng",
+      "show": "Chi tiết Đơn Hàng",
+      "edit": "Chỉnh sửa Đơn Hàng"
+    },
+    "fields": {
+      "code": "Mã đơn hàng",
+      "id": "ID",
+      "status": "Trạng thái",
+      "customer": "Khách hàng",
+      "fullName": "Tên đầy đủ",
+      "phoneNumber": "Số điện thoại",
+      "employee": "Nhân viên",
+      "voucher": "Phiếu giảm giá",
+      "orderDetails": "Chi tiết đơn hàng",
+      "createdAt": "Tạo lúc",
+      "totalPrice": "Tổng cộng",
+      "itemsAmount": "{{amount}} sản phẩm",
+      "note": "Ghi chú đơn hàng",
+      "type": {
+        "title": "Loại",
+        "ONLINE": "Trực tuyến",
+        "OFFLINE": "Tại quầy"
+      },
+      "address": "Địa chỉ hoá đơn"
+    },
+    "filters": {
+      "title": "Bộ lọc",
+      "search": {
+        "label": "Tìm kiếm",
+        "placeholder": "Mã đơn hàng, Người dùng, v.v."
+      },
+      "type": {
+        "label": "Loại",
+        "placeholder": "Loại đơn hàng"
+      },
+      "status": {
+        "label": "Trạng thái",
+        "placeholder": "Tình trạng đơn hàng"
+      },
+      "createdAt": {
+        "label": "Được tạo lúc"
+      },
+      "submit": "Lọc"
+    },
+    "deliverables": {
+      "deliverables": "Chi tiết đơn hàng",
+      "fields": {
+        "items": "Sản phẩm",
+        "paymentMethod": "Phương thức thanh toán",
+        "payment": "Thanh toán",
+        "shipping": "Phí ship",
+        "quantity": "Số lượng",
+        "price": "Giá",
+        "total": "Tổng cộng"
+      },
+      "mainTotal": "TỔNG TIỀN HÀNG",
+      "receipt": "Biên lai chính thức"
+    },
+    "tab": {
+      "label": "Đơn Hàng",
+      "example": "Mẫu",
+      "discount": "Giảm giá",
+      "amountDue": "Khách cần trả",
+      "retailCustomer": "Khách lẻ",
+      "customerPay": "Khách hàng thanh toán",
+      "change": "Tiền thừa",
+      "paymentCode": "Mã giao dịch",
+      "cod": "Thanh toán khi giao hàng",
+      "shippingMoney": "Tiền vận chuyển",
+      "directSales": "Bán trực tiếp",
+      "deliverySales": "Bán giao hàng"
+    },
+    "transportAddress": {
+      "name": "Tên người nhận",
+      "email": "Địa chỉ E-mail",
+      "phoneNumber": "Số điện thoại"
+    },
+    "notification": {
+      "product": {
+        "add": {
+          "success": "Thêm sản phẩm vào giỏ hàng thành công.",
+          "error": "Thêm sản phẩm vào giỏ hàng thất bại: ",
+          "notFound": "Không tìm thấy sản phẩm phù hợp."
+        },
+        "edit": {
+          "success": "Chỉnh sửa đơn hàng thành công.",
+          "error": "Chỉnh sửa đơn hàng thất bại: "
+        }
+      },
+      "employee": {
+        "edit": {
+          "success": "Chỉnh sửa nhân viên trong đơn hàng thành công.",
+          "error": "Chỉnh sửa nhân viên trong đơn hàng thất bại: "
+        }
+      },
+      "customer": {
+        "edit": {
+          "success": "Chỉnh sửa khách hàng trong đơn hàng thành công.",
+          "error": "Chỉnh sửa khách hàng trong đơn hàng thất bại: "
+        }
+      },
+      "note": {
+        "edit": {
+          "success": "Chỉnh sửa ghi chú đơn hàng thành công.",
+          "error": "Chỉnh sửa ghi chú đơn hàng thất bại: "
+        }
+      },
+      "shippingMoney": {
+        "edit": {
+          "success": "Chỉnh sửa phí giao hàng thành công.",
+          "error": "Chỉnh sửa phí giao hàng thất bại: ",
+          "invalid": "Giá trị không hợp lệ"
+        }
+      },
+      "voucher": {
+        "edit": {
+          "success": "Chỉnh sửa giảm giá đơn hàng thành công.",
+          "error": "Chỉnh sửa giảm giá đơn hàng thất bại: ",
+          "notFound": "Vui lòng chọn giảm giá trước."
+        }
+      },
+      "orderDetail": {
+        "remove": {
+          "success": "Xoá sản phẩm khỏi đơn hàng thành công.",
+          "error": "Xoá sản phẩm khỏi đơn hàng thất bại: "
+        }
+      },
+      "tab": {
+        "add": {
+          "success": "Thêm đơn hàng mới thành công.",
+          "error": "Thêm đơn hàng mới thất bại: "
+        },
+        "remove": {
+          "success": "Xoá đơn hàng thành công.",
+          "error": "Xoá đơn hàng thất bại: "
+        },
+        "advancedAdd": {
+          "error": "Vui lòng thêm đơn hàng trước"
+        },
+        "checkoutDrawer": {
+          "error": "Khách hàng thanh toán không được nhỏ hơn Khách cần trả."
+        }
+      },
+      "order": {
+        "error": "Cập nhật đơn hàng thất bại"
+      }
+    },
+    "modal": {
+      "title": "Đơn hàng của bạn",
+      "tooltip": "Bạn chỉ có thể cập nhật 1 số thông tin cơ bản của đơn hàng."
+    },
+    "validation": {
+      "discount": {
+        "retailCustomer": "Khách lẻ không thể sử dụng giảm giá."
+      }
+    }
   }
 }

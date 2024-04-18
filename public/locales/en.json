@@ -1090,5 +1090,165 @@
     "message": {
       "orderDetailLengthExceed": "Please add products first."
     }
+  },
+  "orders": {
+    "orders": "Order",
+    "titles": {
+      "list": "List of orders",
+      "show": "Order Details",
+      "edit": "Edit order"
+    },
+    "fields": {
+      "code": "Code",
+      "id": "ID",
+      "status": "Status",
+      "customer": "Customer",
+      "fullName": "Full name",
+      "phoneNumber": "Phone number",
+      "employee": "Employee",
+      "voucher": "Voucher",
+      "orderDetails": "Order details",
+      "createdAt": "Create at",
+      "totalPrice": "Total",
+      "itemsAmount": "{{amount}} product",
+      "note": "Order notes",
+      "type": {
+        "title": "Type",
+        "ONLINE": "Online",
+        "OFFLINE": "Offline"
+      },
+      "address": "Invoice address"
+    },
+    "filters": {
+      "title": "Filter",
+      "search": {
+        "label": "Search",
+        "placeholder": "Order ID, User, etc."
+      },
+      "type": {
+        "label": "Type",
+        "placeholder": "Order type"
+      },
+      "status": {
+        "label": "Status",
+        "placeholder": "Order status"
+      },
+      "createdAt": {
+        "label": "Created at"
+      },
+      "submit": "Filter"
+    },
+    "deliverables": {
+      "deliverables": "Order details",
+      "fields": {
+        "items": "Product",
+        "paymentMethod": "Payment methods",
+        "payment": "Payment",
+        "shipping": "Shipping fee",
+        "quantity": "Quantity",
+        "price": "Price",
+        "total": "total"
+      },
+      "mainTotal": "TOTAL COST",
+      "receipt": "Official receipt"
+    },
+    "tab": {
+      "label": "Order",
+      "example": "Sample",
+      "discount": "Discount",
+      "amountDue": "Amount due",
+      "retailCustomer": "Retail customer",
+      "customerPay": "Customer pays",
+      "change": "Change",
+      "paymentCode": "Transaction code",
+      "cod": "COD",
+      "shippingMoney": "Shipping money",
+      "directSales": "Direct sales",
+      "deliverySales": "Delivery sales"
+    },
+    "transportAddress": {
+      "name": "Recipient's name",
+      "email": "Email address",
+      "phoneNumber": "Phone number"
+    },
+    "notification": {
+      "product": {
+        "add": {
+          "success": "Added product to cart successfully.",
+          "error": "Adding product to cart failed: ",
+          "notFound": "No suitable products found."
+        },
+        "edit": {
+          "success": "Order edited successfully.",
+          "error": "Edit failed orders: "
+        }
+      },
+      "employee": {
+        "edit": {
+          "success": "Successfully edited the employee in the order.",
+          "error": "Edit employee in failed order: "
+        }
+      },
+      "customer": {
+        "edit": {
+          "success": "Edit customer in order successfully.",
+          "error": "Edit customers in failed orders: "
+        }
+      },
+      "note": {
+        "edit": {
+          "success": "Order note edited successfully.",
+          "error": "Edit failed order notes: "
+        }
+      },
+      "shippingMoney": {
+        "edit": {
+          "success": "Successfully edited delivery fee.",
+          "error": "Edit failed delivery charges: ",
+          "invalid": "Invalid value"
+        }
+      },
+      "voucher": {
+        "edit": {
+          "success": "Successfully edited order discount.",
+          "error": "Edit failed order discounts: ",
+          "notFound": "Please choose a discount first."
+        }
+      },
+      "orderDetail": {
+        "remove": {
+          "success": "Remove product from order successfully.",
+          "error": "Remove products from failed orders: "
+        }
+      },
+      "tab": {
+        "add": {
+          "success": "Added new order successfully.",
+          "error": "Adding new order failed: "
+        },
+        "remove": {
+          "success": "Order deleted successfully.",
+          "error": "Delete failed orders: "
+        },
+        "advancedAdd": {
+          "error": "Please add your order first"
+        },
+        "checkoutDrawer": {
+          "error": "The customer's payment cannot be less than the customer needs to pay."
+        }
+      },
+      "order": {
+        "error": "Failed to update order"
+      }
+    },
+    "modal": {
+      "title": "Your order",
+      "tooltip": "You can only update some basic information of the order."
+    },
+    "validation": {
+      "discount": {
+        "retailCustomer": "Retail customers cannot use discounts."
+      }
+    }
   }
 }
