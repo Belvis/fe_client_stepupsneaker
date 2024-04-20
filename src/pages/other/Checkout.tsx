@@ -259,11 +259,7 @@ const CheckOut = () => {
       );
       const hasDefaultAddress = !!defaultAddress;
 
-      const isValid = Object.values(order.address ?? {}).every(
-        (value) => value !== "" && value !== undefined
-      );
-
-      if (!isValid && hasDefaultAddress) {
+      if (hasDefaultAddress) {
         const {
           phoneNumber,
           provinceId,

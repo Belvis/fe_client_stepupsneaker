@@ -71,7 +71,7 @@ const AccountAddress: React.FC<AccountAddressProps> = ({ data, refetch }) => {
     successNotification: (data, values, resource) => {
       return {
         message: t("my_account.address.messages.create"),
-        description: t("common.succes"),
+        description: t("common.success"),
         type: "success",
       };
     },
@@ -101,8 +101,8 @@ const AccountAddress: React.FC<AccountAddressProps> = ({ data, refetch }) => {
     warnWhenUnsavedChanges: false,
     successNotification: (data, values, resource) => {
       return {
-        message: t("common.update.succes"),
-        description: t("common.succes"),
+        message: t("common.update.success"),
+        description: t("common.success"),
         type: "success",
       };
     },
@@ -120,8 +120,8 @@ const AccountAddress: React.FC<AccountAddressProps> = ({ data, refetch }) => {
         id,
         successNotification: (data, values, resource) => {
           return {
-            message: t("common.update.succes"),
-            description: t("common.succes"),
+            message: t("common.update.success"),
+            description: t("common.success"),
             type: "success",
           };
         },

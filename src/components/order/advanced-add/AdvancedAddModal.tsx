@@ -72,7 +72,7 @@ export const AdvancedAddModal: React.FC<AdvancedAddModalProps> = ({
     sorters: {
       initial: [
         {
-          field: "id",
+          field: "updatedAt",
           order: "desc",
         },
       ],

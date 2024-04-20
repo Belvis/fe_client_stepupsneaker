@@ -65,6 +65,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
     pagination: {
       pageSize: limit,
     },
+    sorters: [{ field: "updatedAt", order: "desc" }],
   });
   const prods = data?.data ? mapProductsToClients(data?.data) : [];
 
