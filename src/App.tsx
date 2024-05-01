@@ -13,13 +13,7 @@ import { App as AntdApp } from "antd";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import { Suspense } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  BrowserRouter,
-  Navigate,
-  Outlet,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { authProvider } from "./providers/authProvider";
 import { dataProvider } from "./providers/dataProvider";
 import { ColorModeContextProvider } from "./contexts/color-mode";
@@ -51,13 +45,9 @@ import ForgotPassword from "./pages/other/ForgotPassword";
 
 // Pages
 
-const API_BASE_URL = `${window.location.protocol}//${
-  window.location.hostname
-}:${import.meta.env.VITE_BACKEND_API_BASE_PATH}`;
+const API_BASE_URL = `${import.meta.env.VITE_BACKEND_API_BASE_PATH}`;
 
-const AUTH_API_URL = `${window.location.protocol}//${
-  window.location.hostname
-}:${import.meta.env.VITE_BACKEND_API_AUTH_PATH}`;
+const AUTH_API_URL = `${import.meta.env.VITE_BACKEND_API_AUTH_PATH}`;
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -125,11 +115,7 @@ function App() {
                           )}
                           Sider={() => <></>}
                           Footer={() => (
-                            <Footer
-                              backgroundColorClass="bg-gray"
-                              spaceTopClass="pt-100"
-                              spaceBottomClass="pb-70"
-                            />
+                            <Footer backgroundColorClass="bg-gray" spaceTopClass="pt-100" spaceBottomClass="pb-70" />
                           )}
                         >
                           <Outlet />
@@ -138,10 +124,7 @@ function App() {
                     >
                       <Route index element={<HomePage />} />
                       <Route path={"/shop"} element={<ShopGridStandard />} />
-                      <Route
-                        path={"/product/:id"}
-                        element={<ProductTabLeft />}
-                      />
+                      <Route path={"/product/:id"} element={<ProductTabLeft />} />
                       <Route path="contact" element={<Contact />} />
                       <Route path="about_us" element={<About />} />
                       <Route path="/pages">
@@ -152,10 +135,7 @@ function App() {
 
                         <Route
                           element={
-                            <Authenticated
-                              key="login"
-                              fallback={<CatchAllNavigate to="/login" />}
-                            >
+                            <Authenticated key="login" fallback={<CatchAllNavigate to="/login" />}>
                               <Outlet />
                             </Authenticated>
                           }
@@ -171,10 +151,7 @@ function App() {
                       </Route>
 
                       <Route path="/success/:id" element={<Success />} />
-                      <Route
-                        path="/submission-failed"
-                        element={<SubmissionFailed />}
-                      />
+                      <Route path="/submission-failed" element={<SubmissionFailed />} />
                       <Route path="/tracking">
                         <Route index element={<TrackingPage />} />
                         <Route path=":code" element={<OrderTracking />} />
@@ -187,26 +164,14 @@ function App() {
                           </Authenticated>
                         }
                       >
-                        <Route
-                          path="login"
-                          element={<LoginRegister type="login" />}
-                        />
-                        <Route
-                          path="register"
-                          element={<LoginRegister type="register" />}
-                        />
+                        <Route path="login" element={<LoginRegister type="login" />} />
+                        <Route path="register" element={<LoginRegister type="register" />} />
                         {/* forgot-password */}
                         {/* update-password */}
                       </Route>
 
-                      <Route
-                        path="/reset-password"
-                        element={<ResetPassword />}
-                      />
-                      <Route
-                        path="/forgot-password"
-                        element={<ForgotPassword />}
-                      />
+                      <Route path="/reset-password" element={<ResetPassword />} />
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
 
                       <Route path="*" element={<NotFound />} />
                     </Route>
