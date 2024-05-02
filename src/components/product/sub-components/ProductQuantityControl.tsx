@@ -41,7 +41,10 @@ const ProductQuantityControl: FC<ProductQuantityControlProps> = ({
         />
         <button
           onClick={() => {
-            if (quantityCount + productCartQty >= 5 || totalCartQty >= 5) {
+            if (
+              quantityCount + productCartQty >= 5 ||
+              quantityCount + totalCartQty >= 5
+            ) {
               return showErrorToast(t("products.messages.max_cart_size"));
             }
 
