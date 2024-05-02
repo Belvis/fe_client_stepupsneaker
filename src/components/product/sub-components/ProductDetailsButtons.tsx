@@ -43,10 +43,15 @@ const ProductDetailsButtons: FC<ProductDetailsButtonsProps> = ({
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
 
+  console.log("productStock", productStock);
+  console.log("productCartQty", productCartQty);
+  console.log("quantityCount", quantityCount);
+  console.log("totalCartQty", totalCartQty);
+
   const isButtonDisabled =
-    productCartQty >= productStock ||
+    quantityCount >= productStock - productCartQty ||
     quantityCount + productCartQty > 5 ||
-    totalCartQty >= 5;
+    quantityCount + totalCartQty > 5;
 
   const handleDispatchAddToCart = () => {
     dispatch(
