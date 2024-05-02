@@ -61,7 +61,7 @@ export const AdvancedAddModal: React.FC<AdvancedAddModalProps> = ({
       pageSize: 5,
     },
     filters: {
-      permanent: [
+      initial: [
         {
           field: "minQuantity",
           operator: "eq",

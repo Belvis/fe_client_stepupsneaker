@@ -560,6 +560,7 @@ const CheckOut = () => {
           {cartItems && cartItems.length >= 1 ? (
             <div className="row">
               <Form
+                scrollToFirstError
                 form={form}
                 name="billing-info"
                 layout="inline"
