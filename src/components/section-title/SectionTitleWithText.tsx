@@ -16,10 +16,10 @@ const SectionTitleWithText: React.FC<SectionTitleWithTextProps> = ({
           <h5>Chúng tôi là ai</h5>
           <h1>Chào mừng đến stepupsneaker</h1>
           <p>
-            Anh Đức nghĩ cho em văn đoạn này phát, consectetur adipisicing elit,
-            sed do eiusmod tempor incididunt labor et dolore magna aliqua. Ut
-            enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
-            ut aliquip ex ea commo consequat irure{" "}
+            Một cửa hàng sneaker tốt cần cung cấp một loạt các sản phẩm từ nhiều
+            thương hiệu khác nhau và trong nhiều phân khúc giá. Điều này giúp
+            thu hút một đối tượng rộng lớn khách hàng và tạo ra sự lựa chọn cho
+            họ.
           </p>
         </div>
       </div>

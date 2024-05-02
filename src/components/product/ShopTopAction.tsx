@@ -37,8 +37,8 @@ const ShopTopAction: React.FC<ShopTopActionProps> = ({
             <option value="best-seller">{t("sort.best_seller")}</option>
             <option value="newest">{t("sort.newest")}</option>
             <option value="latest">{t("sort.oldest")}</option>
-            <option value="price">{t("sort.price_high_to_low")}</option>
-            <option value="price-desc">{t("sort.price_low_to_high")}</option>
+            <option value="price">{t("sort.price_low_to_high")}</option>
+            <option value="price-desc">{t("sort.price_high_to_low")}</option>
           </select>
         </div>
         <p>
