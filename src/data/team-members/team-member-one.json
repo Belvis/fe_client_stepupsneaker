@@ -1,38 +1,38 @@
 [
   {
     "id": "1",
-    "image": "/images/team/team-2.png",
+    "image": "https://res.cloudinary.com/dwoxggxq7/image/upload/v1714673826/oqnetmtreboira2lvonr.jpg",
     "fbLink": "//www.facebook.com",
     "twitterLink": "//www.twitter.com",
     "instagramLink": "//www.instagram.com",
-    "name": "Mr.Doãn Văn Đức",
-    "position": "Quản lý"
+    "name": "Doãn Văn Đức",
+    "position": "Lập trình viên/Kiểm thử viên"
   },
   {
     "id": "2",
-    "image": "/images/team/team-1.jpg",
+    "image": "https://res.cloudinary.com/dwoxggxq7/image/upload/v1714673826/vsdctqailcmsdyefiycu.jpg",
     "fbLink": "//www.facebook.com",
     "twitterLink": "//www.twitter.com",
     "instagramLink": "//www.instagram.com",
-    "name": "Mr.Nguyễn Anh Tuấn",
+    "name": "Nguyễn Anh Tuấn",
     "position": "Lập trình viên"
   },
   {
     "id": "3",
-    "image": "/images/team/team-3.png",
+    "image": "https://res.cloudinary.com/dwoxggxq7/image/upload/v1714673826/bzljzdlgwjxvwprf3ah5.jpg",
     "fbLink": "//www.facebook.com",
     "twitterLink": "//www.twitter.com",
     "instagramLink": "//www.instagram.com",
-    "name": "Ms.Trần Hậu Nguyên",
-    "position": "Nhà thiết kế"
+    "name": "Trần Hậu Nguyên",
+    "position": "Lập trình viên/Nhóm trưởng"
   },
   {
     "id": "4",
-    "image": "/images/team/team-4.png",
+    "image": "https://res.cloudinary.com/dwoxggxq7/image/upload/v1714673826/cytn7e9ty4j4xzwrgsc0.jpg",
     "fbLink": "//www.facebook.com",
     "twitterLink": "//www.twitter.com",
     "instagramLink": "//www.instagram.com",
-    "name": "Mr.Lê Văn Duy",
-    "position": "Chủ tịch"
+    "name": "Lê Văn Duy",
+    "position": "Lập trình viên"
   }
 ]
