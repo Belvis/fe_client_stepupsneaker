@@ -20,7 +20,17 @@ const TeamMemberOneSingle: React.FC<TeamMemberOneSingleProps> = ({
   return (
     <div className={clsx("team-wrapper", spaceBottomClass)}>
       <div className="team-img">
-        <img src={data.image} alt="" className="img-fluid" />
+        <img
+          src={data.image}
+          alt=""
+          className="img-fluid"
+          style={{
+            transform:
+              data.image === "/images/team/team-2.png"
+                ? "rotate(-90deg)"
+                : "none",
+          }}
+        />
         <div className="team-action">
           <a
             className="facebook"

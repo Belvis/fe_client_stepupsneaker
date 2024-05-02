@@ -1,7 +1,7 @@
 [
   {
     "id": "1",
-    "image": "/images/team/team-1.jpg",
+    "image": "/images/team/team-2.png",
     "fbLink": "//www.facebook.com",
     "twitterLink": "//www.twitter.com",
     "instagramLink": "//www.instagram.com",
@@ -10,7 +10,7 @@
   },
   {
     "id": "2",
-    "image": "/images/team/team-2.png",
+    "image": "/images/team/team-1.jpg",
     "fbLink": "//www.facebook.com",
     "twitterLink": "//www.twitter.com",
     "instagramLink": "//www.instagram.com",
